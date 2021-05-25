@@ -1,0 +1,1029 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		45BBBF2725A75151EDE1A93B /* Pods_Trivio___iOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5591293519E0D8B8D5DA658 /* Pods_Trivio___iOS_.framework */; };
+		89853B26F184F37AD648217E /* Pods_Trivio___macOS_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4874111A405031A5D98A046 /* Pods_Trivio___macOS_.framework */; };
+		8BC53852265B5DFF0099D05B /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53851265B5DFF0099D05B /* Tests_iOS.swift */; };
+		8BC5385D265B5DFF0099D05B /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC5385C265B5DFF0099D05B /* Tests_macOS.swift */; };
+		8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53836265B5DFA0099D05B /* Trivio_App.swift */; };
+		8BC53860265B5DFF0099D05B /* Trivio_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53836265B5DFA0099D05B /* Trivio_App.swift */; };
+		8BC53861265B5DFF0099D05B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53837265B5DFA0099D05B /* ContentView.swift */; };
+		8BC53862265B5DFF0099D05B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53837265B5DFA0099D05B /* ContentView.swift */; };
+		8BC53863265B5DFF0099D05B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BC53838265B5DFF0099D05B /* Assets.xcassets */; };
+		8BC53864265B5DFF0099D05B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BC53838265B5DFF0099D05B /* Assets.xcassets */; };
+		8BC5387B265B5F1B0099D05B /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53875265B5F1B0099D05B /* ExploreViewModel.swift */; };
+		8BC5387C265B5F1B0099D05B /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53875265B5F1B0099D05B /* ExploreViewModel.swift */; };
+		8BC5387D265B5F1B0099D05B /* ReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53876265B5F1B0099D05B /* ReportViewModel.swift */; };
+		8BC5387E265B5F1B0099D05B /* ReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53876265B5F1B0099D05B /* ReportViewModel.swift */; };
+		8BC5387F265B5F1B0099D05B /* GamesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53877265B5F1B0099D05B /* GamesViewModel.swift */; };
+		8BC53880265B5F1B0099D05B /* GamesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53877265B5F1B0099D05B /* GamesViewModel.swift */; };
+		8BC53881265B5F1B0099D05B /* BuildViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53878265B5F1B0099D05B /* BuildViewModel.swift */; };
+		8BC53882265B5F1B0099D05B /* BuildViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53878265B5F1B0099D05B /* BuildViewModel.swift */; };
+		8BC53883265B5F1B0099D05B /* ParticipantsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53879265B5F1B0099D05B /* ParticipantsViewModel.swift */; };
+		8BC53884265B5F1B0099D05B /* ParticipantsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53879265B5F1B0099D05B /* ParticipantsViewModel.swift */; };
+		8BC53885265B5F1B0099D05B /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC5387A265B5F1B0099D05B /* SearchViewModel.swift */; };
+		8BC53886265B5F1B0099D05B /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC5387A265B5F1B0099D05B /* SearchViewModel.swift */; };
+		8BC5388B265B5FFD0099D05B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BC5388A265B5FEF0099D05B /* GoogleService-Info.plist */; };
+		8BC5388C265B5FFE0099D05B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BC5388A265B5FEF0099D05B /* GoogleService-Info.plist */; };
+		8BC53897265B610F0099D05B /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53891265B610F0099D05B /* NumberFormatter.swift */; };
+		8BC53898265B610F0099D05B /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53891265B610F0099D05B /* NumberFormatter.swift */; };
+		8BC53899265B610F0099D05B /* FlexibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53892265B610F0099D05B /* FlexibleView.swift */; };
+		8BC5389A265B610F0099D05B /* FlexibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53892265B610F0099D05B /* FlexibleView.swift */; };
+		8BC5389B265B610F0099D05B /* SortDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53893265B610F0099D05B /* SortDictionary.swift */; };
+		8BC5389C265B610F0099D05B /* SortDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53893265B610F0099D05B /* SortDictionary.swift */; };
+		8BC5389D265B610F0099D05B /* SpeakerUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53894265B610F0099D05B /* SpeakerUtils.swift */; };
+		8BC5389E265B610F0099D05B /* SpeakerUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53894265B610F0099D05B /* SpeakerUtils.swift */; };
+		8BC5389F265B610F0099D05B /* MultiLineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53895265B610F0099D05B /* MultiLineTextField.swift */; };
+		8BC538A0265B610F0099D05B /* MultiLineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53895265B610F0099D05B /* MultiLineTextField.swift */; };
+		8BC538A1265B610F0099D05B /* KeyboardAdapt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53896265B610F0099D05B /* KeyboardAdapt.swift */; };
+		8BC538A2265B610F0099D05B /* KeyboardAdapt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53896265B610F0099D05B /* KeyboardAdapt.swift */; };
+		8BC538B0265B61C40099D05B /* GamePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A4265B61C40099D05B /* GamePreviewView.swift */; };
+		8BC538B1265B61C40099D05B /* GamePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A4265B61C40099D05B /* GamePreviewView.swift */; };
+		8BC538B2265B61C40099D05B /* FinalJeopardyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A5265B61C40099D05B /* FinalJeopardyView.swift */; };
+		8BC538B3265B61C40099D05B /* FinalJeopardyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A5265B61C40099D05B /* FinalJeopardyView.swift */; };
+		8BC538B4265B61C40099D05B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A6265B61C40099D05B /* ProfileView.swift */; };
+		8BC538B5265B61C40099D05B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A6265B61C40099D05B /* ProfileView.swift */; };
+		8BC538B6265B61C40099D05B /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A7265B61C40099D05B /* SearchView.swift */; };
+		8BC538B7265B61C40099D05B /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A7265B61C40099D05B /* SearchView.swift */; };
+		8BC538B8265B61C40099D05B /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A8265B61C40099D05B /* ReportsView.swift */; };
+		8BC538B9265B61C40099D05B /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A8265B61C40099D05B /* ReportsView.swift */; };
+		8BC538BA265B61C40099D05B /* ParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A9265B61C40099D05B /* ParticipantsView.swift */; };
+		8BC538BB265B61C40099D05B /* ParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538A9265B61C40099D05B /* ParticipantsView.swift */; };
+		8BC538BC265B61C40099D05B /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AA265B61C40099D05B /* SignInView.swift */; };
+		8BC538BD265B61C40099D05B /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AA265B61C40099D05B /* SignInView.swift */; };
+		8BC538BE265B61C40099D05B /* BuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AB265B61C40099D05B /* BuildView.swift */; };
+		8BC538BF265B61C40099D05B /* BuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AB265B61C40099D05B /* BuildView.swift */; };
+		8BC538C0265B61C40099D05B /* AnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AC265B61C40099D05B /* AnswerView.swift */; };
+		8BC538C1265B61C40099D05B /* AnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AC265B61C40099D05B /* AnswerView.swift */; };
+		8BC538C2265B61C40099D05B /* GamePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AD265B61C40099D05B /* GamePickerView.swift */; };
+		8BC538C3265B61C40099D05B /* GamePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AD265B61C40099D05B /* GamePickerView.swift */; };
+		8BC538C4265B61C40099D05B /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AE265B61C40099D05B /* ExploreView.swift */; };
+		8BC538C5265B61C40099D05B /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AE265B61C40099D05B /* ExploreView.swift */; };
+		8BC538C6265B61C40099D05B /* GameplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AF265B61C40099D05B /* GameplayView.swift */; };
+		8BC538C7265B61C40099D05B /* GameplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538AF265B61C40099D05B /* GameplayView.swift */; };
+		8BC538CE265B723E0099D05B /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538CC265B723D0099D05B /* DataModel.xcdatamodeld */; };
+		8BC538CF265B723E0099D05B /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538CC265B723D0099D05B /* DataModel.xcdatamodeld */; };
+		8BC538D4265B74340099D05B /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538D3265B74340099D05B /* Persistence.swift */; };
+		8BC538D5265B74340099D05B /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC538D3265B74340099D05B /* Persistence.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BC5384E265B5DFF0099D05B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BC53831265B5DFA0099D05B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BC5383C265B5DFF0099D05B;
+			remoteInfo = "Trivio! (iOS)";
+		};
+		8BC53859265B5DFF0099D05B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BC53831265B5DFA0099D05B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BC53844265B5DFF0099D05B;
+			remoteInfo = "Trivio! (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		16EDE0397014BCF73CF61CAB /* Pods-Trivio! (iOS).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (iOS).debug.xcconfig"; path = "Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS).debug.xcconfig"; sourceTree = "<group>"; };
+		264B6EBE8B96E61C3FE6EA4A /* Pods-Trivio! (macOS).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (macOS).debug.xcconfig"; path = "Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS).debug.xcconfig"; sourceTree = "<group>"; };
+		8B0CD264265C3193007D6738 /* FinalJeopardy.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = FinalJeopardy.mp3; sourceTree = "<group>"; };
+		8B0CD265265C3194007D6738 /* JeopardyTheme.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = JeopardyTheme.mp3; sourceTree = "<group>"; };
+		8B0CD266265C3195007D6738 /* dailyDouble.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = dailyDouble.m4a; sourceTree = "<group>"; };
+		8BC53836265B5DFA0099D05B /* Trivio_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trivio_App.swift; sourceTree = "<group>"; };
+		8BC53837265B5DFA0099D05B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8BC53838265B5DFF0099D05B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8BC5383D265B5DFF0099D05B /* Trivio!.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Trivio!.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC53840265B5DFF0099D05B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BC53845265B5DFF0099D05B /* Trivio!.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Trivio!.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC53847265B5DFF0099D05B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BC53848265B5DFF0099D05B /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		8BC5384D265B5DFF0099D05B /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC53851265B5DFF0099D05B /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
+		8BC53853265B5DFF0099D05B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BC53858265B5DFF0099D05B /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC5385C265B5DFF0099D05B /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
+		8BC5385E265B5DFF0099D05B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8BC53875265B5F1B0099D05B /* ExploreViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExploreViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/ExploreViewModel.swift"; sourceTree = "<group>"; };
+		8BC53876265B5F1B0099D05B /* ReportViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReportViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/ReportViewModel.swift"; sourceTree = "<group>"; };
+		8BC53877265B5F1B0099D05B /* GamesViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GamesViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/GamesViewModel.swift"; sourceTree = "<group>"; };
+		8BC53878265B5F1B0099D05B /* BuildViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BuildViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/BuildViewModel.swift"; sourceTree = "<group>"; };
+		8BC53879265B5F1B0099D05B /* ParticipantsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ParticipantsViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/ParticipantsViewModel.swift"; sourceTree = "<group>"; };
+		8BC5387A265B5F1B0099D05B /* SearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SearchViewModel.swift; path = "../../../../../../Desktop/Fun Things/Code/Safekeeping/View Models copy/SearchViewModel.swift"; sourceTree = "<group>"; };
+		8BC5388A265B5FEF0099D05B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8BC53891265B610F0099D05B /* NumberFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NumberFormatter.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/NumberFormatter.swift"; sourceTree = "<group>"; };
+		8BC53892265B610F0099D05B /* FlexibleView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FlexibleView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/FlexibleView.swift"; sourceTree = "<group>"; };
+		8BC53893265B610F0099D05B /* SortDictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SortDictionary.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/SortDictionary.swift"; sourceTree = "<group>"; };
+		8BC53894265B610F0099D05B /* SpeakerUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SpeakerUtils.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/SpeakerUtils.swift"; sourceTree = "<group>"; };
+		8BC53895265B610F0099D05B /* MultiLineTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MultiLineTextField.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/MultiLineTextField.swift"; sourceTree = "<group>"; };
+		8BC53896265B610F0099D05B /* KeyboardAdapt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = KeyboardAdapt.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Utils/KeyboardAdapt.swift"; sourceTree = "<group>"; };
+		8BC538A4265B61C40099D05B /* GamePreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GamePreviewView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/GamePreviewView.swift"; sourceTree = "<group>"; };
+		8BC538A5265B61C40099D05B /* FinalJeopardyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FinalJeopardyView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/FinalJeopardyView.swift"; sourceTree = "<group>"; };
+		8BC538A6265B61C40099D05B /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProfileView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/ProfileView.swift"; sourceTree = "<group>"; };
+		8BC538A7265B61C40099D05B /* SearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SearchView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/SearchView.swift"; sourceTree = "<group>"; };
+		8BC538A8265B61C40099D05B /* ReportsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReportsView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/ReportsView.swift"; sourceTree = "<group>"; };
+		8BC538A9265B61C40099D05B /* ParticipantsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ParticipantsView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/ParticipantsView.swift"; sourceTree = "<group>"; };
+		8BC538AA265B61C40099D05B /* SignInView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SignInView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/SignInView.swift"; sourceTree = "<group>"; };
+		8BC538AB265B61C40099D05B /* BuildView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BuildView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/BuildView.swift"; sourceTree = "<group>"; };
+		8BC538AC265B61C40099D05B /* AnswerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AnswerView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/AnswerView.swift"; sourceTree = "<group>"; };
+		8BC538AD265B61C40099D05B /* GamePickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GamePickerView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/GamePickerView.swift"; sourceTree = "<group>"; };
+		8BC538AE265B61C40099D05B /* ExploreView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExploreView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/ExploreView.swift"; sourceTree = "<group>"; };
+		8BC538AF265B61C40099D05B /* GameplayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameplayView.swift; path = "../../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Views/GameplayView.swift"; sourceTree = "<group>"; };
+		8BC538C8265B6F5F0099D05B /* Trivio Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Trivio Icon.png"; sourceTree = SOURCE_ROOT; };
+		8BC538CD265B723E0099D05B /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		8BC538D3265B74340099D05B /* Persistence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Persistence.swift; path = "../../../../../Desktop/Fun Things/Code/Jeoparty/Jeoparty/Persistence.swift"; sourceTree = "<group>"; };
+		A5A16B6E7299E29015DC5928 /* Pods-Trivio! (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (iOS).release.xcconfig"; path = "Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS).release.xcconfig"; sourceTree = "<group>"; };
+		E350FE4D2C3481EE95CB4020 /* Pods-Trivio! (macOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (macOS).release.xcconfig"; path = "Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS).release.xcconfig"; sourceTree = "<group>"; };
+		E4874111A405031A5D98A046 /* Pods_Trivio___macOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_Trivio___macOS_.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5591293519E0D8B8D5DA658 /* Pods_Trivio___iOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_Trivio___iOS_.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8BC5383A265B5DFF0099D05B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				45BBBF2725A75151EDE1A93B /* Pods_Trivio___iOS_.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53842265B5DFF0099D05B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				89853B26F184F37AD648217E /* Pods_Trivio___macOS_.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC5384A265B5DFF0099D05B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53855265B5DFF0099D05B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0E09110EEE602827FE691CA9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E5591293519E0D8B8D5DA658 /* Pods_Trivio___iOS_.framework */,
+				E4874111A405031A5D98A046 /* Pods_Trivio___macOS_.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8BC53830265B5DFA0099D05B = {
+			isa = PBXGroup;
+			children = (
+				8BC538C8265B6F5F0099D05B /* Trivio Icon.png */,
+				8B0CD265265C3194007D6738 /* JeopardyTheme.mp3 */,
+				8B0CD264265C3193007D6738 /* FinalJeopardy.mp3 */,
+				8B0CD266265C3195007D6738 /* dailyDouble.m4a */,
+				8BC53835265B5DFA0099D05B /* Shared */,
+				8BC5383F265B5DFF0099D05B /* iOS */,
+				8BC53846265B5DFF0099D05B /* macOS */,
+				8BC53850265B5DFF0099D05B /* Tests iOS */,
+				8BC5385B265B5DFF0099D05B /* Tests macOS */,
+				8BC5383E265B5DFF0099D05B /* Products */,
+				8E7B96C538B7EFF7DBFF17A1 /* Pods */,
+				0E09110EEE602827FE691CA9 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		8BC53835265B5DFA0099D05B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53890265B60F60099D05B /* Utils */,
+				8BC53874265B5EEB0099D05B /* View Models */,
+				8BC538A3265B61B40099D05B /* Views */,
+				8BC53836265B5DFA0099D05B /* Trivio_App.swift */,
+				8BC538D3265B74340099D05B /* Persistence.swift */,
+				8BC53837265B5DFA0099D05B /* ContentView.swift */,
+				8BC53838265B5DFF0099D05B /* Assets.xcassets */,
+				8BC5388A265B5FEF0099D05B /* GoogleService-Info.plist */,
+				8BC538CC265B723D0099D05B /* DataModel.xcdatamodeld */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		8BC5383E265B5DFF0099D05B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8BC5383D265B5DFF0099D05B /* Trivio!.app */,
+				8BC53845265B5DFF0099D05B /* Trivio!.app */,
+				8BC5384D265B5DFF0099D05B /* Tests iOS.xctest */,
+				8BC53858265B5DFF0099D05B /* Tests macOS.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8BC5383F265B5DFF0099D05B /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53840265B5DFF0099D05B /* Info.plist */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		8BC53846265B5DFF0099D05B /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53847265B5DFF0099D05B /* Info.plist */,
+				8BC53848265B5DFF0099D05B /* macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		8BC53850265B5DFF0099D05B /* Tests iOS */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53851265B5DFF0099D05B /* Tests_iOS.swift */,
+				8BC53853265B5DFF0099D05B /* Info.plist */,
+			);
+			path = "Tests iOS";
+			sourceTree = "<group>";
+		};
+		8BC5385B265B5DFF0099D05B /* Tests macOS */ = {
+			isa = PBXGroup;
+			children = (
+				8BC5385C265B5DFF0099D05B /* Tests_macOS.swift */,
+				8BC5385E265B5DFF0099D05B /* Info.plist */,
+			);
+			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
+		8BC53874265B5EEB0099D05B /* View Models */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53878265B5F1B0099D05B /* BuildViewModel.swift */,
+				8BC53875265B5F1B0099D05B /* ExploreViewModel.swift */,
+				8BC53877265B5F1B0099D05B /* GamesViewModel.swift */,
+				8BC53879265B5F1B0099D05B /* ParticipantsViewModel.swift */,
+				8BC53876265B5F1B0099D05B /* ReportViewModel.swift */,
+				8BC5387A265B5F1B0099D05B /* SearchViewModel.swift */,
+			);
+			path = "View Models";
+			sourceTree = "<group>";
+		};
+		8BC53890265B60F60099D05B /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				8BC53892265B610F0099D05B /* FlexibleView.swift */,
+				8BC53896265B610F0099D05B /* KeyboardAdapt.swift */,
+				8BC53895265B610F0099D05B /* MultiLineTextField.swift */,
+				8BC53891265B610F0099D05B /* NumberFormatter.swift */,
+				8BC53893265B610F0099D05B /* SortDictionary.swift */,
+				8BC53894265B610F0099D05B /* SpeakerUtils.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		8BC538A3265B61B40099D05B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				8BC538AA265B61C40099D05B /* SignInView.swift */,
+				8BC538AB265B61C40099D05B /* BuildView.swift */,
+				8BC538AE265B61C40099D05B /* ExploreView.swift */,
+				8BC538A5265B61C40099D05B /* FinalJeopardyView.swift */,
+				8BC538AD265B61C40099D05B /* GamePickerView.swift */,
+				8BC538AF265B61C40099D05B /* GameplayView.swift */,
+				8BC538AC265B61C40099D05B /* AnswerView.swift */,
+				8BC538A4265B61C40099D05B /* GamePreviewView.swift */,
+				8BC538A9265B61C40099D05B /* ParticipantsView.swift */,
+				8BC538A6265B61C40099D05B /* ProfileView.swift */,
+				8BC538A8265B61C40099D05B /* ReportsView.swift */,
+				8BC538A7265B61C40099D05B /* SearchView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		8E7B96C538B7EFF7DBFF17A1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				16EDE0397014BCF73CF61CAB /* Pods-Trivio! (iOS).debug.xcconfig */,
+				A5A16B6E7299E29015DC5928 /* Pods-Trivio! (iOS).release.xcconfig */,
+				264B6EBE8B96E61C3FE6EA4A /* Pods-Trivio! (macOS).debug.xcconfig */,
+				E350FE4D2C3481EE95CB4020 /* Pods-Trivio! (macOS).release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8BC5383C265B5DFF0099D05B /* Trivio! (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BC53867265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Trivio! (iOS)" */;
+			buildPhases = (
+				D0E5BA3DBA16D526F68E07DF /* [CP] Check Pods Manifest.lock */,
+				8BC53839265B5DFF0099D05B /* Sources */,
+				8BC5383A265B5DFF0099D05B /* Frameworks */,
+				8BC5383B265B5DFF0099D05B /* Resources */,
+				036899656799B5E900E8C999 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Trivio! (iOS)";
+			productName = "Trivio! (iOS)";
+			productReference = 8BC5383D265B5DFF0099D05B /* Trivio!.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8BC53844265B5DFF0099D05B /* Trivio! (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BC5386A265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Trivio! (macOS)" */;
+			buildPhases = (
+				4F351C514A4674F61998BFEF /* [CP] Check Pods Manifest.lock */,
+				8BC53841265B5DFF0099D05B /* Sources */,
+				8BC53842265B5DFF0099D05B /* Frameworks */,
+				8BC53843265B5DFF0099D05B /* Resources */,
+				CFFF8A5F54046CAA6FEB3C03 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Trivio! (macOS)";
+			productName = "Trivio! (macOS)";
+			productReference = 8BC53845265B5DFF0099D05B /* Trivio!.app */;
+			productType = "com.apple.product-type.application";
+		};
+		8BC5384C265B5DFF0099D05B /* Tests iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BC5386D265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildPhases = (
+				8BC53849265B5DFF0099D05B /* Sources */,
+				8BC5384A265B5DFF0099D05B /* Frameworks */,
+				8BC5384B265B5DFF0099D05B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8BC5384F265B5DFF0099D05B /* PBXTargetDependency */,
+			);
+			name = "Tests iOS";
+			productName = "Tests iOS";
+			productReference = 8BC5384D265B5DFF0099D05B /* Tests iOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		8BC53857265B5DFF0099D05B /* Tests macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8BC53870265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Tests macOS" */;
+			buildPhases = (
+				8BC53854265B5DFF0099D05B /* Sources */,
+				8BC53855265B5DFF0099D05B /* Frameworks */,
+				8BC53856265B5DFF0099D05B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8BC5385A265B5DFF0099D05B /* PBXTargetDependency */,
+			);
+			name = "Tests macOS";
+			productName = "Tests macOS";
+			productReference = 8BC53858265B5DFF0099D05B /* Tests macOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8BC53831265B5DFA0099D05B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				TargetAttributes = {
+					8BC5383C265B5DFF0099D05B = {
+						CreatedOnToolsVersion = 12.5;
+					};
+					8BC53844265B5DFF0099D05B = {
+						CreatedOnToolsVersion = 12.5;
+					};
+					8BC5384C265B5DFF0099D05B = {
+						CreatedOnToolsVersion = 12.5;
+						TestTargetID = 8BC5383C265B5DFF0099D05B;
+					};
+					8BC53857265B5DFF0099D05B = {
+						CreatedOnToolsVersion = 12.5;
+						TestTargetID = 8BC53844265B5DFF0099D05B;
+					};
+				};
+			};
+			buildConfigurationList = 8BC53834265B5DFA0099D05B /* Build configuration list for PBXProject "Trivio!" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8BC53830265B5DFA0099D05B;
+			productRefGroup = 8BC5383E265B5DFF0099D05B /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8BC5383C265B5DFF0099D05B /* Trivio! (iOS) */,
+				8BC53844265B5DFF0099D05B /* Trivio! (macOS) */,
+				8BC5384C265B5DFF0099D05B /* Tests iOS */,
+				8BC53857265B5DFF0099D05B /* Tests macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8BC5383B265B5DFF0099D05B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC5388B265B5FFD0099D05B /* GoogleService-Info.plist in Resources */,
+				8BC53863265B5DFF0099D05B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53843265B5DFF0099D05B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC5388C265B5FFE0099D05B /* GoogleService-Info.plist in Resources */,
+				8BC53864265B5DFF0099D05B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC5384B265B5DFF0099D05B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53856265B5DFF0099D05B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		036899656799B5E900E8C999 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4F351C514A4674F61998BFEF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Trivio! (macOS)-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CFFF8A5F54046CAA6FEB3C03 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS)-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS)-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS)-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D0E5BA3DBA16D526F68E07DF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Trivio! (iOS)-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8BC53839265B5DFF0099D05B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC5387D265B5F1B0099D05B /* ReportViewModel.swift in Sources */,
+				8BC53881265B5F1B0099D05B /* BuildViewModel.swift in Sources */,
+				8BC538B0265B61C40099D05B /* GamePreviewView.swift in Sources */,
+				8BC53885265B5F1B0099D05B /* SearchViewModel.swift in Sources */,
+				8BC53883265B5F1B0099D05B /* ParticipantsViewModel.swift in Sources */,
+				8BC538B2265B61C40099D05B /* FinalJeopardyView.swift in Sources */,
+				8BC538BA265B61C40099D05B /* ParticipantsView.swift in Sources */,
+				8BC5387B265B5F1B0099D05B /* ExploreViewModel.swift in Sources */,
+				8BC5389D265B610F0099D05B /* SpeakerUtils.swift in Sources */,
+				8BC53899265B610F0099D05B /* FlexibleView.swift in Sources */,
+				8BC538B4265B61C40099D05B /* ProfileView.swift in Sources */,
+				8BC538C0265B61C40099D05B /* AnswerView.swift in Sources */,
+				8BC538B6265B61C40099D05B /* SearchView.swift in Sources */,
+				8BC53861265B5DFF0099D05B /* ContentView.swift in Sources */,
+				8BC538C4265B61C40099D05B /* ExploreView.swift in Sources */,
+				8BC538B8265B61C40099D05B /* ReportsView.swift in Sources */,
+				8BC538C6265B61C40099D05B /* GameplayView.swift in Sources */,
+				8BC538D4265B74340099D05B /* Persistence.swift in Sources */,
+				8BC5387F265B5F1B0099D05B /* GamesViewModel.swift in Sources */,
+				8BC538BC265B61C40099D05B /* SignInView.swift in Sources */,
+				8BC53897265B610F0099D05B /* NumberFormatter.swift in Sources */,
+				8BC538C2265B61C40099D05B /* GamePickerView.swift in Sources */,
+				8BC5389B265B610F0099D05B /* SortDictionary.swift in Sources */,
+				8BC538A1265B610F0099D05B /* KeyboardAdapt.swift in Sources */,
+				8BC5389F265B610F0099D05B /* MultiLineTextField.swift in Sources */,
+				8BC538CE265B723E0099D05B /* DataModel.xcdatamodeld in Sources */,
+				8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */,
+				8BC538BE265B61C40099D05B /* BuildView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53841265B5DFF0099D05B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC5387E265B5F1B0099D05B /* ReportViewModel.swift in Sources */,
+				8BC53882265B5F1B0099D05B /* BuildViewModel.swift in Sources */,
+				8BC538B1265B61C40099D05B /* GamePreviewView.swift in Sources */,
+				8BC53886265B5F1B0099D05B /* SearchViewModel.swift in Sources */,
+				8BC53884265B5F1B0099D05B /* ParticipantsViewModel.swift in Sources */,
+				8BC538B3265B61C40099D05B /* FinalJeopardyView.swift in Sources */,
+				8BC538BB265B61C40099D05B /* ParticipantsView.swift in Sources */,
+				8BC5387C265B5F1B0099D05B /* ExploreViewModel.swift in Sources */,
+				8BC5389E265B610F0099D05B /* SpeakerUtils.swift in Sources */,
+				8BC5389A265B610F0099D05B /* FlexibleView.swift in Sources */,
+				8BC538B5265B61C40099D05B /* ProfileView.swift in Sources */,
+				8BC538C1265B61C40099D05B /* AnswerView.swift in Sources */,
+				8BC538B7265B61C40099D05B /* SearchView.swift in Sources */,
+				8BC53862265B5DFF0099D05B /* ContentView.swift in Sources */,
+				8BC538C5265B61C40099D05B /* ExploreView.swift in Sources */,
+				8BC538B9265B61C40099D05B /* ReportsView.swift in Sources */,
+				8BC538C7265B61C40099D05B /* GameplayView.swift in Sources */,
+				8BC538D5265B74340099D05B /* Persistence.swift in Sources */,
+				8BC53880265B5F1B0099D05B /* GamesViewModel.swift in Sources */,
+				8BC538BD265B61C40099D05B /* SignInView.swift in Sources */,
+				8BC53898265B610F0099D05B /* NumberFormatter.swift in Sources */,
+				8BC538C3265B61C40099D05B /* GamePickerView.swift in Sources */,
+				8BC5389C265B610F0099D05B /* SortDictionary.swift in Sources */,
+				8BC538A2265B610F0099D05B /* KeyboardAdapt.swift in Sources */,
+				8BC538A0265B610F0099D05B /* MultiLineTextField.swift in Sources */,
+				8BC538CF265B723E0099D05B /* DataModel.xcdatamodeld in Sources */,
+				8BC53860265B5DFF0099D05B /* Trivio_App.swift in Sources */,
+				8BC538BF265B61C40099D05B /* BuildView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53849265B5DFF0099D05B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC53852265B5DFF0099D05B /* Tests_iOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8BC53854265B5DFF0099D05B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8BC5385D265B5DFF0099D05B /* Tests_macOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8BC5384F265B5DFF0099D05B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BC5383C265B5DFF0099D05B /* Trivio! (iOS) */;
+			targetProxy = 8BC5384E265B5DFF0099D05B /* PBXContainerItemProxy */;
+		};
+		8BC5385A265B5DFF0099D05B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BC53844265B5DFF0099D05B /* Trivio! (macOS) */;
+			targetProxy = 8BC53859265B5DFF0099D05B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		8BC53865265B5DFF0099D05B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		8BC53866265B5DFF0099D05B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		8BC53868265B5DFF0099D05B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 16EDE0397014BCF73CF61CAB /* Pods-Trivio! (iOS).debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-";
+				PRODUCT_NAME = "Trivio!";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		8BC53869265B5DFF0099D05B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A5A16B6E7299E29015DC5928 /* Pods-Trivio! (iOS).release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-";
+				PRODUCT_NAME = "Trivio!";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8BC5386B265B5DFF0099D05B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 264B6EBE8B96E61C3FE6EA4A /* Pods-Trivio! (macOS).debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-";
+				PRODUCT_NAME = "Trivio!";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8BC5386C265B5DFF0099D05B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E350FE4D2C3481EE95CB4020 /* Pods-Trivio! (macOS).release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = macOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-";
+				PRODUCT_NAME = "Trivio!";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		8BC5386E265B5DFF0099D05B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				INFOPLIST_FILE = "Tests iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Trivio! (iOS)";
+			};
+			name = Debug;
+		};
+		8BC5386F265B5DFF0099D05B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				INFOPLIST_FILE = "Tests iOS/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Trivio! (iOS)";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8BC53871265B5DFF0099D05B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				INFOPLIST_FILE = "Tests macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Trivio! (macOS)";
+			};
+			name = Debug;
+		};
+		8BC53872265B5DFF0099D05B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 9976LKZKCG;
+				INFOPLIST_FILE = "Tests macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "Trivio! (macOS)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8BC53834265B5DFA0099D05B /* Build configuration list for PBXProject "Trivio!" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC53865265B5DFF0099D05B /* Debug */,
+				8BC53866265B5DFF0099D05B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BC53867265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Trivio! (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC53868265B5DFF0099D05B /* Debug */,
+				8BC53869265B5DFF0099D05B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BC5386A265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Trivio! (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC5386B265B5DFF0099D05B /* Debug */,
+				8BC5386C265B5DFF0099D05B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BC5386D265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC5386E265B5DFF0099D05B /* Debug */,
+				8BC5386F265B5DFF0099D05B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8BC53870265B5DFF0099D05B /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8BC53871265B5DFF0099D05B /* Debug */,
+				8BC53872265B5DFF0099D05B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		8BC538CC265B723D0099D05B /* DataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				8BC538CD265B723E0099D05B /* DataModel.xcdatamodel */,
+			);
+			currentVersion = 8BC538CD265B723E0099D05B /* DataModel.xcdatamodel */;
+			path = DataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 8BC53831265B5DFA0099D05B /* Project object */;
+}
