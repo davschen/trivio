@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import Firebase
 import FirebaseFirestoreSwift
 
@@ -147,4 +148,8 @@ class ProfileViewModel: ObservableObject {
         NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
         try? Auth.auth().signOut()
     }
+}
+
+enum DeviceType {
+    case iPad, iPhone
 }

@@ -10,14 +10,17 @@ import CoreData
 
 struct ContentView: View {
     @State var isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false
+    @ObservedObject var masterHandler = MasterHandler()
     
     var body: some View {
         ZStack {
             if !isLoggedIn {
                 SignInView(isLoggedIn: $isLoggedIn)
                     .foregroundColor(.white)
+                    .environmentObject(masterHandler)
             } else {
-                HomePageView() 
+                HomePageView()
+                    .environmentObject(masterHandler)
             }
         }
         .onAppear {
