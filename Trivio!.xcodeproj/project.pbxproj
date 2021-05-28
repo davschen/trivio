@@ -15,6 +15,8 @@
 		8B9B0699265CA2C700758036 /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B0697265CA2C700758036 /* HomePageView.swift */; };
 		8B9B069C265CC41E00758036 /* MasterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B069B265CC41E00758036 /* MasterHandler.swift */; };
 		8B9B069D265CC41E00758036 /* MasterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B069B265CC41E00758036 /* MasterHandler.swift */; };
+		8B9B069F265FFC8700758036 /* AlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B069E265FFC8700758036 /* AlertView.swift */; };
+		8B9B06A0265FFC8800758036 /* AlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B069E265FFC8700758036 /* AlertView.swift */; };
 		8BC53852265B5DFF0099D05B /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53851265B5DFF0099D05B /* Tests_iOS.swift */; };
 		8BC5385D265B5DFF0099D05B /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC5385C265B5DFF0099D05B /* Tests_macOS.swift */; };
 		8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53836265B5DFA0099D05B /* Trivio_App.swift */; };
@@ -105,6 +107,7 @@
 		8B9B0694265C9B4500758036 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8B9B0697265CA2C700758036 /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		8B9B069B265CC41E00758036 /* MasterHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterHandler.swift; sourceTree = "<group>"; };
+		8B9B069E265FFC8700758036 /* AlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertView.swift; sourceTree = "<group>"; };
 		8BC53836265B5DFA0099D05B /* Trivio_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trivio_App.swift; sourceTree = "<group>"; };
 		8BC53837265B5DFA0099D05B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8BC53838265B5DFF0099D05B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -320,6 +323,7 @@
 				8BC538A7265B61C40099D05B /* SearchView.swift */,
 				8BC538AB265B61C40099D05B /* BuildView.swift */,
 				8BC538A6265B61C40099D05B /* ProfileView.swift */,
+				8B9B069E265FFC8700758036 /* AlertView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -608,6 +612,7 @@
 				8BC538A1265B610F0099D05B /* KeyboardAdapt.swift in Sources */,
 				8BC5389F265B610F0099D05B /* MultiLineTextField.swift in Sources */,
 				8BC538CE265B723E0099D05B /* DataModel.xcdatamodeld in Sources */,
+				8B9B069F265FFC8700758036 /* AlertView.swift in Sources */,
 				8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */,
 				8BC538BE265B61C40099D05B /* BuildView.swift in Sources */,
 			);
@@ -646,6 +651,7 @@
 				8BC538A2265B610F0099D05B /* KeyboardAdapt.swift in Sources */,
 				8BC538A0265B610F0099D05B /* MultiLineTextField.swift in Sources */,
 				8BC538CF265B723E0099D05B /* DataModel.xcdatamodeld in Sources */,
+				8B9B06A0265FFC8800758036 /* AlertView.swift in Sources */,
 				8BC53860265B5DFF0099D05B /* Trivio_App.swift in Sources */,
 				8BC538BF265B61C40099D05B /* BuildView.swift in Sources */,
 			);

@@ -20,8 +20,10 @@ class ProfileViewModel: ObservableObject {
     private var db = Firestore.firestore()
     
     init() {
-        getPlayedGames()
-        getUserInfo()
+        if let _ = Auth.auth().currentUser?.uid {
+            getPlayedGames()
+            getUserInfo()
+        }
     }
     
     func getPlayedGames() {
@@ -98,6 +100,17 @@ class ProfileViewModel: ObservableObject {
                 }
             } else {
                 completion(true)
+            }
+        }
+    }
+    
+    func checkUsernameValidWithHandler(completion: @escaping (Bool) -> Void) {
+        checkUsernameExists { (success) -> Void in
+            if success && !self.username.isEmpty && self.checkForbiddenChars().isEmpty {
+                completion(true)
+            } else {
+                self.usernameValid = false
+                completion(false)
             }
         }
     }

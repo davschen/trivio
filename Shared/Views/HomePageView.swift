@@ -9,80 +9,84 @@ import Foundation
 import SwiftUI
 
 struct HomePageView: View {
-    @EnvironmentObject var masterHandler: MasterHandler
-    @ObservedObject var buildVM = BuildViewModel()
-    @ObservedObject var exploreVM = ExploreViewModel()
-    @ObservedObject var gamesVM = GamesViewModel()
-    @ObservedObject var participantsVM = ParticipantsViewModel()
-    @ObservedObject var profileVM = ProfileViewModel()
-    @ObservedObject var reportVM = ReportViewModel()
-    @ObservedObject var searchVM = SearchViewModel()
-    
-    var formatter = MasterHandler()
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var reportVM: ReportViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var searchVM: SearchViewModel
     
     var body: some View {
         VStack (spacing: 0) {
             ZStack (alignment: .bottomLeading) {
                 Color("MainBG")
                     .edgesIgnoringSafeArea(.all)
-                switch gamesVM.menuChoice {
-                case .explore:
-                    ExploreView()
-                        .environmentObject(gamesVM)
-                        .environmentObject(exploreVM)
-                        .environmentObject(participantsVM)
-                        .environmentObject(profileVM)
-                case .game:
-                    GameplayView()
-                        .environmentObject(buildVM)
-                        .environmentObject(gamesVM)
-                        .environmentObject(participantsVM)
-                        .environmentObject(profileVM)
-                case .participants:
-                    ParticipantsView()
-                        .environmentObject(participantsVM)
-                case .gamepicker:
-                    GamePickerView()
-                        .environmentObject(gamesVM)
-                        .environmentObject(participantsVM)
-                        .environmentObject(profileVM)
-                        .environmentObject(searchVM)
-                case .reports:
-                    ReportsView()
-                        .environmentObject(reportVM)
-                default:
-                    ProfileView()
-                        .environmentObject(buildVM)
-                        .environmentObject(gamesVM)
-                        .environmentObject(participantsVM)
-                        .environmentObject(profileVM)
-                        .environmentObject(reportVM)
-                        .environmentObject(searchVM)
-                }
-                if formatter.deviceType == .iPhone {
-                    Button (action: {
-                        gamesVM.showingTabBar.toggle()
-                    }) {
-                        ZStack {
-                            Color.white
-                                .opacity(0.2)
-                                .frame(width: 40, height: 40)
-                            Image(systemName: "chevron.up")
+                MainView()
+                    .environmentObject(buildVM)
+                    .environmentObject(exploreVM)
+                    .environmentObject(gamesVM)
+                    .environmentObject(participantsVM)
+                    .environmentObject(profileVM)
+                    .environmentObject(reportVM)
+                    .environmentObject(searchVM)
+                if formatter.deviceType == .iPhone && !formatter.showingAlert {
+                    HStack {
+                        Button (action: {
+                            formatter.showingTabBar.toggle()
+                        }) {
+                            ZStack {
+                                Color.white
+                                    .opacity(0.2)
+                                    .frame(width: 40, height: 40)
+                                Image(systemName: "chevron.up")
+                            }
+                            .clipShape(Circle())
+                            .rotationEffect(Angle(degrees: formatter.showingTabBar ? 180 : 0))
                         }
-                        .clipShape(Circle())
-                        .rotationEffect(Angle(degrees: gamesVM.showingTabBar ? 180 : 0))
+                        .offset(x: -30)
+                        .padding()
                     }
-                    .padding()
                 }
+                AlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
+                    formatter.alertAction()
+                })
             }
-            if gamesVM.showingTabBar {
+            .padding(formatter.shrink(iPadSize: 30, factor: 3))
+            if formatter.showingTabBar {
                 TabBarView()
                     .environmentObject(gamesVM)
             }
         }
-        .animation(.easeInOut)
-        .foregroundColor(.white)
         .edgesIgnoringSafeArea(.bottom)
+    }
+}
+
+struct MainView: View {
+    @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var reportVM: ReportViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var searchVM: SearchViewModel
+    
+    var body: some View {
+        switch gamesVM.menuChoice {
+        case .explore:
+            ExploreView()
+        case .game:
+            GameplayView()
+        case .participants:
+            ParticipantsView()
+        case .gamepicker:
+            GamePickerView()
+        case .reports:
+            ReportsView()
+        default:
+            ProfileView()
+        }
     }
 }
 
@@ -90,7 +94,7 @@ struct TabBarView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @State var hasHack = UserDefaults.standard.value(forKey: "hasHack") as? Bool ?? false
     
-    var formatter = MasterHandler()
+    @EnvironmentObject var formatter: MasterHandler
     
     var body: some View {
         ZStack {
@@ -117,21 +121,22 @@ struct TabBarView: View {
                     .onTapGesture {
                         gamesVM.menuChoice = .game
                         if formatter.deviceType == .iPhone {
-                            gamesVM.showingTabBar.toggle()
+                            formatter.showingTabBar.toggle()
                         }
                     }
                 Image(systemName: gamesVM.menuChoice == .profile ? "person.circle.fill" : "person.circle")
                     .foregroundColor(gamesVM.menuChoice == .profile ? .blue : .gray)
                     .onTapGesture {
                         gamesVM.menuChoice = .profile
+                        if formatter.deviceType == .iPhone {
+                            formatter.showingTabBar.toggle()
+                        }
                     }
             }
-            
         }
         .font(.system(size: 20))
-        .padding(.vertical, 15)
         .padding(.bottom, 10)
-        .frame(height: 70)
+        .frame(height: formatter.shrink(iPadSize: 70, factor: 1.3))
         .frame(maxWidth: .infinity)
         .background(Color("DarkGray"))
         .shadow(color: Color.black.opacity(0.1), radius: 10)

@@ -10,19 +10,38 @@ import CoreData
 
 struct ContentView: View {
     @State var isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false
-    @ObservedObject var masterHandler = MasterHandler()
+    @ObservedObject var formatter = MasterHandler()
+    @ObservedObject var buildVM = BuildViewModel()
+    @ObservedObject var exploreVM = ExploreViewModel()
+    @ObservedObject var gamesVM = GamesViewModel()
+    @ObservedObject var participantsVM = ParticipantsViewModel()
+    @ObservedObject var profileVM = ProfileViewModel()
+    @ObservedObject var reportVM = ReportViewModel()
+    @ObservedObject var searchVM = SearchViewModel()
     
     var body: some View {
         ZStack {
+            Color("MainBG")
+                .edgesIgnoringSafeArea(.all)
+            
             if !isLoggedIn {
                 SignInView(isLoggedIn: $isLoggedIn)
                     .foregroundColor(.white)
-                    .environmentObject(masterHandler)
+                    .environmentObject(formatter)
             } else {
                 HomePageView()
-                    .environmentObject(masterHandler)
+                    .environmentObject(formatter)
+                    .environmentObject(buildVM)
+                    .environmentObject(exploreVM)
+                    .environmentObject(gamesVM)
+                    .environmentObject(participantsVM)
+                    .environmentObject(profileVM)
+                    .environmentObject(reportVM)
+                    .environmentObject(searchVM)
             }
         }
+        .foregroundColor(.white)
+        .animation(.easeInOut)
         .onAppear {
             NotificationCenter.default.addObserver(forName: NSNotification.Name("LogInStatusChange"), object: nil, queue: .main) { (_) in
                 let isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false
