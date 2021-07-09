@@ -12,18 +12,17 @@ import FirebaseFirestoreSwift
 
 class ProfileViewModel: ObservableObject {
     @Published var playedGames = [String]()
-    @Published var menuSelectedItem = "My Sets"
+    @Published var menuSelectedItem = "Summary"
     @Published var username = "" 
     @Published var name = ""
     @Published var usernameValid = false
+    @Published var drafts = [CustomSet]()
     
     private var db = Firestore.firestore()
     
     init() {
-        if let _ = Auth.auth().currentUser?.uid {
-            getPlayedGames()
-            getUserInfo()
-        }
+        getPlayedGames()
+        getUserInfo()
     }
     
     func getPlayedGames() {
@@ -34,7 +33,6 @@ class ProfileViewModel: ObservableObject {
             }
             guard let snap = snap else { return }
             snap.documentChanges.forEach { (diff) in
-                print(diff.document.data())
                 guard let playedGame = diff.document.get("gameID") as? String else { return }
                 if diff.type == .added {
                     self.playedGames.append(playedGame)
@@ -126,7 +124,8 @@ class ProfileViewModel: ObservableObject {
     }
     
     func getUserInfo() {
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "NID").addSnapshotListener { (docSnap, error) in
+        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        db.collection("users").document(myUID).addSnapshotListener { (docSnap, error) in
             if error != nil { return }
             guard let doc = docSnap else { return }
             let name = doc.get("name") as? String ?? ""
@@ -135,6 +134,16 @@ class ProfileViewModel: ObservableObject {
                 self.name = name
                 self.username = username
             }
+        }
+        db.collection("drafts")
+            .whereField("userID", isEqualTo: myUID)
+            .order(by: "dateCreated", descending: true)
+            .addSnapshotListener { snap, error in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            self.drafts = data.compactMap({ (queryDocSnap) -> CustomSet? in
+                return try? queryDocSnap.data(as: CustomSet.self)
+            })
         }
     }
     

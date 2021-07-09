@@ -9,21 +9,22 @@ import Foundation
 import SwiftUI
 
 struct HomePageView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var exploreVM: ExploreViewModel
-    @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var reportVM: ReportViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @EnvironmentObject var searchVM: SearchViewModel
+    @ObservedObject var formatter = MasterHandler()
+    @ObservedObject var buildVM = BuildViewModel()
+    @ObservedObject var exploreVM = ExploreViewModel()
+    @ObservedObject var gamesVM = GamesViewModel()
+    @ObservedObject var participantsVM = ParticipantsViewModel()
+    @ObservedObject var profileVM = ProfileViewModel()
+    @ObservedObject var reportVM = ReportViewModel()
+    @ObservedObject var searchVM = SearchViewModel()
     
     var body: some View {
         VStack (spacing: 0) {
             ZStack (alignment: .bottomLeading) {
-                Color("MainBG")
+                formatter.color(.primaryBG)
                     .edgesIgnoringSafeArea(.all)
                 MainView()
+                    .environmentObject(formatter)
                     .environmentObject(buildVM)
                     .environmentObject(exploreVM)
                     .environmentObject(gamesVM)
@@ -32,30 +33,31 @@ struct HomePageView: View {
                     .environmentObject(reportVM)
                     .environmentObject(searchVM)
                 if formatter.deviceType == .iPhone && !formatter.showingAlert {
-                    HStack {
-                        Button (action: {
-                            formatter.showingTabBar.toggle()
-                        }) {
-                            ZStack {
-                                Color.white
-                                    .opacity(0.2)
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: "chevron.up")
-                            }
-                            .clipShape(Circle())
-                            .rotationEffect(Angle(degrees: formatter.showingTabBar ? 180 : 0))
+                    Button (action: {
+                        formatter.showingTabBar.toggle()
+                    }) {
+                        HStack (spacing: 3) {
+                            Text("Menu")
+                            Image(systemName: "chevron.up")
+                                .rotationEffect(Angle(degrees: formatter.showingTabBar ? 180 : 0))
                         }
-                        .offset(x: -30)
-                        .padding()
+                        .padding(formatter.padding())
+                        .font(formatter.customFont(weight: "Bold", iPadSize: 15))
+                        .background(Color.white.opacity(0.4))
+                        .clipShape(Capsule())
                     }
                 }
                 AlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                     formatter.alertAction()
-                })
+                }, hasSecondaryAction: formatter.hasSecondaryAction, secondaryAction: {
+                    formatter.secondaryAction()
+                }, secondaryActionLabel: formatter.secondaryActionLabel)
+                .environmentObject(formatter)
             }
-            .padding(formatter.shrink(iPadSize: 30, factor: 3))
+            
             if formatter.showingTabBar {
                 TabBarView()
+                    .environmentObject(formatter)
                     .environmentObject(gamesVM)
             }
         }
@@ -91,55 +93,54 @@ struct MainView: View {
 }
 
 struct TabBarView: View {
-    @EnvironmentObject var gamesVM: GamesViewModel
-    @State var hasHack = UserDefaults.standard.value(forKey: "hasHack") as? Bool ?? false
-    
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @State var isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
     
     var body: some View {
         ZStack {
-            HStack (spacing: 30) {
-                Image(systemName: gamesVM.menuChoice == .explore ? "magnifyingglass.circle.fill" : "magnifyingglass.circle")
-                    .foregroundColor(gamesVM.menuChoice == .explore ? .blue : .gray)
-                    .onTapGesture {
-                        gamesVM.menuChoice = .explore
-                    }
-                if hasHack {
-                    Image(systemName: gamesVM.menuChoice == .gamepicker ? "square.grid.3x2.fill" : "square.grid.3x2")
-                        .foregroundColor(gamesVM.menuChoice == .gamepicker ? .blue : .gray)
-                        .onTapGesture {
-                            gamesVM.menuChoice = .gamepicker
-                        }
+            HStack (spacing: 70) {
+                TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "magnifyingglass", selectedIconName: "magnifyingglass", myMenuChoice: .explore)
+                if isVIP {
+                    TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "square.grid.3x2", selectedIconName: "square.grid.3x2.fill", myMenuChoice: .gamepicker)
                 }
-                Image(systemName: gamesVM.menuChoice == .participants ? "person.3.fill" : "person.3")
-                    .foregroundColor(gamesVM.menuChoice == .participants ? .blue : .gray)
-                    .onTapGesture {
-                        gamesVM.menuChoice = .participants
-                    }
-                Image(systemName: gamesVM.menuChoice == .game ? "gamecontroller.fill" : "gamecontroller")
-                    .foregroundColor(gamesVM.menuChoice == .game ? .blue : .gray)
-                    .onTapGesture {
-                        gamesVM.menuChoice = .game
-                        if formatter.deviceType == .iPhone {
-                            formatter.showingTabBar.toggle()
-                        }
-                    }
-                Image(systemName: gamesVM.menuChoice == .profile ? "person.circle.fill" : "person.circle")
-                    .foregroundColor(gamesVM.menuChoice == .profile ? .blue : .gray)
-                    .onTapGesture {
-                        gamesVM.menuChoice = .profile
-                        if formatter.deviceType == .iPhone {
-                            formatter.showingTabBar.toggle()
-                        }
-                    }
+                TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "person.3", selectedIconName: "person.3.fill", myMenuChoice: .participants)
+                TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "gamecontroller", selectedIconName: "gamecontroller.fill", myMenuChoice: .game)
+                TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "person.circle", selectedIconName: "person.circle.fill", myMenuChoice: .profile)
             }
         }
-        .font(.system(size: 20))
         .padding(.bottom, 10)
-        .frame(height: formatter.shrink(iPadSize: 70, factor: 1.3))
+        .frame(height: 90)
         .frame(maxWidth: .infinity)
-        .background(Color("DarkGray"))
+        .background(formatter.color(.primaryFG))
         .shadow(color: Color.black.opacity(0.1), radius: 10)
         .edgesIgnoringSafeArea(.all)
+    }
+}
+
+struct TabBarItemView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @Binding var menuChoice: MenuChoice
+    
+    let deselectedIconName: String
+    let selectedIconName: String
+    let myMenuChoice: MenuChoice
+    
+    var body: some View {
+        VStack {
+            Image(systemName: self.menuChoice == myMenuChoice ? selectedIconName : deselectedIconName)
+                .font(.system(size: 20))
+                .foregroundColor(formatter.color(self.menuChoice == myMenuChoice ? .highContrastWhite : .mediumContrastWhite))
+                .onTapGesture {
+                    self.menuChoice = myMenuChoice
+                }
+            if menuChoice == myMenuChoice {
+                Circle()
+                    .frame(width: 5, height: 5)
+                    .foregroundColor(formatter.color(.highContrastWhite))
+                    .transition(.offset(y: -10))
+                    .padding(.top, 2)
+            }
+        }
     }
 }

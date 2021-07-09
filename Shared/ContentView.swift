@@ -11,17 +11,10 @@ import CoreData
 struct ContentView: View {
     @State var isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false
     @ObservedObject var formatter = MasterHandler()
-    @ObservedObject var buildVM = BuildViewModel()
-    @ObservedObject var exploreVM = ExploreViewModel()
-    @ObservedObject var gamesVM = GamesViewModel()
-    @ObservedObject var participantsVM = ParticipantsViewModel()
-    @ObservedObject var profileVM = ProfileViewModel()
-    @ObservedObject var reportVM = ReportViewModel()
-    @ObservedObject var searchVM = SearchViewModel()
     
     var body: some View {
         ZStack {
-            Color("MainBG")
+            formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
             
             if !isLoggedIn {
@@ -29,15 +22,7 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .environmentObject(formatter)
             } else {
-                HomePageView()
-                    .environmentObject(formatter)
-                    .environmentObject(buildVM)
-                    .environmentObject(exploreVM)
-                    .environmentObject(gamesVM)
-                    .environmentObject(participantsVM)
-                    .environmentObject(profileVM)
-                    .environmentObject(reportVM)
-                    .environmentObject(searchVM)
+                HomePageView() 
             }
         }
         .foregroundColor(.white)

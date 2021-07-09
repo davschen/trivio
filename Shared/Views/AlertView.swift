@@ -24,6 +24,9 @@ struct AlertView: View {
     var hasCancel = false
     var actionLabel = ""
     var action: () -> () = { print("default alert") }
+    var hasSecondaryAction = false
+    var secondaryAction: () -> () = { print("secondary alert") }
+    var secondaryActionLabel = ""
     
     var body: some View {
         ZStack {
@@ -52,17 +55,15 @@ struct AlertView: View {
                                     .font(formatter.customFont(weight: "Medium", iPadSize: 15))
                             }
                             .padding(.bottom, 20)
-                            Button {
+                            ActionButtonView(action: {
                                 action()
                                 formatter.dismissAlert()
-                            } label: {
-                                Text(actionLabel)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.white.opacity(0.5))
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                    .foregroundColor(Color("MainAccent"))
-                                    .cornerRadius(5)
+                            }, label: actionLabel)
+                            if hasSecondaryAction {
+                                ActionButtonView(action: {
+                                    secondaryAction()
+                                    formatter.dismissAlert()
+                                }, label: secondaryActionLabel)
                             }
                         }
                         .padding(30)
@@ -76,7 +77,7 @@ struct AlertView: View {
                                 Text("Cancel")
                                     .font(formatter.customFont(weight: "Bold", iPadSize: 20))
                             }
-                            .padding()
+                            .padding(formatter.padding())
                         }
                     }
                 }
@@ -84,6 +85,23 @@ struct AlertView: View {
             .frame(width: 300)
             .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height)
         }
+    }
+    
+    func ActionButtonView(action: @escaping () -> (), label: String) -> some View {
+        var body: some View {
+            Button {
+                action()
+            } label: {
+                Text(label)
+                    .frame(maxWidth: .infinity)
+                    .padding(formatter.padding())
+                    .background(Color.white.opacity(0.5))
+                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                    .foregroundColor(Color("MainAccent"))
+                    .cornerRadius(5)
+            }
+        }
+        return body
     }
 }
 
