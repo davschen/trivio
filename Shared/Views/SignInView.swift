@@ -14,7 +14,7 @@ import FirebaseFirestoreSwift
 struct SignInView: View {
     @EnvironmentObject var formatter: MasterHandler
     @Binding var isLoggedIn: Bool
-    @State var signInStage: SignInStage = .pickLoginSignup
+    @State var signInStage: SignInStage = .enterNumber
     @State var isLogin = false
     @State var isShowingVerify = false
     @State var countryCode = CountryCode(countryFullName: "United States", countryAbbreviation: "US", code: "1")
@@ -34,35 +34,54 @@ struct SignInView: View {
             Color("MainBG")
                 .edgesIgnoringSafeArea(.all)
             HStack {
-                HStack {
+                VStack (alignment: .leading, spacing: 20) {
                     Spacer()
-                    Text("Welcome to Trivio!")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 50))
-                        .foregroundColor(Color("MainAccent"))
-                    Spacer()
-                }
-                Spacer()
-                ZStack {
-                    VisualEffectView(effect: UIBlurEffect(style: .dark))
-                    VStack (alignment: .leading, spacing: formatter.padding()) {
-                        AuthHUDView(signInStage: $signInStage, isLogin: $isLogin)
-                        switch signInStage {
-                        case .pickLoginSignup:
-                            LoginSignUpView(signInStage: $signInStage, isLogin: $isLogin)
-                        case .enterNumber:
-                            AuthEnterNumberView(signInStage: $signInStage, countryCode: $countryCode, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage)
-                        case .verifyNumber:
-                            AuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage)
-                        default:
-                            AuthNameUsernameView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, name: $name, username: $username)
-                        }
+                    HStack {
+                        Text("Welcome to")
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                        Text("Trivio!")
+                            .foregroundColor(formatter.color(.secondaryFG))
+                        Spacer()
                     }
-                    .padding(.horizontal, formatter.padding(size: 30))
+                    .font(formatter.font(fontSize: .extraLarge))
+                    VStack (alignment: .leading) {
+                        Text("If it’s your first time here, please sign up by tapping on the button below.")
+                        Text("Our Terms of Agreement can be found here.")
+                            .underline()
+                            .onTapGesture {
+                                let url = URL.init(string: "https://www.privacypolicies.com/live/3779e433-e05a-43db-8ca5-9d6df7e7a136")
+                                guard let privURL = url, UIApplication.shared.canOpenURL(privURL) else { return }
+                                UIApplication.shared.open(privURL)
+                            }
+                    }
+                    .font(formatter.font(.regular, fontSize: .small))
+                    Button {
+                        
+                    } label: {
+                        Text("Sign Up")
+                            .font(formatter.font())
+                            .padding()
+                            .padding(.horizontal, 30)
+                            .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: 3))
+                    }
+
                 }
-                .frame(width: UIScreen.main.bounds.width * 0.6)
-                .cornerRadius(20)
+                .padding(80)
+                Spacer()
+                VStack (alignment: .leading, spacing: formatter.padding()) {
+                    AuthHUDView(signInStage: $signInStage, isLogin: $isLogin)
+                    switch signInStage {
+                    case .enterNumber:
+                        AuthEnterNumberView(signInStage: $signInStage, countryCode: $countryCode, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage)
+                    case .verifyNumber:
+                        AuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage)
+                    default:
+                        AuthNameUsernameView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, name: $name, username: $username)
+                    }
+                }
+                .frame(width: UIScreen.main.bounds.width * 0.3)
+                .background(formatter.color(.primaryFG))
             }
-            .padding(formatter.padding())
             .animation(.easeInOut)
             AlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                 formatter.alertAction()
@@ -83,28 +102,27 @@ struct AuthHUDView: View {
     @EnvironmentObject var formatter: MasterHandler
     @Binding var signInStage: SignInStage
     @Binding var isLogin: Bool
+    
     var text: String {
         switch signInStage {
-        case .pickLoginSignup:
-            return ""
         case .enterNumber:
-            return "Enter your number"
+            return "Enter your phone number"
         case .verifyNumber:
-            return "Enter the verification code you received"
+            return "Enter verification code"
         default:
-            return "Enter your name and a valid username"
+            return "Enter your account info"
         }
     }
+    
     var body: some View {
-        if !(signInStage == .pickLoginSignup) {
-            VStack (alignment: .leading) {
+        ZStack {
+            VStack (alignment: .leading, spacing: 20) {
+                Spacer()
                 Text(signInStage != .nameUsername ? (isLogin ? "Login" : "Sign up") : "Sign up")
-                    .padding(.bottom, formatter.shrink(iPadSize: 20, factor: 4))
+                    .font(formatter.font(fontSize: .extraLarge))
                 HStack {
                     Button {
                         switch signInStage {
-                        case .enterNumber:
-                            signInStage = .pickLoginSignup
                         case .verifyNumber:
                             signInStage = .enterNumber
                         default:
@@ -113,19 +131,28 @@ struct AuthHUDView: View {
                     } label: {
                         HStack (spacing: 3) {
                             Image(systemName: "chevron.left")
+                                .font(.system(size: 10, weight: .bold))
                             Text("Back")
                         }
-                        .font(formatter.customFont(iPadSize: 20))
-                        .foregroundColor(.white)
+                        .font(formatter.font())
                     }
                     Spacer()
                         .frame(width: formatter.padding())
                     Text(text)
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                        .font(formatter.font(.regular))
                     Spacer()
                 }
             }
-            .font(formatter.customFont(weight: "Bold", iPadSize: 40))
+            .padding(30)
+            .padding(.trailing, 30)
+            .foregroundColor(formatter.color(.highContrastWhite))
+            .background(formatter.color(.secondaryFG))
+            .clipShape(RoundedCorners(br: 70))
+        }
+        HStack {
+            Spacer()
+            Image("CircleGrid")
+                .offset(x: 30, y: -50)
         }
     }
 }
@@ -196,51 +223,24 @@ struct AuthEnterNumberView: View {
                 Text("+" + countryCode.code)
                     .padding(.horizontal)
                     .padding(.vertical, 15)
-                    .font(formatter.customFont(weight: "Medium", iPadSize: 14))
-                    .background(Color.white.opacity(0.1))
+                    .font(formatter.font())
+                    .background(formatter.color(.secondaryFG))
                     .cornerRadius(5)
-                    .onTapGesture {
-                        showingPicker.toggle()
+                ZStack (alignment: .leading) {
+                    if number.isEmpty {
+                        Text("Enter your number")
+                            .foregroundColor(.gray)
                     }
-                ZStack {
-                    ZStack (alignment: .leading) {
-                        if number.isEmpty {
-                            Text("Enter Your Number")
-                                .foregroundColor(.gray)
-                        }
-                        TextField("Enter Your Number", text: $number)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .keyboardType(.numberPad)
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 15)
-                    .font(formatter.customFont(weight: "Medium", iPadSize: 14))
-                    .background(RoundedRectangle(
-                        cornerRadius: 5, style: .continuous
-                    ).stroke(Color.white, lineWidth: 2))
-                    .accentColor(.white)
-                    HStack {
-                        Spacer()
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.white)
-                            .padding(6)
-                            .background(Color.green.opacity(hasValidEntry() ? 1 : 0.3))
-                            .clipShape(Circle())
-                            .padding(.horizontal, 7)
-                            .background(Circle().stroke(Color.white, lineWidth: 0.5))
-                    }
+                    TextField("Enter your number", text: $number)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .keyboardType(.numberPad)
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 15)
+                .font(formatter.font())
+                .background(formatter.color(.secondaryFG))
+                .accentColor(formatter.color(.secondaryAccent))
             }
-            
-            if showingPicker {
-                Picker("", selection: $countryCode) {
-                    let codes: [CountryCode] = CountryCodes().getCCList
-                    ForEach(codes, id: \.self) {
-                        Text("+" + $0.code + " (\($0.countryFullName))").tag(UUID().uuidString)
-                    }
-                }
-            }
-            
             Spacer()
                 .frame(height: formatter.padding(size: 30))
             Button {
@@ -261,8 +261,8 @@ struct AuthEnterNumberView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color("MainFG"))
-                    .clipShape(Capsule())
+                    .background(formatter.color(.secondaryAccent))
+                    .cornerRadius(5)
             }
             .opacity(hasValidEntry() ? 1 : 0.5)
         }
@@ -587,5 +587,5 @@ struct AuthNameUsernameView: View {
 }
 
 enum SignInStage {
-    case pickLoginSignup, enterNumber, verifyNumber, nameUsername
+    case enterNumber, verifyNumber, nameUsername
 }

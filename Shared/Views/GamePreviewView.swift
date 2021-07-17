@@ -24,23 +24,17 @@ struct GamePreviewView: View {
                 } else {
                     if formatter.deviceType == .iPad {
                         Group {
-                            Text(gamesVM.title)
-                                .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                .padding(5)
-                                .background(Color.white.opacity(0.4))
-                                .cornerRadius(5)
                             VStack (alignment: .leading, spacing: 0) {
                                 Text("Trivio Round Categories")
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                                    .font(formatter.font())
                                 HStack {
                                     ForEach(gamesVM.jeopardyCategories, id: \.self) { category in
                                         let shouldHighlight = profileVM.categoryInSearch(categoryName: category, searchQuery: searchQuery)
                                         ZStack {
-                                            Color("MainFG")
+                                            formatter.color(.primaryAccent)
                                             Text(category.uppercased())
-                                                .font(formatter.customFont(weight: "Bold", iPadSize: 15))
-                                                .foregroundColor(Color.white)
-                                                .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                                .font(formatter.font(fontSize: .small))
+                                                .foregroundColor(formatter.color(.highContrastWhite))
                                                 .multilineTextAlignment(.center)
                                                 .padding(.horizontal, 10)
                                                 .frame(maxWidth: .infinity)
@@ -50,63 +44,48 @@ struct GamePreviewView: View {
                                         .cornerRadius(5)
                                         .padding(2)
                                         .tag(UUID().uuidString)
-                                        .background(RoundedRectangle(cornerRadius: 5).stroke(Color("MainAccent"), lineWidth: shouldHighlight ? 10 : 0))
+                                        .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.secondaryAccent), lineWidth: shouldHighlight ? 5 : 0))
                                     }
                                 }
                             }
                             VStack (alignment: .leading, spacing: 0) {
                                 Text("Double Trivio Round Categories")
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                                    .font(formatter.font())
                                 HStack {
                                     ForEach(gamesVM.doubleJeopardyCategories, id: \.self) { category in
                                         let shouldHighlight = profileVM.categoryInSearch(categoryName: category, searchQuery: searchQuery)
                                         ZStack {
-                                            Color("MainFG")
+                                            formatter.color(.primaryAccent)
                                             Text(category.uppercased())
-                                                .font(formatter.customFont(weight: "Bold", iPadSize: 15))
-                                                .foregroundColor(Color.white)
-                                                .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                                .font(formatter.font(fontSize: .small))
+                                                .foregroundColor(formatter.color(.highContrastWhite))
                                                 .multilineTextAlignment(.center)
                                                 .padding(.horizontal, 10)
                                                 .frame(maxWidth: .infinity)
                                                 .minimumScaleFactor(0.1)
+                                                .padding(2)
                                         }
                                         .cornerRadius(5)
                                         .padding(2)
                                         .tag(UUID().uuidString)
-                                        .background(RoundedRectangle(cornerRadius: 5).stroke(Color("MainAccent"), lineWidth: shouldHighlight ? 10 : 0))
+                                        .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.secondaryAccent), lineWidth: shouldHighlight ? 5 : 0))
                                     }
                                 }
                             }
                             HStack {
                                 Spacer()
-                                if gamesVM.menuChoice != .gamepicker && !exploreVM.isShowingUserView {
-                                    Button(action: {
-                                        exploreVM.isShowingUserView = true
-                                        exploreVM.pullAllFromUser(withID: gamesVM.customSet.userID)
-                                        gamesVM.previewViewShowing = false
-                                    }, label: {
-                                        HStack {
-                                            Image(systemName: "person.circle")
-                                            Text(gamesVM.queriedUserName)
-                                        }
-                                        .font(formatter.customFont(weight: "Bold", iPadSize: 15))
-                                        .foregroundColor(Color("MainAccent"))
-                                        .padding(10)
-                                        .background(Color.gray.opacity(0.4))
-                                        .cornerRadius(5)
-                                    })
-                                }
                                 Button(action: {
-                                    gamesVM.setEpisode(ep: "")
+                                    gamesVM.previewViewShowing.toggle()
                                 }, label: {
                                     HStack {
+                                        Image(systemName: "xmark")
+                                            .font(.system(size: 15, weight: .bold))
                                         Text("Close")
                                     }
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 15))
-                                    .foregroundColor(.white)
+                                    .font(formatter.font())
+                                    .foregroundColor(formatter.color(.primaryFG))
                                     .padding(10)
-                                    .background(Color.gray.opacity(0.4))
+                                    .background(formatter.color(.highContrastWhite))
                                     .cornerRadius(5)
                                 })
                                 Button(action: {
@@ -114,13 +93,14 @@ struct GamePreviewView: View {
                                     gamesVM.reset()
                                 }, label: {
                                     HStack {
-                                        Image(systemName: "gamecontroller")
+                                        Image(systemName: "gamecontroller.fill")
+                                            .font(.system(size: 15, weight: .bold))
                                         Text("Play")
                                     }
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 15))
-                                    .foregroundColor(.white)
+                                    .font(formatter.font())
+                                    .foregroundColor(formatter.color(.primaryFG))
                                     .padding(10)
-                                    .background(Color.gray.opacity(0.4))
+                                    .background(formatter.color(.highContrastWhite))
                                     .cornerRadius(5)
                                 })
                             }

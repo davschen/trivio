@@ -15,64 +15,14 @@ struct SearchView: View {
     @EnvironmentObject var searchVM: SearchViewModel
     
     @Environment(\.colorScheme) var colorScheme
-    @Binding var isShowingSearchView: Bool
-    
-    var seasonEpGrid = [
-        GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())
-    ]
     
     var body: some View {
-        Color("MainBG")
-            .edgesIgnoringSafeArea(.all)
         ZStack {
             VStack (alignment: .leading) {
-                HStack {
-                    Button(action: {
-                        isShowingSearchView.toggle()
-                    }, label: {
-                        Image(systemName: "chevron.left")
-                            .font(formatter.deviceType == .iPad ? .largeTitle : .title2)
-                    })
-                    Text("Search")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 50))
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(formatter.deviceType == .iPad ? .largeTitle : .title2)
-                        .foregroundColor(Color.green.opacity(!searchVM.searchPending ? 1 : 0.2))
-                }
-                HStack {
-                    HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
-                        Image(systemName: "magnifyingglass")
-                        TextField("Search a category (must be an exact match)", text: $searchVM.searchItem, onCommit: {
-                            searchVM.resetSearchLimit()
-                            searchVM.searchAndPull()
-                            gamesVM.previewViewShowing = false
-                        })
-                        Image(systemName: "xmark.circle.fill")
-                            .onTapGesture {
-                                self.searchVM.clearSearch()
-                            }
-                    }
-                    .font(formatter.customFont(iPadSize: 20))
-                    .padding(.vertical, formatter.shrink(iPadSize: 10)).padding(.horizontal, formatter.shrink(iPadSize: 15))
-                    .background(Color.gray.opacity(0.3))
-                    .accentColor(.white)
-                    .clipShape(Capsule())
-                    Button {
-                        searchVM.resetSearchLimit()
-                        searchVM.searchAndPull()
-                        gamesVM.previewViewShowing = false
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    } label: {
-                        Text("SEARCH")
-                            .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                            .padding(.vertical, 5).padding(.horizontal, 10)
-                            .background(Color.white.opacity(0.3))
-                            .cornerRadius(formatter.cornerRadius(5))
-                    }
-                }
-                if searchVM.hasSearch && searchVM.gameIDs.count == 0 {
+                if searchVM.hasSearch && searchVM.gameIDs.count == 0 && !searchVM.searchPending {
                     Text("No Matches Found")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 25))
+                        .font(formatter.font())
+                        .frame(maxWidth: .infinity)
                 }
                 VStack (alignment: .leading) {
                     if searchVM.searchPending {
@@ -82,9 +32,10 @@ struct SearchView: View {
                         .frame(maxWidth: .infinity)
                     } else {
                         if searchVM.games.count > 0 {
-                            Text("Found \(searchVM.gameIDs.count) matches")
-                                .font(formatter.customFont(weight: "Bold", iPadSize: 25))
                             if formatter.deviceType == .iPad {
+                                Text("Found \(searchVM.gameIDs.count) matches")
+                                    .font(formatter.font())
+                                    .foregroundColor(formatter.color(.highContrastWhite))
                                 JeopardyGamesView(showingGames: true, games: searchVM.games)
                             } else {
                                 if gamesVM.previewViewShowing {

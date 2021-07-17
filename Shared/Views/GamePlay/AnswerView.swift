@@ -40,111 +40,97 @@ struct AnswerView: View {
     var body: some View {
         ZStack {
             VStack {
-                if (gamesVM.timeRemaining > 0) {
-                    HStack (spacing: formatter.deviceType == .iPad ? nil : 5) {
-                        ForEach(0..<Int(self.gamesVM.timeRemaining * 2 - 1)) { i in
-                            Rectangle()
-                                .foregroundColor(self.usedBlocks.contains(i + 1) ? Color("MainBG") : .red)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: formatter.deviceType == .iPad ? 50 : 20)
-                        }
+                // Countdown timer blocks
+                HStack (spacing: formatter.deviceType == .iPad ? nil : 5) {
+                    ForEach(0..<Int(self.gamesVM.timeRemaining * 2 - 1)) { i in
+                        Rectangle()
+                            .foregroundColor(formatter.color(self.usedBlocks.contains(i + 1) ? .primaryFG : .secondaryAccent))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 20)
                     }
-                    .padding([.top, .horizontal], 5)
                 }
-                
-                ZStack {
-                    Color(self.timeElapsed == self.gamesVM.timeRemaining ? "Darkened" : "MainFG")
-                    VStack {
-                        Text(clue.uppercased())
-                            .font(formatter.customFont(weight: "Bold", iPadSize: 35))
+                .clipShape(Capsule())
+                .padding(.vertical)
+                .padding(.horizontal, 5)
+                VStack {
+                    ZStack {
+                        HStack {
+                            VolumeControlView()
+                            Spacer()
+                        }
+                        Text("\(category.uppercased()) - $\(self.value)")
+                            .font(formatter.font(fontSize: .mediumLarge))
                             .foregroundColor(.white)
-                            .shadow(color: Color.black.opacity(0.2), radius: 5)
-                            .multilineTextAlignment(.center)
-                            .minimumScaleFactor(0.1)
+                            .padding(formatter.padding())
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(5)
                             .padding()
-                        if self.showResponse {
-                            VStack (spacing: 0) {
-                                Text(response.uppercased())
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 35))
-                                    .foregroundColor(self.isTripleStumper ? Color.red : Color("MainAccent"))
+                    }
+                    Spacer()
+                    Text(clue.uppercased())
+                        .font(formatter.font(fontSize: .large))
+                        .foregroundColor(formatter.color(.highContrastWhite))
+                        .multilineTextAlignment(.center)
+                        .padding()
+                    if self.showResponse {
+                        VStack (spacing: 0) {
+                            Text(response.uppercased())
+                                .font(formatter.font(fontSize: .large))
+                                .foregroundColor(formatter.color(self.isTripleStumper ? .red : .secondaryAccent))
+                                .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                .multilineTextAlignment(.center)
+                            if isTripleStumper {
+                                Text("(Triple Stumper)")
+                                    .font(formatter.font(fontSize: .medium))
+                                    .foregroundColor(formatter.color(.red))
                                     .shadow(color: Color.black.opacity(0.2), radius: 5)
                                     .multilineTextAlignment(.center)
-                                if isTripleStumper {
-                                    Text("(Triple Stumper)")
+                            }
+                        }
+                    }
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        if self.isDailyDouble {
+                            if participantsVM.teams.count > 0 {
+                                HStack {
+                                    Text("\(participantsVM.selectedTeam.name) (Wager: $\(Int(wager)))")
                                         .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                        .foregroundColor(Color.red)
-                                        .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(Color("MainAccent"))
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 15, weight: .bold))
                                 }
-                            }
-                        }
-                    }
-                    // volume control and category
-                    VStack {
-                        ZStack {
-                            HStack {
-                                VolumeControlView()
-                                Spacer()
-                            }
-                            Text("\(category.uppercased()) - $\(self.value)")
-                                .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                .foregroundColor(.white)
                                 .padding(formatter.padding())
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(5)
-                                .padding()
-                        }
-                        Spacer()
-                    }
-                    
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            if self.isDailyDouble {
-                                if participantsVM.teams.count > 0 {
-                                    HStack {
-                                        Text("\(participantsVM.selectedTeam.name) (Wager: $\(Int(wager)))")
-                                            .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                            .foregroundColor(Color("MainAccent"))
-                                        Image(systemName: "xmark")
-                                            .font(.title3.weight(.black))
-                                    }
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                    .padding(formatter.padding())
-                                    .background(Color.red.opacity(self.ddCorrect ? 0 : 0.5))
-                                    .background(Color.gray.opacity(0.4))
-                                    .cornerRadius(formatter.cornerRadius(5))
-                                    .padding(5)
-                                    .onTapGesture {
-                                        let teamIndex = participantsVM.selectedTeam.index
-                                        let wager = Int(self.ddCorrect ? -self.wager : self.wager)
-                                        
-                                        self.participantsVM.editScore(index: teamIndex, amount: wager)
-                                        self.ddCorrect.toggle()
-                                    }
-                                }
-                            } else {
-                                CorrectSelectorView(teamCorrect: $teamCorrect, amount: self.amount)
-                            }
-                            Text("\(self.showResponse ? "Hide" : "Show") Response")
-                                .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                .foregroundColor(Color("MainAccent"))
-                                .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                .padding(formatter.padding())
-                                .background(Color.gray.opacity(self.showResponse ? 1 : 0.4))
+                                .background(Color.red.opacity(self.ddCorrect ? 0 : 0.5))
+                                .background(Color.gray.opacity(0.4))
                                 .cornerRadius(formatter.cornerRadius(5))
                                 .padding(5)
                                 .onTapGesture {
-                                    self.showResponse.toggle()
+                                    let teamIndex = participantsVM.selectedTeam.index
+                                    let wager = Int(self.ddCorrect ? -self.wager : self.wager)
+                                    self.participantsVM.editScore(index: teamIndex, amount: wager)
+                                    self.ddCorrect.toggle()
                                 }
+                            }
+                        } else {
+                            CorrectSelectorView(teamCorrect: $teamCorrect, amount: self.amount)
                         }
-                        .padding()
+                        Text("  \(self.showResponse ? "Hide" : "Show") Response  ")
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .shadow(color: Color.black.opacity(0.2), radius: 5)
+                            .padding(25)
+                            .background(formatter.color(.lowContrastWhite).opacity(showResponse ? 1 : 0.4))
+                            .clipShape(Capsule())
+                            .onTapGesture {
+                                self.showResponse.toggle()
+                            }
                     }
+                    .padding()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .cornerRadius(20)
-                .shadow(color: Color.black.opacity(0.2), radius: 10)
+                .padding(20)
+                .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
+                .cornerRadius(40)
             }
             .onTapGesture {
                 clue = ""
@@ -175,19 +161,18 @@ struct AnswerView: View {
             if self.isDailyDouble {
                 VStack {
                     Text("DUPLEX OF THE DAY")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 80))
-                        .foregroundColor(Color.white)
+                        .font(formatter.font(fontSize: .extraLarge))
+                        .foregroundColor(formatter.color(.highContrastWhite))
                         .shadow(color: Color.black.opacity(0.2), radius: 5)
                         .multilineTextAlignment(.center)
                         .padding()
                     VStack {
                         Slider(value: $wager, in: 0...Double(max(maxScore, participantsVM.teams.indices.contains(participantsVM.selectedTeam.index) ? participantsVM.teams[participantsVM.selectedTeam.index].score : 0)), step: 100)
-                            .accentColor(Color("MainAccent"))
+                            .accentColor(formatter.color(.secondaryAccent))
                         HStack {
                             Text("Wager: \(Int(self.wager))")
-                                .font(formatter.customFont(weight: "Bold", iPadSize: 30))
-                                .foregroundColor(Color.white)
-                                .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                .font(formatter.font())
+                                .foregroundColor(formatter.color(.highContrastWhite))
                                 .multilineTextAlignment(.center)
                             Spacer(minLength: 30)
                             Button(action: {
@@ -197,25 +182,20 @@ struct AnswerView: View {
                                 self.formatter.speaker.speak(self.clue)
                             }) {
                                 Text("Done")
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                    .foregroundColor(Color("MainAccent"))
-                                    .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                    .font(formatter.font())
+                                    .foregroundColor(formatter.color(.highContrastWhite))
                                     .padding()
-                                    .background(Color.gray.opacity(0.4))
+                                    .background(formatter.color(.lowContrastWhite))
                                     .cornerRadius(5.0)
-                                    .padding(5)
                             }
                         }
                     }
                     .frame(width: UIScreen.main.bounds.width / 2)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color("MainFG"))
-                .cornerRadius(formatter.cornerRadius(iPadSize: 20))
+                .background(formatter.color(.primaryAccent))
+                .cornerRadius(40)
                 .opacity(self.ddWagerMade ? 0 : 1)
-//                .onAppear {
-//                    self.speaker.playSounds("dailyDouble.m4a")
-//                }
             }
         }
     }
@@ -230,9 +210,9 @@ struct CorrectSelectorView: View {
     
     var body: some View {
         ScrollView (.horizontal, showsIndicators: false) {
-            HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+            HStack (spacing: 15) {
                 ForEach(participantsVM.teams) { team in
-                    HStack {
+                    HStack (spacing: 10) {
                         // xmark button
                         Button(action: {
                             if team == teamCorrect {
@@ -244,32 +224,34 @@ struct CorrectSelectorView: View {
                             self.participantsVM.editScore(index: team.index, amount: amount)
                         }, label: {
                             Image(systemName: "xmark")
-                                .font(formatter.deviceType == .iPad ? .title3.weight(.black) : .caption.weight(.black))
+                                .font(.system(size: 25, weight: .bold))
+                                .foregroundColor(formatter.color(.highContrastWhite))
                                 .padding(5)
                         })
-                        
+                        RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 25)
+                            .padding(.horizontal, 5)
                         Text("\(team.name)")
-                            .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                            .foregroundColor(Color("MainAccent"))
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .padding(.horizontal, 5)
                             .onTapGesture {
                                 markCorrect(teamIndex: team.index)
                             }
-                        
                         // check button
                         Button(action: {
                             markCorrect(teamIndex: team.index)
                         }, label: {
                             Image(systemName: "checkmark")
-                                .font(formatter.deviceType == .iPad ? .title3.weight(.black) : .caption.weight(.black))
+                                .font(.system(size: 25, weight: .bold))
                                 .padding(5)
                         })
                     }
                     .shadow(color: Color.black.opacity(0.2), radius: 5)
-                    .padding(formatter.padding())
-                    .background(Color.red.opacity(self.participantsVM.toSubtracts[team.index] ? 0.5 : 0))
-                    .background(Color.green.opacity(team == teamCorrect ? 0.5 : 0))
-                    .background(Color.gray.opacity(0.4))
-                    .cornerRadius(formatter.cornerRadius(5))
+                    .padding(20)
+                    .background(formatter.color(.red).opacity(self.participantsVM.toSubtracts[team.index] ? 1 : 0))
+                    .background(formatter.color(.green).opacity(team == teamCorrect ? 1 : 0))
+                    .background(formatter.color(.lowContrastWhite).opacity(0.4))
+                    .clipShape(Capsule())
                 }
             }
         }
@@ -322,7 +304,7 @@ struct VolumeControlView: View {
                         self.formatter.volume = newVal
                         self.formatter.setVolume()
                     }))
-                    .accentColor(Color("MainAccent"))
+                    .accentColor(formatter.color(.secondaryAccent))
                 }
                 Spacer()
             }
@@ -333,7 +315,7 @@ struct VolumeControlView: View {
             }
             if showingVolumeSlider {
                 Text("Effective next clue")
-                    .font(formatter.customFont(iPadSize: 15))
+                    .font(formatter.font(fontSize: .small))
             }
         }
         .padding(.horizontal, formatter.shrink(iPadSize: 40))

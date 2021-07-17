@@ -18,6 +18,7 @@ struct ExploreView: View {
             UserView(isShowingUserView: $exploreVM.isShowingUserView)
         } else {
             ExploreSearchView(isShowingUserView: $exploreVM.isShowingUserView)
+                .padding([.horizontal, .top], 30)
         }
     }
 }
@@ -54,9 +55,7 @@ struct UserView: View {
             if (formatter.deviceType == .iPad && !gamesVM.selectedEpisode.isEmpty) || (formatter.deviceType == .iPhone && gamesVM.previewViewShowing) {
                 GamePreviewView()
             }
-            if formatter.deviceType == .iPad || (formatter.deviceType == .iPhone && !gamesVM.previewViewShowing) {
-                CustomSetView(isMine: false, customSets: exploreVM.userResults)
-            }
+            CustomSetView(isMine: false, customSets: exploreVM.userResults)
             Spacer()
         }
     }

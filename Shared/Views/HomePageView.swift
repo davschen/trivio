@@ -129,7 +129,7 @@ struct TabBarItemView: View {
     var body: some View {
         VStack {
             Image(systemName: self.menuChoice == myMenuChoice ? selectedIconName : deselectedIconName)
-                .font(.system(size: 20))
+                .font(.system(size: 25, weight: .bold))
                 .foregroundColor(formatter.color(self.menuChoice == myMenuChoice ? .highContrastWhite : .mediumContrastWhite))
                 .onTapGesture {
                     self.menuChoice = myMenuChoice

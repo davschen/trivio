@@ -18,131 +18,145 @@ struct ParticipantsView: View {
     
     var body: some View {
         ZStack (alignment: .topLeading) {
-            Color("MainBG")
-                .edgesIgnoringSafeArea(.all)
-            VStack {
+            VStack (spacing: 15) {
                 HStack (spacing: formatter.shrink(iPadSize: 15)) {
-                    Text("\(participantsVM.isTeams ? "Teams" : "Contestants") (\(participantsVM.teams.count))")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 50))
+                    Text("\(participantsVM.isTeams ? "Teams" : "Contestants")")
+                        .font(formatter.font(fontSize: .extraLarge))
                     Button (action: {
                         self.participantsVM.addTeam(name: "", members: [], score: 0, color: "")
                         self.teamToEdit = self.participantsVM.teams.last!
                         self.showsBuild.toggle()
                     }) {
                         Image(systemName: "plus")
-                            .font(formatter.deviceType == .iPad ? .title : .title3)
-                            .foregroundColor(Color("MainBG"))
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(formatter.color(.highContrastWhite))
                             .padding(formatter.deviceType == .iPad ? 10 : 5)
-                            .background(Color.white)
-                            .clipShape(Circle())
                     }
                     Spacer()
                     Button(action: {
                         participantsVM.isTeams.toggle()
                     }, label: {
                         Text("Switch to \(participantsVM.isTeams ? "Contestants" : "Teams")")
-                            .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                            .foregroundColor(Color("MainAccent"))
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.primaryFG))
                             .padding(formatter.padding())
-                            .background(Color.gray.opacity(0.4))
+                            .background(formatter.color(.highContrastWhite))
                             .cornerRadius(formatter.cornerRadius(5))
                     })
                     Button(action: {
                         gamesVM.menuChoice = .game
                     }, label: {
                         HStack {
-                            Image(systemName: "gamecontroller")
+                            Image(systemName: "gamecontroller.fill")
+                                .font(.system(size: 20, weight: .bold))
                             Text("Play")
                         }
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
                     })
+                    .font(formatter.font(fontSize: .mediumLarge))
+                    .foregroundColor(formatter.color(.primaryFG))
                     .padding(formatter.padding())
-                    .background(Color.gray.opacity(0.4))
+                    .background(formatter.color(.highContrastWhite))
                     .cornerRadius(formatter.cornerRadius(5))
                 }
-                VStack (alignment: .leading, spacing: 0) {
-                    Text("Who's Playing?")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 30))
-                    ScrollView (.horizontal) {
-                        HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
-                            ForEach(self.participantsVM.historicalTeams) { team in
-                                HStack {
-                                    Circle()
-                                        .foregroundColor(ColorMap().getColor(color: team.color))
-                                        .frame(width: 10)
-                                    Text(team.name)
-                                        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                        .foregroundColor(self.participantsVM.teams.contains(team) ? .white : Color("MainAccent"))
-                                }
-                                .padding(formatter.padding())
-                                .frame(height: formatter.shrink(iPadSize: 50, factor: 1.5))
-                                .background(Color.gray.opacity(self.participantsVM.teams.contains(team) ? 1 : 0.4))
-                                .cornerRadius(formatter.deviceType == .iPad ? 5 : 2)
-                                .onTapGesture {
-                                    if !self.participantsVM.teams.contains(team) {
-                                        self.participantsVM.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
-                                    } else {
-                                        self.participantsVM.removeTeam(index: self.participantsVM.getIndexByID(id: team.id))
-                                    }
-                                }
-                                .onLongPressGesture {
+                ScrollView (.horizontal) {
+                    HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+                        Text("Saved Players")
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .padding(.trailing, 15)
+                        ForEach(self.participantsVM.historicalTeams) { team in
+                            HStack {
+                                Circle()
+                                    .foregroundColor(ColorMap().getColor(color: team.color))
+                                    .frame(width: 10)
+                                Text(team.name)
+                                    .font(formatter.font())
+                                    .foregroundColor(formatter.color(.highContrastWhite))
+                                Button(action: {
                                     self.participantsVM.removeTeamFromFirestore(id: team.id)
+                                }, label: {
+                                    Image(systemName: "minus.circle.fill")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(formatter.color(.highContrastWhite))
+                                })
+                                .padding(.leading, 10)
+                            }
+                            .padding()
+                            .frame(height: 50)
+                            .background(formatter.color(participantsVM.teams.contains(team) ? .lowContrastWhite : .secondaryFG))
+                            .cornerRadius(5)
+                            .onTapGesture {
+                                if !participantsVM.teams.contains(team) {
+                                    participantsVM.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
+                                } else {
+                                    participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                 }
                             }
                         }
                     }
-                    Text("Press and hold a \(participantsVM.isTeams ? "team" : "contestant") to delete")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 15))
                 }
-                .opacity(participantsVM.historicalTeams.isEmpty ? 0 : 1)
-                HStack (alignment: .top, spacing: formatter.deviceType == .iPad ? nil : 3) {
-                    ForEach(self.participantsVM.teams) { team in
-                        VStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
-                            ZStack {
-                                Text(team.name.isEmpty ? "" : team.name + (self.participantsVM.isTeams ? " (\(team.members.count))" : ""))
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 30))
-                                    .foregroundColor(.white)
-                                VStack {
-                                    HStack {
-                                        Image(systemName: self.participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
-                                            .font(formatter.deviceType == .iPad ? .title3 : .caption)
-                                            .padding(5)
-                                            .foregroundColor(Color("Darkened"))
-                                            .onTapGesture {
-                                                self.participantsVM.writeTeamToFirestore(team: team)
-                                            }
-                                        Spacer()
+                .padding()
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(5)
+                
+                HStack (alignment: .top, spacing: formatter.deviceType == .iPad ? 15 : 3) {
+                    ForEach(participantsVM.teams) { team in
+                        VStack (spacing: 15) {
+                            HStack (spacing: participantsVM.teams.count > 4 ? 7 : 15) {
+                                Image(systemName: participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
+                                    .font(.system(size: 25, weight: .bold))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
+                                    .padding(.trailing, 10)
+                                    .offset(y: -5)
+                                    .minimumScaleFactor(0.5)
+                                    .onTapGesture {
+                                        participantsVM.writeTeamToFirestore(team: team)
                                     }
-                                    Spacer()
-                                }
+                                Circle()
+                                    .frame(width: 20, height: 20)
+                                    .foregroundColor(ColorMap().getColor(color: team.color))
+                                Text(team.name.isEmpty ? "" : team.name + (participantsVM.isTeams ? " (\(team.members.count))" : ""))
+                                    .font(formatter.font(fontSize: participantsVM.teams.count > 3 ? .mediumLarge : .large))
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
+                                Spacer()
+                                Button(action: {
+                                    participantsVM.removeTeam(index: team.index)
+                                }, label: {
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 25, weight: .bold))
+                                        .minimumScaleFactor(0.5)
+                                })
                             }
-                            .padding(formatter.padding())
+                            .padding(participantsVM.teams.count > 4 ? 15 : 20)
                             .frame(maxWidth: .infinity)
-                            .frame(height: formatter.shrink(iPadSize: 100, factor: 2))
-                            .background(ColorMap().getColor(color: team.color))
-                            .cornerRadius(formatter.cornerRadius(5))
+                            .frame(height: 120)
+                            .background(formatter.color(.primaryAccent))
+                            .cornerRadius(20)
                             .onTapGesture {
-                                self.teamToEdit = team
-                                self.showsBuild.toggle()
+                                teamToEdit = team
+                                showsBuild.toggle()
                             }
+                            
                             ScrollView (.vertical, showsIndicators: false) {
-                                VStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+                                VStack (spacing: 15) {
                                     ForEach(team.members, id: \.self) { member in
                                         HStack {
                                             Text(member)
-                                                .font(formatter.customFont(weight: "Bold", iPadSize: 30))
+                                                .font(formatter.font(fontSize: .large))
+                                                .foregroundColor(formatter.color(.highContrastWhite))
                                             Spacer()
                                             Image(systemName: "minus.circle.fill")
-                                                .font(formatter.deviceType == .iPad ? .largeTitle : .title3)
-                                                .foregroundColor(Color("MainFG"))
+                                                .font(.system(size: 30))
+                                                .foregroundColor(formatter.color(.highContrastWhite))
                                                 .onTapGesture {
                                                     self.participantsVM.removeMember(index: team.index, name: member)
                                                 }
                                         }
-                                        .padding(formatter.padding())
+                                        .padding(30)
                                         .frame(maxWidth: .infinity)
-                                        .background(Color("MainAccent"))
-                                        .cornerRadius(formatter.cornerRadius(5))
+                                        .background(formatter.color(.secondaryFG))
+                                        .cornerRadius(10)
                                     }
                                 }
                             }
@@ -151,6 +165,7 @@ struct ParticipantsView: View {
                     }
                 }
             }
+            .padding([.horizontal, .top], 30)
             TeamBuildView(showsBuild: $showsBuild, team: self.participantsVM.teams.count > teamToEdit.index ? $participantsVM.teams[self.teamToEdit.index] : $teamToEdit, isTeams: $participantsVM.isTeams)
         }
     }
@@ -209,7 +224,7 @@ struct TeamBuildView: View {
                                 .padding(.horizontal, 5)
                                 HStack {
                                     VStack (alignment: .leading, spacing: 0) {
-                                        Text("\(self.isTeams ? "Team" : "Participant") Name")
+                                        Text("\(self.isTeams ? "Team" : "Contestant") Name")
                                             .font(formatter.customFont(weight: "Bold", iPadSize: 25))
                                         HStack {
                                             TextField("Add Name", text: $team.name)
@@ -338,25 +353,6 @@ struct VisualEffectView: UIViewRepresentable {
     var effect: UIVisualEffect?
     func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
     func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) { uiView.effect = effect }
-}
-
-struct ColorMap {
-    func getColor(color: String) -> Color {
-        switch color {
-        case "orange":
-            return Color.orange
-        case "yellow":
-            return Color.yellow
-        case "purple":
-            return Color.purple
-        case "red":
-            return Color.red
-        case "pink":
-            return Color.pink
-        default:
-            return Color.blue
-        }
-    }
 }
 
 struct RoundedCorners: Shape {

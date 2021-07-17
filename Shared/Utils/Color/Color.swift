@@ -31,6 +31,29 @@ extension MasterHandler {
     }
 }
 
+struct ColorMap {
+    let formatter = MasterHandler()
+    
+    func getColor(color: String) -> Color {
+        switch color {
+        case "orange":
+            return formatter.color(.orange)
+        case "yellow":
+            return formatter.color(.yellow)
+        case "purple":
+            return formatter.color(.purple)
+        case "red":
+            return formatter.color(.red)
+        case "pink":
+            return Color.pink
+        case "green":
+            return formatter.color(.green)
+        default:
+            return formatter.color(.blue)
+        }
+    }
+}
+
 enum ColorType {
     case blue, green, highContrastWhite, lowContrastWhite, mediumContrastWhite, orange, primaryAccent, primaryBG, primaryFG, purple, red, secondaryAccent, secondaryFG, yellow
 }

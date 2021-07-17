@@ -17,6 +17,7 @@ extension MasterHandler {
         case .regular: styleString = "Regular"
         case .regularItalic: styleString = "RegularItalic"
         case .medium: styleString = "Medium"
+        case .boldItalic: styleString = "ExtraBoldItalic"
         case .extraBold: styleString = "ExtraBold"
         default: styleString = "Bold"
         }
@@ -41,7 +42,7 @@ extension MasterHandler {
 }
 
 enum FontStyle {
-    case regular, regularItalic, medium, bold, extraBold
+    case regular, regularItalic, medium, bold, boldItalic, extraBold
 }
 
 enum FontSize {
