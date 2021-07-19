@@ -153,4 +153,16 @@ extension GamesViewModel {
             }
         }
     }
+    
+    func deleteSet(setID: String) {
+        var copyOfCustomSets = customSets
+        for i in 0..<customSets.count {
+            let set = customSets[i]
+            guard let id = set.id else { return }
+            if setID == id {
+                copyOfCustomSets.remove(at: i)
+            }
+        }
+        customSets = copyOfCustomSets
+    }
 }

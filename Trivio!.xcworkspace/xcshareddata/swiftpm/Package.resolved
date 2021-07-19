@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "ConfettiSwiftUI",
+        "repositoryURL": "https://github.com/simibac/ConfettiSwiftUI",
+        "state": {
+          "branch": "master",
+          "revision": "7c0b9e92b75ada5d36ec0022d16aa3389b113594",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

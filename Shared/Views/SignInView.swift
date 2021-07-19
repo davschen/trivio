@@ -31,7 +31,7 @@ struct SignInView: View {
     
     var body: some View {
         ZStack {
-            Color("MainBG")
+            formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
             HStack {
                 VStack (alignment: .leading, spacing: 20) {
@@ -40,7 +40,7 @@ struct SignInView: View {
                         Text("Welcome to")
                             .foregroundColor(formatter.color(.highContrastWhite))
                         Text("Trivio!")
-                            .foregroundColor(formatter.color(.secondaryFG))
+                            .foregroundColor(formatter.color(.secondaryAccent))
                         Spacer()
                     }
                     .font(formatter.font(fontSize: .extraLarge))
@@ -56,9 +56,9 @@ struct SignInView: View {
                     }
                     .font(formatter.font(.regular, fontSize: .small))
                     Button {
-                        
+                        isLogin.toggle()
                     } label: {
-                        Text("Sign Up")
+                        Text(isLogin ? "Sign Up" : "Log In")
                             .font(formatter.font())
                             .padding()
                             .padding(.horizontal, 30)
@@ -67,22 +67,25 @@ struct SignInView: View {
 
                 }
                 .padding(80)
+                .keyboardAware()
                 Spacer()
                 VStack (alignment: .leading, spacing: formatter.padding()) {
                     AuthHUDView(signInStage: $signInStage, isLogin: $isLogin)
+                        .padding(.trailing, 100)
                     switch signInStage {
                     case .enterNumber:
-                        AuthEnterNumberView(signInStage: $signInStage, countryCode: $countryCode, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage)
+                        AuthEnterNumberView(signInStage: $signInStage, countryCode: $countryCode, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
                     case .verifyNumber:
-                        AuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage)
+                        AuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
                     default:
                         AuthNameUsernameView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, name: $name, username: $username)
                     }
                 }
-                .frame(width: UIScreen.main.bounds.width * 0.3)
+                .frame(width: UIScreen.main.bounds.width * 0.4)
                 .background(formatter.color(.primaryFG))
             }
             .animation(.easeInOut)
+            .edgesIgnoringSafeArea(.all)
             AlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                 formatter.alertAction()
             })
@@ -115,29 +118,30 @@ struct AuthHUDView: View {
     }
     
     var body: some View {
-        ZStack {
+        ZStack (alignment: .bottomTrailing) {
             VStack (alignment: .leading, spacing: 20) {
                 Spacer()
-                Text(signInStage != .nameUsername ? (isLogin ? "Login" : "Sign up") : "Sign up")
+                Text(isLogin ? "Log In" : "Sign Up")
                     .font(formatter.font(fontSize: .extraLarge))
-                HStack {
-                    Button {
-                        switch signInStage {
-                        case .verifyNumber:
-                            signInStage = .enterNumber
-                        default:
-                            signInStage = .verifyNumber
+                HStack (spacing: 0) {
+                    if signInStage != .enterNumber {
+                        Button {
+                            switch signInStage {
+                            case .verifyNumber:
+                                signInStage = .enterNumber
+                            default:
+                                signInStage = .verifyNumber
+                            }
+                        } label: {
+                            HStack (spacing: 3) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 10, weight: .bold))
+                                Text("Back")
+                            }
+                            .font(formatter.font())
+                            .padding(.trailing)
                         }
-                    } label: {
-                        HStack (spacing: 3) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 10, weight: .bold))
-                            Text("Back")
-                        }
-                        .font(formatter.font())
                     }
-                    Spacer()
-                        .frame(width: formatter.padding())
                     Text(text)
                         .font(formatter.font(.regular))
                     Spacer()
@@ -146,64 +150,11 @@ struct AuthHUDView: View {
             .padding(30)
             .padding(.trailing, 30)
             .foregroundColor(formatter.color(.highContrastWhite))
-            .background(formatter.color(.secondaryFG))
+            .background(formatter.color(.primaryAccent))
             .clipShape(RoundedCorners(br: 70))
-        }
-        HStack {
-            Spacer()
             Image("CircleGrid")
-                .offset(x: 30, y: -50)
+                .offset(x: 50, y: -85)
         }
-    }
-}
-
-struct LoginSignUpView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @Binding var signInStage: SignInStage
-    @Binding var isLogin: Bool
-    
-    var body: some View {
-        VStack (alignment: .leading) {
-            Text("Login or Sign up")
-                .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                .padding(10)
-                .background(Color.white.opacity(0.5))
-                .cornerRadius(5)
-            Spacer()
-                .frame(height: 10)
-            Button {
-                signInStage = .enterNumber
-                isLogin = true
-            } label: {
-                Text("Login")
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color("LoMainFG"))
-                    .clipShape(Capsule())
-            }
-            Button {
-                signInStage = .enterNumber
-                isLogin = false
-            } label: {
-                Text("Sign up")
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color("MainFG"))
-                    .clipShape(Capsule())
-                    .foregroundColor(Color("MainAccent"))
-            }
-            Text("By signing up, you agree to Trivio!'s Privacy Policy")
-                .underline()
-                .font(formatter.customFont(iPadSize: 15))
-                .onTapGesture {
-                    let url = URL.init(string: "https://www.privacypolicies.com/live/3779e433-e05a-43db-8ca5-9d6df7e7a136")
-                    guard let privURL = url, UIApplication.shared.canOpenURL(privURL) else { return }
-                    UIApplication.shared.open(privURL)
-                }
-        }
-        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-        .foregroundColor(.white)
-        .padding(.horizontal, formatter.padding())
     }
 }
 
@@ -215,17 +166,17 @@ struct AuthEnterNumberView: View {
     @Binding var ID: String
     @Binding var alert: Bool
     @Binding var alertMessage: String
+    @Binding var isLogin: Bool
     @State var showingPicker = false
     
     var body: some View {
-        VStack {
-            HStack {
+        VStack (spacing: 15) {
+            HStack (spacing: 15) {
+                Image(systemName: "phone.fill")
+                    .font(.system(size: 20))
+                RoundedRectangle(cornerRadius: 2)
+                    .frame(width: 1, height: 20)
                 Text("+" + countryCode.code)
-                    .padding(.horizontal)
-                    .padding(.vertical, 15)
-                    .font(formatter.font())
-                    .background(formatter.color(.secondaryFG))
-                    .cornerRadius(5)
                 ZStack (alignment: .leading) {
                     if number.isEmpty {
                         Text("Enter your number")
@@ -235,14 +186,14 @@ struct AuthEnterNumberView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .keyboardType(.numberPad)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 15)
-                .font(formatter.font())
-                .background(formatter.color(.secondaryFG))
-                .accentColor(formatter.color(.secondaryAccent))
             }
-            Spacer()
-                .frame(height: formatter.padding(size: 30))
+            .font(formatter.font(fontSize: .mediumLarge))
+            .foregroundColor(formatter.color(.highContrastWhite))
+            .padding(.horizontal)
+            .padding(.vertical, 20)
+            .background(formatter.color(.secondaryFG))
+            .accentColor(formatter.color(.secondaryAccent))
+            .cornerRadius(5)
             Button {
                 if hasValidEntry() {
                     formatter.resignKeyboard()
@@ -257,15 +208,22 @@ struct AuthEnterNumberView: View {
                 }
             } label: {
                 Text("Continue")
-                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                    .font(formatter.font(fontSize: .mediumLarge))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(formatter.color(.secondaryAccent))
+                    .background(formatter.color(isLogin ? .primaryAccent : .secondaryAccent))
                     .cornerRadius(5)
             }
             .opacity(hasValidEntry() ? 1 : 0.5)
+            Spacer()
+                .frame(height: 100)
+            Text("Your personal information will never be used to contact you. It’s simply used for user verification, then we never touch it again.")
+                .font(formatter.font(.regular, fontSize: .small))
+                .padding(.bottom, 60)
         }
+        .padding(30)
+        .keyboardAware(heightFactor: 0.7)
     }
     
     func hasValidEntry() -> Bool {
@@ -282,43 +240,34 @@ struct AuthVerifyNumberView: View {
     @Binding var ID: String
     @Binding var alert: Bool
     @Binding var alertMessage: String
+    @Binding var isLogin: Bool
     @State var isLoading = false
     
     var db = Firestore.firestore()
     
     var body: some View {
-        VStack {
-            ZStack {
+        VStack (spacing: 15) {
+            HStack (spacing: 15) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 20))
+                RoundedRectangle(cornerRadius: 2)
+                    .frame(width: 1, height: 20)
                 ZStack (alignment: .leading) {
                     if number.isEmpty {
                         Text("Enter Valid Code")
-                            .foregroundColor(.gray)
                     }
                     TextField("Enter Valid Code", text: $code)
                         .fixedSize(horizontal: false, vertical: true)
-                        .foregroundColor(.white)
                         .keyboardType(.numberPad)
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 15)
-                .font(formatter.customFont(weight: "Medium", iPadSize: 14))
-                .background(RoundedRectangle(
-                    cornerRadius: 5, style: .continuous
-                ).stroke(Color.white, lineWidth: 2))
-                .accentColor(.white)
-                HStack {
-                    Spacer()
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(Color.green.opacity(hasValidCode() ? 1 : 0.3))
-                        .clipShape(Circle())
-                        .padding(.horizontal, 7)
-                        .background(Circle().stroke(Color.white, lineWidth: 0.5))
-                }
             }
-            Spacer()
-                .frame(height: formatter.padding(size: 30))
+            .font(formatter.font(fontSize: .mediumLarge))
+            .foregroundColor(formatter.color(.highContrastWhite))
+            .padding(.horizontal)
+            .padding(.vertical, 20)
+            .background(formatter.color(.secondaryFG))
+            .accentColor(formatter.color(.secondaryAccent))
+            .cornerRadius(5)
             Button {
                 isLoading = true
                 if hasValidCode() {
@@ -358,23 +307,25 @@ struct AuthVerifyNumberView: View {
                     }
                 }
             } label: {
-                HStack {
+                HStack (spacing: 15) {
                     Text("Continue")
-                        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
                     if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .padding(.horizontal, formatter.padding())
+                        LoadingView()
                     }
                 }
+                .font(formatter.font(fontSize: .mediumLarge))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color("MainFG"))
-                .clipShape(Capsule())
+                .background(formatter.color(isLogin ? .primaryAccent : .secondaryAccent))
+                .cornerRadius(5)
             }
             .opacity(hasValidCode() ? 1 : 0.5)
+            Spacer()
+                .frame(height: 100)
         }
+        .padding(30)
+        .keyboardAware(heightFactor: 0.7)
     }
     
     func hasValidCode() -> Bool {
@@ -582,6 +533,39 @@ struct AuthNameUsernameView: View {
             if myUID == doc.documentID {
                 completion(true)
             }
+        }
+    }
+}
+
+struct LoadingView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @State var timeElapsed = 0
+    
+    let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
+    let color: ColorType = .highContrastWhite
+    
+    var ticker: Int {
+        return timeElapsed % 3
+    }
+    
+    var body: some View {
+        HStack {
+            Circle()
+                .frame(width: 7, height: 7)
+                .foregroundColor(formatter.color(color))
+                .offset(y: ticker == 0 ? -10 : 0)
+            Circle()
+                .frame(width: 7, height: 7)
+                .foregroundColor(formatter.color(color))
+                .offset(y: ticker == 1 ? -10 : 0)
+            Circle()
+                .frame(width: 7, height: 7)
+                .foregroundColor(formatter.color(color))
+                .offset(y: ticker == 2 ? -10 : 0)
+        }
+        .animation(Animation.easeInOut(duration: 1))
+        .onReceive(timer) { time in
+            timeElapsed += 1
         }
     }
 }

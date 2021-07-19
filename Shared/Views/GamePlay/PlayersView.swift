@@ -25,7 +25,7 @@ struct PlayersView: View {
                                 .foregroundColor(ColorMap().getColor(color: team.color))
                             VStack (alignment: .leading) {
                                 Text("\(team.name)")
-                                    .font(formatter.font(fontSize: .mediumLarge))
+                                    .font(formatter.font(fontSize: participantsVM.teams.count > 3 ? .mediumLarge : .large))
                                     .foregroundColor(formatter.color(.highContrastWhite))
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.1)

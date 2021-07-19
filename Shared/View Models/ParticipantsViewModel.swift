@@ -20,6 +20,7 @@ class ParticipantsViewModel: ObservableObject {
     @Published var spokespeople = [String]()
     @Published var toSubtracts = [Bool]()
     @Published var fjCorrects = [Bool]()
+    @Published var fjReveals = [Bool]()
     @Published var selectedTeam: Team = Team(id: "", index: 0, name: "", members: [], score: 0, color: "")
     
     @Published var scores: [[Int]] = []
@@ -51,13 +52,6 @@ class ParticipantsViewModel: ObservableObject {
                 return
             }
             guard let data = snap?.documents else { return }
-//            data.forEach { (doc) in
-//                DispatchQueue.main.async {
-//                    self.historicalTeams = data.compactMap { (queryDocSnap) -> Team? in
-//                        return try? queryDocSnap.data(as: Team.self)
-//                    }
-//                }
-//            }
             DispatchQueue.main.async {
                 self.historicalTeams = data.compactMap { (queryDocSnap) -> Team? in
                     return try? queryDocSnap.data(as: Team.self)
@@ -88,6 +82,7 @@ class ParticipantsViewModel: ObservableObject {
         self.spokespeople.append("")
         self.toSubtracts.append(false)
         self.fjCorrects.append(false)
+        self.fjReveals.append(false)
         self.scores.append([Int](repeating: 0, count: questionTicker))
     }
     
@@ -111,6 +106,7 @@ class ParticipantsViewModel: ObservableObject {
         self.spokespeople.remove(at: index)
         self.toSubtracts.remove(at: index)
         self.fjCorrects.remove(at: index)
+        self.fjReveals.remove(at: index)
         self.scores.remove(at: index)
         
         for i in 0..<self.teams.count {
@@ -144,6 +140,7 @@ class ParticipantsViewModel: ObservableObject {
             wagers[i] = ""
             toSubtracts[i] = false
             fjCorrects[i] = false
+            fjReveals[i] = false
             finalJeopardyAnswers[i] = ""
         }
         self.questionTicker = 0
@@ -173,28 +170,7 @@ class ParticipantsViewModel: ObservableObject {
         }
         questionTicker += 1
     }
-    
-    func addFJCorrect(index: Int) {
-        var amount = Int(self.wagers[index]) ?? 0
-        if self.fjCorrects[index] {
-            amount = -amount
-            self.editScore(index: index, amount: amount)
-        } else {
-            self.editScore(index: index, amount: amount)
-        }
-        self.fjCorrects[index].toggle()
-    }
-    
-    func addFJIncorrect(index: Int) {
-        var amount = Int(self.wagers[index]) ?? 0
-        if self.toSubtracts[index] {
-            self.editScore(index: index, amount: amount)
-        } else {
-            amount = -amount
-            self.editScore(index: index, amount: amount)
-        }
-        self.toSubtracts[index].toggle()
-    }
+
     
     func getIDMap() -> [String : String] {
         var idMap = [String : String]()
@@ -317,25 +293,6 @@ class ParticipantsViewModel: ObservableObject {
         }
     }
     
-    func teamHasLock(teamIndex: Int) -> Bool {
-        if teams.count < 2 { return true }
-        var allScores = [Int]()
-        for scoreArray in scores {
-            let finalScore: Int = scoreArray.last ?? 0
-            allScores.append(finalScore)
-        }
-        let myScore: Int = self.scores[teamIndex].last ?? 0
-        var sortedScores = allScores.sorted()
-        let highestScore = sortedScores.removeLast()
-        let runnerUpScore = sortedScores.removeLast()
-        if myScore != highestScore {
-            return false
-        } else if myScore > 2 * runnerUpScore {
-            return true
-        }
-        return false
-    }
-    
     func resetToLastIncrement(amount: Int) {
         for i in 0..<teams.count {
             guard let last = scores[i].count > 0 ? scores[i].last : 0 else { return }
@@ -365,6 +322,72 @@ class ParticipantsViewModel: ObservableObject {
             }
         }
     }
+    
+    // MARK: - Final Trivio
+    func teamHasLock(teamIndex: Int) -> Bool {
+        if teams.count < 2 { return true }
+        var allScores = [Int]()
+        for scoreArray in scores {
+            let finalScore: Int = scoreArray.last ?? 0
+            allScores.append(finalScore)
+        }
+        let myScore: Int = self.scores[teamIndex].last ?? 0
+        var sortedScores = allScores.sorted()
+        let highestScore = sortedScores.removeLast()
+        let runnerUpScore = sortedScores.removeLast()
+        if myScore != highestScore {
+            return false
+        } else if myScore > 2 * runnerUpScore {
+            return true
+        }
+        return false
+    }
+    
+    func getTeamIndexForPlace(_ placing: Placing) -> Int? {
+        if teams.count == 0 {
+            return nil
+        } else if placing == .second && teams.count < 2 {
+            return nil
+        } else if placing == .third && teams.count < 3 {
+            return nil
+        }
+        var allScores = [Int:Int]()
+        for i in 0..<teams.count {
+            allScores.updateValue(teams[i].score, forKey: teams[i].index)
+        }
+        let sortedScores = Array(allScores.sortedByValue.reversed())
+        
+        switch placing {
+        case .first:
+            return sortedScores[0].0
+        case .second:
+            return sortedScores[1].0
+        default:
+            return sortedScores[2].0
+        }
+    }
+    
+    func addFJCorrect(index: Int) {
+        var amount = Int(self.wagers[index]) ?? 0
+        if self.fjCorrects[index] {
+            amount = -amount
+            self.editScore(index: index, amount: amount)
+        } else {
+            self.editScore(index: index, amount: amount)
+        }
+        self.fjCorrects[index].toggle()
+    }
+    
+    func addFJIncorrect(index: Int) {
+        var amount = Int(self.wagers[index]) ?? 0
+        if self.toSubtracts[index] {
+            self.editScore(index: index, amount: amount)
+        } else {
+            amount = -amount
+            self.editScore(index: index, amount: amount)
+        }
+        self.toSubtracts[index].toggle()
+    }
 }
 
 struct Team: Hashable, Identifiable, Decodable {
@@ -386,6 +409,10 @@ struct Team: Hashable, Identifiable, Decodable {
         self.members = members
         self.score = score
         self.color = color
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
     
     mutating func editName(name: String) {

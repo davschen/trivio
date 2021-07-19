@@ -73,6 +73,9 @@ class ReportViewModel: ObservableObject {
                     self.addGameName(from: gameID)
                     return try? queryDocSnap.data(as: Report.self)
                 }
+                if let gameID = self.allGames.first?.id {
+                    self.getGameInfo(id: gameID)
+                }
             }
         }
     }
@@ -101,7 +104,8 @@ class ReportViewModel: ObservableObject {
     
     func getGameInfo(id: String) {
         self.scores.removeAll()
-        let docRef = db.collection("users").document(Auth.auth().currentUser?.uid ?? "hello").collection("games").document(id)
+        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        let docRef = db.collection("users").document(myUID).collection("games").document(id)
         docRef.addSnapshotListener { (doc, err) in
             if err != nil {
                 print(err!.localizedDescription)
@@ -109,7 +113,9 @@ class ReportViewModel: ObservableObject {
             }
             
             DispatchQueue.main.async {
-                self.currentReport = try? doc?.data(as: Report.self)
+                guard let doc = doc else { return }
+                self.currentReport = try? doc.data(as: Report.self)
+                self.selectedGameID = doc.documentID
             }
             
             if let gameID = doc?.get("episode_played") as? String {
@@ -147,10 +153,6 @@ class ReportViewModel: ObservableObject {
         }
     }
     
-    func setCurrentToFirst() {
-        self.currentReport = self.allGames.first ?? Report()
-    }
-    
     func getMinMax() {
         self.min = 0
         self.max = 0
@@ -168,7 +170,11 @@ class ReportViewModel: ObservableObject {
             var counter = 0
             while counter <= game.steps {
                 xArray.append(counter)
-                counter += 5
+                if game.steps < 30 {
+                    counter += 2
+                } else {
+                    counter += 5
+                }
             }
             self.xAxis = xArray
             

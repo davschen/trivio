@@ -33,7 +33,7 @@ struct GamePreviewView: View {
                                         ZStack {
                                             formatter.color(.primaryAccent)
                                             Text(category.uppercased())
-                                                .font(formatter.font(fontSize: .small))
+                                                .font(formatter.font())
                                                 .foregroundColor(formatter.color(.highContrastWhite))
                                                 .multilineTextAlignment(.center)
                                                 .padding(.horizontal, 10)
@@ -41,7 +41,7 @@ struct GamePreviewView: View {
                                                 .minimumScaleFactor(0.1)
                                                 .padding(2)
                                         }
-                                        .cornerRadius(5)
+                                        .cornerRadius(10)
                                         .padding(2)
                                         .tag(UUID().uuidString)
                                         .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.secondaryAccent), lineWidth: shouldHighlight ? 5 : 0))
@@ -57,7 +57,7 @@ struct GamePreviewView: View {
                                         ZStack {
                                             formatter.color(.primaryAccent)
                                             Text(category.uppercased())
-                                                .font(formatter.font(fontSize: .small))
+                                                .font(formatter.font())
                                                 .foregroundColor(formatter.color(.highContrastWhite))
                                                 .multilineTextAlignment(.center)
                                                 .padding(.horizontal, 10)
@@ -65,7 +65,7 @@ struct GamePreviewView: View {
                                                 .minimumScaleFactor(0.1)
                                                 .padding(2)
                                         }
-                                        .cornerRadius(5)
+                                        .cornerRadius(10)
                                         .padding(2)
                                         .tag(UUID().uuidString)
                                         .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.secondaryAccent), lineWidth: shouldHighlight ? 5 : 0))

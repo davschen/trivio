@@ -30,29 +30,29 @@ struct AlertView: View {
     
     var body: some View {
         ZStack {
-            Color("MainBG")
+            formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
-                .opacity(formatter.showingAlert ? 0.75 : 0)
+                .opacity(formatter.showingAlert ? 0.9 : 0)
             ZStack {
                 switch alertStyle {
                 case .view:
                     Text("")
                 case .loading:
                     VStack {
-                        ProgressView()
+                        LoadingView()
                     }
                     .padding(50)
-                    .background(Color("MainFG"))
+                    .background(formatter.color(.secondaryFG))
                     .cornerRadius(20)
                     .shadow(radius: 10)
                 default:
                     VStack {
                         VStack {
-                            VStack {
+                            VStack (spacing: 15) {
                                 Text(titleText)
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                                    .font(formatter.font(fontSize: .mediumLarge))
                                 Text(subtitleText)
-                                    .font(formatter.customFont(weight: "Medium", iPadSize: 15))
+                                    .font(formatter.font(.regular, fontSize: .small))
                             }
                             .padding(.bottom, 20)
                             ActionButtonView(action: {
@@ -67,7 +67,7 @@ struct AlertView: View {
                             }
                         }
                         .padding(30)
-                        .background(Color("MainFG"))
+                        .background(formatter.color(.secondaryFG))
                         .cornerRadius(20)
                         .shadow(radius: 10)
                         if hasCancel {
@@ -75,14 +75,15 @@ struct AlertView: View {
                                 formatter.dismissAlert()
                             } label: {
                                 Text("Cancel")
-                                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
+                                    .font(formatter.font(fontSize: .mediumLarge))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
                             }
-                            .padding(formatter.padding())
+                            .padding()
                         }
                     }
                 }
             }
-            .frame(width: 300)
+            .frame(width: 350)
             .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height)
         }
     }
@@ -95,9 +96,9 @@ struct AlertView: View {
                 Text(label)
                     .frame(maxWidth: .infinity)
                     .padding(formatter.padding())
-                    .background(Color.white.opacity(0.5))
-                    .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                    .foregroundColor(Color("MainAccent"))
+                    .background(formatter.color(.primaryAccent))
+                    .font(formatter.font(fontSize: .medium))
+                    .foregroundColor(formatter.color(.highContrastWhite))
                     .cornerRadius(5)
             }
         }

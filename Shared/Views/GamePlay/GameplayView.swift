@@ -24,6 +24,7 @@ struct GameplayView: View {
     @State var allDone = false
     @State var showInfoView = false
     @State var category = ""
+    @State var finalTrivioLoading = false
     
     var body: some View {
         VStack (spacing: 10) {
@@ -38,40 +39,40 @@ struct GameplayView: View {
                     if !self.clue.isEmpty {
                         AnswerView(clue: $clue, category: $category, value: $value, response: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: self.isDailyDouble, isTripleStumper: self.isTripleStumper)
                             .onDisappear {
-                                if gamesVM.doneWithRound() && self.gamesVM.isDoubleJeopardy {
-                                    self.allDone.toggle()
-                                } else if gamesVM.doneWithRound() {
-                                    gamesVM.moveOntoDoubleJeopardy()
-                                    participantsVM.changeDJTeam()
-                                }
-                                self.participantsVM.incrementGameStep()
-                                self.participantsVM.resetSubtracts()
+                                progressGame()
                             }
                     }
-                    Group {
-                        if allDone {
-                            HStack {
-                                Button(action: {
-                                    self.finalJeopardySelected.toggle()
-                                }, label: {
-                                    Text("Final Trivio")
-                                        .font(formatter.customFont(weight: "Bold", iPadSize: 50))
-                                        .foregroundColor(Color("Darkened"))
-                                        .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                        .multilineTextAlignment(.center)
-                                        .padding(formatter.padding())
-                                })
-                            }
-                            .background(Color.white)
-                            .cornerRadius(5)
-                            .opacity(self.finalJeopardySelected ? 0 : 1)
-                        }
-                        if finalJeopardySelected {
-                            FinalJeopardyView(finalJeopardySelected: $finalJeopardySelected)
-                                .onDisappear {
-                                    self.allDone.toggle()
+                    if allDone {
+                        HStack {
+                            Button(action: {
+                                self.finalJeopardySelected.toggle()
+                            }, label: {
+                                HStack (spacing: 15) {
+                                    Text("Continue to Final Trivio!")
+                                    Image(systemName: "arrow.right.circle.fill")
+                                        .font(.system(size: 30, weight: .bold))
+                                        .offset(x: finalTrivioLoading ? 20 : 0)
+                                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true))
                                 }
+                                .font(formatter.font(fontSize: .large))
+                                .foregroundColor(formatter.color(.primaryFG))
+                                .multilineTextAlignment(.center)
+                                .padding(20)
+                                .padding(.horizontal, 70)
+                            })
                         }
+                        .background(formatter.color(.highContrastWhite))
+                        .clipShape(Capsule())
+                        .opacity(finalJeopardySelected ? 0 : 1)
+                        .onAppear {
+                            finalTrivioLoading = true
+                        }
+                    }
+                    if finalJeopardySelected {
+                        FinalJeopardyView(finalJeopardySelected: $finalJeopardySelected)
+                            .onDisappear {
+                                self.allDone.toggle()
+                            }
                     }
                 }
                 InfoView(showInfoView: $showInfoView)
@@ -80,9 +81,18 @@ struct GameplayView: View {
         }
         .padding(30)
     }
+    
+    func progressGame() {
+        if gamesVM.doneWithRound() && self.gamesVM.isDoubleJeopardy {
+            self.allDone.toggle()
+        } else if gamesVM.doneWithRound() {
+            gamesVM.moveOntoDoubleJeopardy()
+            participantsVM.changeDJTeam()
+        }
+        self.participantsVM.incrementGameStep()
+        self.participantsVM.resetSubtracts()
+    }
 }
-
-
 
 struct GameGridView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
@@ -105,7 +115,7 @@ struct GameGridView: View {
         VStack (spacing: 10) {
             HStack {
                 Text("\(gamesVM.isDoubleJeopardy ? "Double Trivio! Round" : "Trivio! Round")")
-                    .font(formatter.font(.bold, fontSize: .large))
+                    .font(formatter.font(fontSize: .large))
                 Image(systemName: "arrow.right.square.fill")
                     .font(formatter.deviceType == .iPad ? .largeTitle : .title3)
                     .onTapGesture {
@@ -123,7 +133,6 @@ struct GameGridView: View {
                         showInfoView.toggle()
                     }
             }
-            .opacity(gamesVM.categories.isEmpty ? 0 : 1)
             HStack (spacing: 10) {
                 ForEach(0..<(gamesVM.categories.count), id: \.self) { i in
                     let category: String = gamesVM.categories[i]

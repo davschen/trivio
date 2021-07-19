@@ -53,7 +53,7 @@ struct CustomSetView: View {
     var isMine: Bool
     var customSets: [CustomSet]
     
-    let columns = [GridItem](repeating: GridItem(spacing: 15), count: 3)
+    let columns = [GridItem](repeating: GridItem(spacing: 15), count: 2)
     
     var body: some View {
         VStack {
@@ -68,7 +68,7 @@ struct CustomSetView: View {
                     if searchItem.isEmpty {
                         Button {
                             searchItem.removeAll()
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            formatter.resignKeyboard()
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 20, weight: .bold))

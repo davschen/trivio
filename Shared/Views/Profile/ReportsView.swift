@@ -92,11 +92,8 @@ struct ReportPreviewView: View {
         .background(formatter.color(reportVM.selectedGameID == gameID ? .secondaryFG : .primaryFG))
         .cornerRadius(10)
         .onTapGesture {
-            if reportVM.selectedGameID == gameID {
-                self.reportVM.selectedGameID = ""
-            } else {
+            if reportVM.selectedGameID != gameID {
                 self.reportVM.getGameInfo(id: gameID)
-                self.reportVM.selectedGameID = gameID
             }
         }
         .onLongPressGesture {
@@ -143,7 +140,7 @@ struct AnalysisView: View {
                                 }
                             }
                             .frame(height: 15)
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.top, 5)
                         }
                     }

@@ -60,7 +60,6 @@ struct AnswerView: View {
                         }
                         Text("\(category.uppercased()) - $\(self.value)")
                             .font(formatter.font(fontSize: .mediumLarge))
-                            .foregroundColor(.white)
                             .padding(formatter.padding())
                             .background(Color.gray.opacity(0.3))
                             .cornerRadius(5)
@@ -69,7 +68,6 @@ struct AnswerView: View {
                     Spacer()
                     Text(clue.uppercased())
                         .font(formatter.font(fontSize: .large))
-                        .foregroundColor(formatter.color(.highContrastWhite))
                         .multilineTextAlignment(.center)
                         .padding()
                     if self.showResponse {
@@ -95,14 +93,13 @@ struct AnswerView: View {
                             if participantsVM.teams.count > 0 {
                                 HStack {
                                     Text("\(participantsVM.selectedTeam.name) (Wager: $\(Int(wager)))")
-                                        .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                                        .foregroundColor(Color("MainAccent"))
+                                        .font(formatter.font())
                                     Image(systemName: "xmark")
                                         .font(.system(size: 15, weight: .bold))
                                 }
                                 .padding(formatter.padding())
-                                .background(Color.red.opacity(self.ddCorrect ? 0 : 0.5))
-                                .background(Color.gray.opacity(0.4))
+                                .background(formatter.color(.red).opacity(self.ddCorrect ? 0 : 1))
+                                .background(formatter.color(.lowContrastWhite))
                                 .cornerRadius(formatter.cornerRadius(5))
                                 .padding(5)
                                 .onTapGesture {
@@ -117,7 +114,6 @@ struct AnswerView: View {
                         }
                         Text("  \(self.showResponse ? "Hide" : "Show") Response  ")
                             .font(formatter.font(fontSize: .mediumLarge))
-                            .foregroundColor(formatter.color(.highContrastWhite))
                             .shadow(color: Color.black.opacity(0.2), radius: 5)
                             .padding(25)
                             .background(formatter.color(.lowContrastWhite).opacity(showResponse ? 1 : 0.4))
@@ -162,7 +158,6 @@ struct AnswerView: View {
                 VStack {
                     Text("DUPLEX OF THE DAY")
                         .font(formatter.font(fontSize: .extraLarge))
-                        .foregroundColor(formatter.color(.highContrastWhite))
                         .shadow(color: Color.black.opacity(0.2), radius: 5)
                         .multilineTextAlignment(.center)
                         .padding()
@@ -172,7 +167,6 @@ struct AnswerView: View {
                         HStack {
                             Text("Wager: \(Int(self.wager))")
                                 .font(formatter.font())
-                                .foregroundColor(formatter.color(.highContrastWhite))
                                 .multilineTextAlignment(.center)
                             Spacer(minLength: 30)
                             Button(action: {
@@ -182,11 +176,10 @@ struct AnswerView: View {
                                 self.formatter.speaker.speak(self.clue)
                             }) {
                                 Text("Done")
-                                    .font(formatter.font())
-                                    .foregroundColor(formatter.color(.highContrastWhite))
-                                    .padding()
+                                    .font(formatter.font(fontSize: .mediumLarge))
+                                    .padding(25)
                                     .background(formatter.color(.lowContrastWhite))
-                                    .cornerRadius(5.0)
+                                    .clipShape(Capsule())
                             }
                         }
                     }
@@ -225,14 +218,12 @@ struct CorrectSelectorView: View {
                         }, label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 25, weight: .bold))
-                                .foregroundColor(formatter.color(.highContrastWhite))
                                 .padding(5)
                         })
                         RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 25)
                             .padding(.horizontal, 5)
                         Text("\(team.name)")
                             .font(formatter.font(fontSize: .mediumLarge))
-                            .foregroundColor(formatter.color(.highContrastWhite))
                             .padding(.horizontal, 5)
                             .onTapGesture {
                                 markCorrect(teamIndex: team.index)
