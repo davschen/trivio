@@ -308,9 +308,10 @@ struct AuthVerifyNumberView: View {
                 }
             } label: {
                 HStack (spacing: 15) {
-                    Text("Continue")
                     if isLoading {
                         LoadingView()
+                    } else {
+                        Text("Continue")
                     }
                 }
                 .font(formatter.font(fontSize: .mediumLarge))

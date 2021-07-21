@@ -62,6 +62,7 @@ struct FinalTrivioMakeWagerView: View {
                     .background(formatter.color(.lowContrastWhite))
                     .clipShape(Capsule())
                     .frame(maxWidth: .infinity, alignment: .trailing)
+                    .opacity(participantsVM.wagersValid() ? 1 : 0.5)
             })
             .keyboardAware()
             
@@ -141,6 +142,12 @@ struct MakeWagerView: View {
                     hidden.toggle()
                 }
             }
+            if !participantsVM.wagers.isEmpty && !invalidWagerString(teamIndex: teamIndex).isEmpty {
+                Text(invalidWagerString(teamIndex: teamIndex))
+                    .font(formatter.font(.regularItalic))
+                    .foregroundColor(formatter.color(.secondaryAccent))
+                    .multilineTextAlignment(.leading)
+            }
         }
     }
     
@@ -150,5 +157,16 @@ struct MakeWagerView: View {
         } else {
             return (UIScreen.main.bounds.width - (120 + CGFloat(15 * (participantsVM.teams.count - 1)))) * CGFloat(1 / Double(participantsVM.teams.count))
         }
+    }
+    
+    func invalidWagerString(teamIndex: Int) -> String {
+        if Int(participantsVM.wagers[teamIndex]) == nil {
+            return "You must enter a number"
+        } else if Int(participantsVM.wagers[teamIndex])! > participantsVM.teams[teamIndex].score {
+            return "Your wager cannot be higher than your score"
+        } else if Int(participantsVM.wagers[teamIndex])! < 0 {
+            return "Your wager cannot be negative. Nice try though."
+        }
+        return ""
     }
 }

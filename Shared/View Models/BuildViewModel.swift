@@ -701,6 +701,10 @@ struct CustomSet: Decodable, Hashable, Identifiable, Encodable {
     var averageScore: Double
     var jRoundLen: Int
     var djRoundLen: Int
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 struct Empty {

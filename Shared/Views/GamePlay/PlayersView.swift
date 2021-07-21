@@ -7,12 +7,13 @@
 
 import Foundation
 import SwiftUI
+import MovingNumbersView
 
 struct PlayersView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
-
+    
     var body: some View {
         // Contestants HStack
         if participantsVM.teams.count > 0 {
@@ -41,14 +42,21 @@ struct PlayersView: View {
                                 }
                             }
                             Spacer(minLength: 0)
-                            Text("\(team.score >= 0 ? "$" : "-$")\(abs(team.score))")
-                                .font(formatter.font(fontSize: .mediumLarge))
-                                .foregroundColor(formatter.color(team.score < 0 ? .red : .highContrastWhite))
-                                .frame(maxWidth: 130)
-                                .frame(maxHeight: .infinity)
-                                .background(formatter.color(.primaryFG))
-                                .cornerRadius(15)
-                                .minimumScaleFactor(0.1)
+                            HStack (spacing: 0) {
+                                Text("\(team.score >= 0 ? "$" : "-$")")
+                                    .font(formatter.font(fontSize: .mediumLarge))
+                                MovingNumbersView(
+                                    number: Double(abs(team.score)),
+                                    numberOfDecimalPlaces: 0) { str in
+                                        Text(str)
+                                            .font(formatter.font(fontSize: .mediumLarge))
+                                }
+                            }
+                            .foregroundColor(formatter.color(team.score < 0 ? .red : .highContrastWhite))
+                            .frame(maxWidth: 140)
+                            .frame(maxHeight: .infinity)
+                            .background(formatter.color(.primaryFG))
+                            .cornerRadius(15)
                         }
                     }
                     .padding(20)

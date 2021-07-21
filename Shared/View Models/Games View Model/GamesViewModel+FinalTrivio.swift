@@ -11,7 +11,6 @@ extension GamesViewModel {
     func finalTrivioFinishedAction() {
         switch finalTrivioStage {
         case .makeWager:
-            wagersMade.toggle()
             finalTrivioStage = .submitAnswer
         case .submitAnswer:
             finalTrivioStage = .revealResponse
@@ -24,5 +23,5 @@ extension GamesViewModel {
 }
 
 enum FinalTrivioStage {
-    case makeWager, submitAnswer, revealResponse, podium
+    case notBegun, makeWager, submitAnswer, revealResponse, podium
 }

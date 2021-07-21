@@ -19,6 +19,7 @@ class ProfileViewModel: ObservableObject {
     @Published var drafts = [CustomSet]()
     
     private var db = Firestore.firestore()
+    public var myUID = Auth.auth().currentUser?.uid
     
     init() {
         getPlayedGames()
@@ -26,7 +27,8 @@ class ProfileViewModel: ObservableObject {
     }
     
     func getPlayedGames() {
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "NID").collection("played").addSnapshotListener { (snap, error) in
+        guard let uid = myUID else { return }
+        db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return

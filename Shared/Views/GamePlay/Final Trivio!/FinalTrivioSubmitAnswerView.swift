@@ -40,7 +40,9 @@ struct FinalTrivioSubmitAnswerView: View {
                 }
                 // Finished button
                 Button(action: {
-                    gamesVM.finalTrivioFinishedAction()
+                    if participantsVM.answersValid() {
+                        gamesVM.finalTrivioFinishedAction()
+                    }
                 }, label: {
                     Text("Finished")
                         .font(formatter.font())
@@ -49,6 +51,7 @@ struct FinalTrivioSubmitAnswerView: View {
                         .background(formatter.color(.lowContrastWhite))
                         .clipShape(Capsule())
                         .frame(maxWidth: .infinity, alignment: .trailing)
+                        .opacity(participantsVM.answersValid() ? 1 : 0.5)
                 })
             }
             .keyboardAware()
@@ -124,7 +127,7 @@ struct SubmitAnswerView: View {
                 }
                 .font(formatter.font(fontSize: .mediumLarge))
                 .foregroundColor(formatter.color(answerSubmitted ? .highContrastWhite : .mediumContrastWhite))
-                .padding(30)
+                .padding(20)
                 .frame(maxWidth: .infinity)
                 .background(formatter.color(hidden ? .primaryFG : .lowContrastWhite))
                 .cornerRadius(10)

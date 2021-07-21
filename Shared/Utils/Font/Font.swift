@@ -31,6 +31,8 @@ extension MasterHandler {
             sizeFloat = deviceType == .iPhone ? 16 : 20
         case .mediumLarge:
             sizeFloat = deviceType == .iPhone ? 18 : 25
+        case .semiLarge:
+            sizeFloat = deviceType == .iPhone ? 20 : 30
         case .large:
             sizeFloat = deviceType == .iPhone ? 22 : 35
         case .extraLarge:
@@ -46,5 +48,5 @@ enum FontStyle {
 }
 
 enum FontSize {
-    case small, regular, medium, mediumLarge, large, extraLarge
+    case small, regular, medium, mediumLarge, semiLarge, large, extraLarge
 }

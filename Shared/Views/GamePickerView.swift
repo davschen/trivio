@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import Shimmer
 
 struct GamePickerView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -28,6 +29,8 @@ struct GamePickerView: View {
                     SearchView()
                 }
             }
+            .redacted(reason: gamesVM.loadingGame ? .placeholder : [])
+            .shimmering(active: gamesVM.loadingGame) 
         }
         .padding(30)
     }

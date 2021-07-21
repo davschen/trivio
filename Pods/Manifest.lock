@@ -352,12 +352,14 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (1.2.12)
+  - ScrollCounter (0.0.2)
 
 DEPENDENCIES:
   - Firebase/Analytics
   - Firebase/Auth
   - Firebase/Firestore
   - FirebaseFirestoreSwift (~> 7.11.0-beta)
+  - ScrollCounter
 
 SPEC REPOS:
   trunk:
@@ -380,6 +382,7 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - ScrollCounter
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -401,7 +404,8 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
+  ScrollCounter: 22ba58449addef7ed242cdf2e4b46aa9dbbe3a49
 
-PODFILE CHECKSUM: 43bacb313d85a06406a78715e026c36ccb6e7fbd
+PODFILE CHECKSUM: 1cb7a54e2a05cac5c39d51471afd0266e3471f19
 
 COCOAPODS: 1.10.1

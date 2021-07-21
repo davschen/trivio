@@ -34,7 +34,7 @@ struct SummaryView: View {
         @EnvironmentObject var reportVM: ReportViewModel
         
         var body: some View {
-            ScrollView (.vertical) {
+            ScrollView (.vertical, showsIndicators: false) {
                 VStack (spacing: 25) {
                     VStack (alignment: .leading) {
                         Button(action: {

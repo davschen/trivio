@@ -15,8 +15,6 @@ struct FinalTrivioPodiumView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
-    @Binding var finalJeopardySelected: Bool
-    
     @State var rating = 0
     
     var body: some View {
@@ -49,8 +47,6 @@ struct FinalTrivioPodiumView: View {
                 // go to the report
                 gamesVM.menuChoice = .profile
                 profileVM.menuSelectedItem = "Past Games"
-                
-                finalJeopardySelected.toggle()
             }, label: {
                 Text("Finish Game!")
                     .font(formatter.font())

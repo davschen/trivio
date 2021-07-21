@@ -119,6 +119,7 @@ struct RevealGradeView: View {
             .onTapGesture {
                 if !participantsVM.fjReveals[teamIndex] {
                     participantsVM.fjReveals[teamIndex].toggle()
+                    participantsVM.setSelectedTeam(index: teamIndex)
                 }
             }
             

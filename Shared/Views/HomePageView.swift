@@ -78,16 +78,22 @@ struct MainView: View {
         switch gamesVM.menuChoice {
         case .explore:
             ExploreView()
+                .transition(.identity)
         case .game:
             GameplayView()
+                .transition(.identity)
         case .participants:
             ParticipantsView()
+                .transition(.identity)
         case .gamepicker:
             GamePickerView()
+                .transition(.identity)
         case .reports:
             ReportsView()
+                .transition(.identity)
         default:
             ProfileView()
+                .transition(.identity)
         }
     }
 }

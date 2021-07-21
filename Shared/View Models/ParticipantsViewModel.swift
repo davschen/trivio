@@ -30,39 +30,101 @@ class ParticipantsViewModel: ObservableObject {
     private static let suffix = ["", "K", "M", "B", "T", "P", "E"]
     var defaultIndex = 0
     
+    private var myUID: String? {
+        return Auth.auth().currentUser?.uid
+    }
+    
     init() {
         getAllTeams()
     }
     
-    func writeTeamToFirestore(team: Team) {
-        self.db.collection("users").document(Auth.auth().currentUser?.uid ?? "unknownUser").collection("contestants").addDocument(data: [
-            "name" : team.name,
-            "color" : team.color,
-            "id" : team.id,
-            "members" : team.members,
-            "score" : 0,
-            "index" : 0
-        ])
+    func writeTeamToFirestore(team: Team, isSelf: Bool = false) {
+        guard let uid = myUID else { return }
+        let teamID = isSelf ? uid : team.id
+        
+        self.db.collection("users")
+            .document(uid)
+            .collection("contestants")
+            .document(teamID)
+            .setData([
+                "name" : team.name,
+                "color" : team.color,
+                "id" : team.id,
+                "members" : team.members,
+                "score" : 0,
+                "index" : 0
+            ])
+        
+        self.getAllTeams()
+    }
+    
+    func addSelfAsTeam() {
+        guard let uid = myUID else { return }
+        self.db.collection("users")
+            .document(uid)
+            .getDocument { docSnap, error in
+                if error != nil {
+                    print(error!.localizedDescription)
+                    return
+                }
+                DispatchQueue.main.async {
+                    guard let doc = docSnap else { return }
+                    guard let name = doc.get("name") as? String else { return }
+                    guard let firstName = name.components(separatedBy: " ").first else { return }
+                    self.addTeam(id: uid, name: firstName, members: [], score: 0, color: "blue")
+                    
+                    guard let addedTeam = self.teams.last else { return }
+                    self.writeTeamToFirestore(team: addedTeam)
+                }
+            }
+    }
+    
+    func editTeamInDB(teamIndex: Int) {
+        guard let uid = myUID else { return }
+        try? self.db.collection("users")
+            .document(uid)
+            .collection("contestants")
+            .document(teams[teamIndex].id)
+            .setData(from: teams[teamIndex])
+        getAllTeams()
     }
     
     func getAllTeams() {
-        self.db.collection("users").document(Auth.auth().currentUser?.uid ?? "unknownUser").collection("contestants").addSnapshotListener { (snap, err) in
-            if err != nil {
-                print(err!.localizedDescription)
-                return
-            }
-            guard let data = snap?.documents else { return }
-            DispatchQueue.main.async {
-                self.historicalTeams = data.compactMap { (queryDocSnap) -> Team? in
-                    return try? queryDocSnap.data(as: Team.self)
+        guard let uid = myUID else { return }
+        self.db.collection("users")
+            .document(uid)
+            .collection("contestants")
+            .getDocuments { (snap, err) in
+                if err != nil {
+                    print(err!.localizedDescription)
+                    return
+                }
+                guard let data = snap?.documents else { return }
+                DispatchQueue.main.async {
+                    self.historicalTeams = data.compactMap { (queryDocSnap) -> Team? in
+                        return try? queryDocSnap.data(as: Team.self)
+                    }
+                    var shouldAddSelf = true
+                    for team in self.historicalTeams {
+                        if team.id == uid {
+                            shouldAddSelf = false
+                            if !self.teams.contains(team) {
+                                self.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
+                            }
+                            break
+                        }
+                    }
+                    if shouldAddSelf {
+                        self.addSelfAsTeam()
+                    }
                 }
             }
-        }
     }
     
     func removeTeamFromFirestore(id: String) {
-        let docRef = self.db.collection("users").document(Auth.auth().currentUser?.uid ?? "unknownUser").collection("contestants")
-        docRef.whereField("id", isEqualTo: id).addSnapshotListener { (snap, err) in
+        guard let uid = myUID else { return }
+        let docRef = self.db.collection("users").document(uid).collection("contestants")
+        docRef.whereField("id", isEqualTo: id).getDocuments { (snap, err) in
             if err != nil {
                 print(err!.localizedDescription)
                 return
@@ -72,54 +134,63 @@ class ParticipantsViewModel: ObservableObject {
             if doc.exists {
                 docRef.document(doc.documentID).delete()
             }
+            self.getAllTeams()
         }
     }
     
     func addTeam(id: String = "", name: String, members: [String], score: Int, color: String) {
-        self.teams.append(Team(id: id, index: teams.count, name: name, members: members, score: score, color: color))
-        self.wagers.append("")
-        self.finalJeopardyAnswers.append("")
-        self.spokespeople.append("")
-        self.toSubtracts.append(false)
-        self.fjCorrects.append(false)
-        self.fjReveals.append(false)
-        self.scores.append([Int](repeating: 0, count: questionTicker))
+        teams.append(Team(id: id, index: teams.count, name: name, members: members, score: score, color: color))
+        wagers.append("")
+        finalJeopardyAnswers.append("")
+        spokespeople.append("")
+        toSubtracts.append(false)
+        fjCorrects.append(false)
+        fjReveals.append(false)
+        scores.append([Int](repeating: 0, count: questionTicker))
     }
     
     func editScore(index: Int, amount: Int) {
-        self.teams[index].editScore(amount: amount)
+        teams[index].editScore(amount: amount)
     }
     
     func addMember(index: Int, name: String) {
-        self.teams[index].addMember(name: name)
-        self.spokespeople[index] = name
+        teams[index].addMember(name: name)
+        spokespeople[index] = name
+        
+        if !teams.indices.contains(selectedTeam.index) {
+            setSelectedTeam(index: index)
+        }
     }
     
     func editName(index: Int, name: String) {
-        self.teams[index].editName(name: name)
+        teams[index].editName(name: name)
     }
     
     func removeTeam(index: Int) {
-        self.teams.remove(at: index)
-        self.wagers.remove(at: index)
-        self.finalJeopardyAnswers.remove(at: index)
-        self.spokespeople.remove(at: index)
-        self.toSubtracts.remove(at: index)
-        self.fjCorrects.remove(at: index)
-        self.fjReveals.remove(at: index)
-        self.scores.remove(at: index)
+        teams.remove(at: index)
+        wagers.remove(at: index)
+        finalJeopardyAnswers.remove(at: index)
+        spokespeople.remove(at: index)
+        toSubtracts.remove(at: index)
+        fjCorrects.remove(at: index)
+        fjReveals.remove(at: index)
+        scores.remove(at: index)
         
         for i in 0..<self.teams.count {
             teams[i].setIndex(index: i)
         }
+        
+        if selectedTeam.index == index && teams.count > 0 {
+            setSelectedTeam(index: 0)
+        }
     }
     
     func removeMember(index: Int, name: String) {
-        self.teams[index].removeMember(name: name)
+        teams[index].removeMember(name: name)
     }
     
     func editColor(index: Int, color: String) {
-        self.teams[index].editColor(color: color)
+        teams[index].editColor(color: color)
     }
     
     func resetSubtracts() {
@@ -143,9 +214,9 @@ class ParticipantsViewModel: ObservableObject {
             fjReveals[i] = false
             finalJeopardyAnswers[i] = ""
         }
-        self.questionTicker = 0
-        self.solved = 0
-        self.scores = [[Int]](repeating: [], count: teams.count)
+        questionTicker = 0
+        solved = 0
+        scores = [[Int]](repeating: [], count: teams.count)
     }
     
     func getIndexByID(id: String) -> Int {
@@ -163,9 +234,9 @@ class ParticipantsViewModel: ObservableObject {
     
     func incrementGameStep() {
         for team in self.teams {
-            self.scores[team.index].append(team.score)
+            scores[team.index].append(team.score)
             if team.members.count > 0 {
-                self.spokespeople[team.index] = team.members[questionTicker % team.members.count]
+                spokespeople[team.index] = team.members[questionTicker % team.members.count]
             }
         }
         questionTicker += 1
@@ -205,6 +276,15 @@ class ParticipantsViewModel: ObservableObject {
                 continue
             }
             if Int(wager) == nil || wager.isEmpty || intWager > score || intWager < 0 {
+                return false
+            }
+        }
+        return true
+    }
+    
+    func answersValid() -> Bool {
+        for answer in finalJeopardyAnswers {
+            if answer.isEmpty {
                 return false
             }
         }
@@ -390,7 +470,7 @@ class ParticipantsViewModel: ObservableObject {
     }
 }
 
-struct Team: Hashable, Identifiable, Decodable {
+struct Team: Hashable, Identifiable, Decodable, Encodable {
     static func == (lhs: Team, rhs: Team) -> Bool {
         return lhs.id == rhs.id
     }

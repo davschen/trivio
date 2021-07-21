@@ -9,7 +9,9 @@ import Foundation
 import SwiftUI
 
 struct TeamBuildView: View {
+    @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @Binding var showsBuild: Bool
     @Binding var team: Team
@@ -17,16 +19,17 @@ struct TeamBuildView: View {
     @State var nameToAdd = ""
     @State var scoreToAdd = ""
     
-    @EnvironmentObject var formatter: MasterHandler
-    
     var body: some View {
         ZStack (alignment: .bottomLeading) {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
-                .opacity(self.showsBuild ? 0.9 : 0)
+                .opacity(showsBuild ? 0.6 : 0)
                 .onTapGesture {
-                    self.showsBuild.toggle()
+                    if participantsVM.historicalTeams.contains(team) {
+                        participantsVM.editTeamInDB(teamIndex: team.index)
+                    }
                     formatter.resignKeyboard()
+                    showsBuild.toggle()
                 }
             
             VStack (spacing: 10) {
@@ -43,7 +46,7 @@ struct TeamBuildView: View {
                 HStack {
                     ColorPickerView(color: formatter.color(.blue), colorString: "blue", team: $team)
                     ColorPickerView(color: formatter.color(.purple), colorString: "purple", team: $team)
-                    ColorPickerView(color: formatter.color(.green), colorString: "pink", team: $team)
+                    ColorPickerView(color: formatter.color(.green), colorString: "green", team: $team)
                     ColorPickerView(color: formatter.color(.yellow), colorString: "yellow", team: $team)
                     ColorPickerView(color: formatter.color(.orange), colorString: "orange", team: $team)
                     ColorPickerView(color: formatter.color(.red), colorString: "red", team: $team)
@@ -66,26 +69,31 @@ struct TeamBuildView: View {
                         .background(formatter.color(.highContrastWhite))
                         .cornerRadius(10)
                     }
-                    Button {
-                        if !participantsVM.historicalTeams.contains(team) {
-                            participantsVM.writeTeamToFirestore(team: team)
-                        } else {
-                            formatter.setAlertSettings(alertAction: {
-                                participantsVM.removeTeamFromFirestore(id: team.id)
-                            }, alertTitle: "Delete Player?", alertSubtitle: "If you delete \(team.name), you'll have to add them back later manually.", hasCancel: true, actionLabel: "Delete")
+                    
+                    if let uid = profileVM.myUID {
+                        if team.id != uid {
+                            Button {
+                                if !participantsVM.historicalTeams.contains(team) {
+                                    participantsVM.writeTeamToFirestore(team: team)
+                                } else {
+                                    formatter.setAlertSettings(alertAction: {
+                                        participantsVM.removeTeamFromFirestore(id: team.id)
+                                    }, alertTitle: "Delete Player?", alertSubtitle: "If you delete \(team.name), you'll have to add them back later manually.", hasCancel: true, actionLabel: "Delete")
+                                }
+                            } label: {
+                                HStack {
+                                    Image(systemName: participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
+                                        .font(.system(size: 20, weight: .bold))
+                                        .offset(y: -3)
+                                    Text(participantsVM.historicalTeams.contains(team) ? "Unsave" : "Save")
+                                        .font(formatter.font())
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .foregroundColor(formatter.color(.primaryFG))
+                                .background(formatter.color(.highContrastWhite))
+                                .cornerRadius(10)
+                            }
                         }
-                    } label: {
-                        HStack {
-                            Image(systemName: participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
-                                .font(.system(size: 20, weight: .bold))
-                                .offset(y: -3)
-                            Text(participantsVM.historicalTeams.contains(team) ? "Unsave" : "Save")
-                                .font(formatter.font())
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .foregroundColor(formatter.color(.primaryFG))
-                        .background(formatter.color(.highContrastWhite))
-                        .cornerRadius(10)
                     }
                 }
                 .frame(height: 60)
@@ -93,14 +101,14 @@ struct TeamBuildView: View {
                     TextField("Edit Score", text: $scoreToAdd)
                         .keyboardType(.numberPad)
                     Button(action: {
-                        if !self.scoreToAdd.isEmpty {
-                            self.participantsVM.editScore(index: self.team.index, amount: Int(scoreToAdd) ?? 0)
-                            self.scoreToAdd = ""
+                        if !scoreToAdd.isEmpty {
+                            participantsVM.editScore(index: self.team.index, amount: Int(scoreToAdd) ?? 0)
+                            scoreToAdd.removeAll()
                         }
                     }, label: {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 35, weight: .bold))
-                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .foregroundColor(formatter.color(scoreToAdd.isEmpty ? .lowContrastWhite : .highContrastWhite))
                     })
                 }
                 .font(formatter.font())
@@ -134,8 +142,8 @@ struct ColorPickerView: View {
                 .foregroundColor(color)
                 .frame(maxWidth: .infinity)
                 .onTapGesture {
-                    self.team.color = colorString
-                    self.participantsVM.editColor(index: team.index, color: colorString)
+                    team.color = colorString
+                    participantsVM.editColor(index: team.index, color: colorString)
                 }
             if team.color == colorString || (team.color.isEmpty && colorString == "blue") {
                 Circle()
