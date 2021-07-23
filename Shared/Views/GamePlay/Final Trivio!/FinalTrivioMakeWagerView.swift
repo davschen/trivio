@@ -16,57 +16,57 @@ struct FinalTrivioMakeWagerView: View {
     @State var isShowingInstructions = false
     
     var body: some View {
-        VStack (spacing: 15) {
-            // Category name view
-            ZStack (alignment: .topTrailing) {
-                Text(gamesVM.fjCategory.uppercased())
-                    .font(formatter.font())
-                    .padding()
-                    .frame(width: 350, height: 150)
-                    .background(formatter.color(.lowContrastWhite))
-                    .cornerRadius(10)
-                Button(action: {
-                    isShowingInstructions.toggle()
-                }, label: {
-                    Image(systemName: isShowingInstructions ? "questionmark.circle.fill" : "questionmark.circle")
-                        .font(.system(size: 20))
-                        .padding(10)
-                })
-            }
-            
-            // Instructions (only shown if isShowingInstructions is true)
-            if isShowingInstructions {
-                Text("In the next screen, you will receive a question under this category. Each player must wager a dollar amount up to their own score. If your answer is correct, you will receive that amount. If not, your wager will be deducted from your total score.")
-                    .font(formatter.font(.regularItalic))
-            }
-            
-            // Make wagers scrollview
-            ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: 15) {
-                    ForEach(participantsVM.teams, id: \.self) { team in
-                        MakeWagerView(teamIndex: team.index)
+        ScrollView (.vertical, showsIndicators: false) {
+            VStack (spacing: 15) {
+                // Category name view
+                ZStack (alignment: .topTrailing) {
+                    Text(gamesVM.fjCategory.uppercased())
+                        .font(formatter.font())
+                        .padding()
+                        .frame(width: 350, height: 150)
+                        .background(formatter.color(.lowContrastWhite))
+                        .cornerRadius(10)
+                    Button(action: {
+                        isShowingInstructions.toggle()
+                    }, label: {
+                        Image(systemName: isShowingInstructions ? "questionmark.circle.fill" : "questionmark.circle")
+                            .font(.system(size: 20))
+                            .padding(10)
+                    })
+                }
+                
+                // Instructions (only shown if isShowingInstructions is true)
+                if isShowingInstructions {
+                    Text("In the next screen, you will receive a question under this category. Each player must wager a dollar amount up to their own score. If your answer is correct, you will receive that amount. If not, your wager will be deducted from your total score.")
+                        .font(formatter.font(.regularItalic))
+                }
+                
+                // Make wagers scrollview
+                ScrollView (.horizontal, showsIndicators: false) {
+                    HStack (spacing: 15) {
+                        ForEach(participantsVM.teams, id: \.self) { team in
+                            MakeWagerView(teamIndex: team.index)
+                        }
                     }
                 }
+                
+                // Finished button
+                Button(action: {
+                    if participantsVM.wagersValid() {
+                        gamesVM.finalTrivioFinishedAction()
+                    }
+                }, label: {
+                    Text("Finished")
+                        .font(formatter.font())
+                        .padding(20)
+                        .padding(.horizontal, 20)
+                        .background(formatter.color(.lowContrastWhite))
+                        .clipShape(Capsule())
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .opacity(participantsVM.wagersValid() ? 1 : 0.5)
+                })
+                .keyboardAware()
             }
-            
-            // Finished button
-            Button(action: {
-                if participantsVM.wagersValid() {
-                    gamesVM.finalTrivioFinishedAction()
-                }
-            }, label: {
-                Text("Finished")
-                    .font(formatter.font())
-                    .padding(20)
-                    .padding(.horizontal, 20)
-                    .background(formatter.color(.lowContrastWhite))
-                    .clipShape(Capsule())
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .opacity(participantsVM.wagersValid() ? 1 : 0.5)
-            })
-            .keyboardAware()
-            
-            Spacer()
         }
         .frame(maxWidth: .infinity)
         .padding(30)
@@ -142,7 +142,7 @@ struct MakeWagerView: View {
                     hidden.toggle()
                 }
             }
-            if !participantsVM.wagers.isEmpty && !invalidWagerString(teamIndex: teamIndex).isEmpty {
+            if !invalidWagerString(teamIndex: teamIndex).isEmpty {
                 Text(invalidWagerString(teamIndex: teamIndex))
                     .font(formatter.font(.regularItalic))
                     .foregroundColor(formatter.color(.secondaryAccent))
@@ -160,6 +160,9 @@ struct MakeWagerView: View {
     }
     
     func invalidWagerString(teamIndex: Int) -> String {
+        if participantsVM.wagers[teamIndex].isEmpty {
+            return ""
+        }
         if Int(participantsVM.wagers[teamIndex]) == nil {
             return "You must enter a number"
         } else if Int(participantsVM.wagers[teamIndex])! > participantsVM.teams[teamIndex].score {

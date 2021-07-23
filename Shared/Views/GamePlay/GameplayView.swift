@@ -29,6 +29,7 @@ struct GameplayView: View {
     var body: some View {
         VStack (spacing: 10) {
             GameplayHeaderView(showInfoView: $showInfoView)
+                .offset(y: 10)
             PlayersView()
             ZStack {
                 ZStack {
@@ -49,7 +50,7 @@ struct GameplayView: View {
                     .shadow(radius: 20)
             }
         }
-        .padding(30)
+        .padding([.horizontal, .bottom], 30)
     }
 }
 
@@ -82,7 +83,7 @@ struct GameplayHeaderView: View {
     var body: some View {
         HStack {
             Button {
-                // placeholder
+                gamesVM.gameSetupMode = .settings
             } label: {
                 Image(systemName: "gear")
                     .font(.system(size: 30, weight: .bold))
@@ -188,55 +189,5 @@ struct EmptyGameView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.gray.opacity(0.1))
         .cornerRadius(5)
-    }
-}
-
-struct InfoView: View {
-    @EnvironmentObject var gamesVM: GamesViewModel
-    @Binding var showInfoView: Bool
-    
-    @EnvironmentObject var formatter: MasterHandler
-    var customSet: CustomSet {
-        return gamesVM.customSet
-    }
-    
-    var body: some View {
-        ZStack {
-            formatter.color(.primaryBG)
-                .edgesIgnoringSafeArea(.all)
-                .opacity(showInfoView ? 0.6 : 0)
-                .onTapGesture {
-                    self.showInfoView.toggle()
-                }
-            HStack {
-                VStack (alignment: .leading) {
-                    HStack {
-                        Text("Title: " + "\(gamesVM.title)")
-                            .font(formatter.customFont(weight: "Bold", iPadSize: 30))
-                            .padding(formatter.padding())
-                            .background(Color.white.opacity(0.4))
-                            .cornerRadius(5)
-                    }
-                    Text("Date Created: " + "\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
-                    if gamesVM.rating > 0 {
-                        Text("Rating: " + "\(round(customSet.rating))/5")
-                    }
-                    if gamesVM.customSet.plays > 0 {
-                        Text("Plays: " + "\(customSet.plays)")
-                        Text("Average Rating: " + "\(customSet.rating)/5")
-                        Text("Average Score: " + "\(customSet.averageScore.formatPoints())")
-                        Text("Number of Clues: " + "\(customSet.numclues)")
-                    }
-                    Spacer()
-                }
-                .font(formatter.customFont(weight: "Bold", iPadSize: 20))
-                .padding()
-                Spacer()
-            }
-            .frame(width: UIScreen.main.bounds.width / 2, height: UIScreen.main.bounds.height / 2)
-            .background(Color("MainFG"))
-            .cornerRadius(20)
-            .offset(y: self.showInfoView ? 0 : UIScreen.main.bounds.height)
-        }
     }
 }

@@ -80,7 +80,7 @@ struct PlayersView: View {
             .padding(.vertical, 5)
         } else {
             Button(action: {
-                gamesVM.menuChoice = .participants
+                gamesVM.gameSetupMode = .participants
             }, label: {
                 HStack {
                     Text("Looks like you haven't set up any contestants - Tap to set up contestants")

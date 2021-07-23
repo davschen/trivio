@@ -37,6 +37,6 @@ struct ContentView: View {
 }
 
 enum MenuChoice {
-    case explore, gamepicker, participants, game, reports, profile
+    case explore, gamepicker, game, reports, profile
 }
 

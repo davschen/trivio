@@ -43,8 +43,18 @@ struct GamePickerSearchBarView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15, weight: .bold))
+                if searchVM.isShowingExpandedView {
+                    Button {
+                        searchVM.isShowingExpandedView.toggle()
+                        formatter.resignKeyboard()
+                    } label: {
+                        Image(systemName: "arrow.left")
+                            .font(.system(size: 15, weight: .bold))
+                    }
+                } else {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 15, weight: .bold))
+                }
                 TextField("Search games", text: $searchVM.searchItem, onEditingChanged: { focused in
                     if focused {
                         searchVM.isShowingExpandedView = true
@@ -68,7 +78,7 @@ struct GamePickerSearchBarView: View {
                         searchVM.searchItem.removeAll()
                         searchVM.isShowingExpandedView = false
                         searchVM.isShowingSearchView = false
-                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                        formatter.resignKeyboard()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.system(size: 20, weight: .bold))
@@ -108,7 +118,7 @@ struct GamePickerSearchBarView: View {
                                     searchVM.isShowingExpandedView.toggle()
                                     searchVM.isShowingSearchView = true
                                     searchVM.searchAndPull()
-                                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    formatter.resignKeyboard()
                                 }
                             }
                         }
@@ -121,7 +131,7 @@ struct GamePickerSearchBarView: View {
         .padding()
         .background(formatter.color(.secondaryFG))
         .cornerRadius(5)
-        .padding(.bottom, 20)
+        .padding(.bottom, 5)
     }
 }
 
@@ -134,41 +144,13 @@ struct ClassicGamePickerView: View {
     
     var body: some View {
         HStack {
-            if formatter.deviceType == .iPad {
-                ScrollView (.vertical, showsIndicators: false) {
-                    SeasonsListView()
-                }
-                .frame(width: UIScreen.main.bounds.width * 0.15)
-                .padding(.trailing, 30)
+            ScrollView (.vertical, showsIndicators: false) {
+                SeasonsListView()
             }
+            .frame(width: UIScreen.main.bounds.width * 0.15)
+            .padding(.trailing, 30)
             VStack {
-                if formatter.deviceType == .iPhone {
-                    HStack {
-                        Button(action: {
-                            searchVM.isShowingSearchView.toggle()
-                        }, label: {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: formatter.padding(size: 30)))
-                        })
-                        Text("Seasons")
-                            .font(MasterHandler().customFont(weight: "Bold", iPadSize: 50))
-                        ScrollView (.horizontal, showsIndicators: false) {
-                            HStack (spacing: 3) {
-                                SeasonsListView()
-                            }
-                        }
-                    }
-                    Spacer()
-                }
-                if formatter.deviceType == .iPad {
-                    JeopardyGamesView(showingGames: false, gamePreviews: gamesVM.gamePreviews)
-                } else {
-                    if gamesVM.previewViewShowing {
-                        GamePreviewView()
-                    } else {
-                        JeopardyGamesView(showingGames: false, gamePreviews: gamesVM.gamePreviews)
-                    }
-                }
+                JeopardyGamesView(showingGames: false, gamePreviews: gamesVM.gamePreviews)
             }
         }
     }
@@ -180,21 +162,21 @@ struct SeasonsListView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
-            ForEach(gamesVM.seasonFolders, id: \.self) { folder in
-                let folderID = folder.id ?? "NID"
+            ForEach(gamesVM.seasonFolders, id: \.self) { season in
+                let seasonID = season.id ?? "NID"
                 ZStack {
-                    Text(folder.title)
+                    Text(season.title)
                         .font(formatter.font(fontSize: .mediumLarge))
                         .foregroundColor(formatter.color(.highContrastWhite))
                 }
                 .frame(maxWidth: .infinity)
                 .padding(10)
                 .padding(.vertical, 5)
-                .background(formatter.color(.secondaryAccent).opacity(gamesVM.selectedSeason == folderID ? 1 : 0))
+                .background(formatter.color(.secondaryAccent).opacity(gamesVM.selectedSeason == seasonID ? 1 : 0))
                 .cornerRadius(5)
                 .onTapGesture {
-                    self.gamesVM.getEpisodes(seasonID: folderID)
-                    self.gamesVM.setSeason(folder: folder)
+                    self.gamesVM.getEpisodes(seasonID: seasonID)
+                    self.gamesVM.setSeason(folder: season)
                     self.gamesVM.setEpisode(ep: "")
                     self.gamesVM.clearAll()
                     self.gamesVM.previewViewShowing = false
@@ -216,7 +198,7 @@ struct JeopardyGamesView: View {
     var body: some View {
         if (showingGames ? !searchVM.games.isEmpty : !gamesVM.selectedSeason.isEmpty) {
             GeometryReader { geometry in
-                VStack (alignment: .leading, spacing: 5) {
+                VStack (alignment: .leading, spacing: 15) {
                     if !showingGames {
                         Text(gamesVM.currentSeason.title)
                             .font(formatter.font(fontSize: .large))
@@ -226,7 +208,7 @@ struct JeopardyGamesView: View {
                     }
                     VStack (alignment: .leading, spacing: 0) {
                         ScrollView (.vertical) {
-                            VStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+                            VStack {
                                 if showingGames {
                                     ForEach(games, id: \.self) { gamePreview in
                                         let gamePreviewID = gamePreview.id ?? "NID"
@@ -287,14 +269,13 @@ struct JeopardyGamesView: View {
                                         .lineLimit(1)
                                         .padding(.vertical, 5)
                                         .frame(maxWidth: .infinity)
-                                        .shadow(color: Color.black.opacity(0.2), radius: 10)
                                         .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
                                         .cornerRadius(formatter.cornerRadius(5))
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            self.gamesVM.getEpisodeData(gameID: gamePreviewID)
                                             self.gamesVM.setEpisode(ep: gamePreviewID)
                                             self.gamesVM.previewViewShowing = true
+                                            self.gamesVM.getEpisodeData(gameID: gamePreviewID)
                                             self.participantsVM.resetScores()
                                         }
                                         .id(UUID())

@@ -14,6 +14,7 @@ class GamesViewModel: ObservableObject {
     @Published var menuChoice: MenuChoice = .explore
     
     @Published var moneySections = ["200", "400", "600", "800", "1000"]
+    @Published var gameSetupMode: GameSetupMode = .settings
     @Published var gamePhase: GamePhase = .trivio
     @Published var gameplayDisplay: GameplayDisplay = .grid
     
@@ -70,6 +71,7 @@ class GamesViewModel: ObservableObject {
     
     @Published var loadingGame = false
     @Published var finalTrivioStage: FinalTrivioStage = .makeWager
+    @Published var gameQueryFromType: MenuChoice = .explore
     
     var categoryCompletes = [Int](repeating: 0, count: 6)
     var jCategoryCompletesReference = [Int](repeating: 0, count: 6)
@@ -77,7 +79,7 @@ class GamesViewModel: ObservableObject {
     var jRoundCompletes = 0
     var djRoundCompletes = 0
     
-    var dateFormatter: DateFormatter {
+    public var dateFormatter: DateFormatter {
         let df = DateFormatter()
         df.dateStyle = .short
         return df
@@ -85,14 +87,18 @@ class GamesViewModel: ObservableObject {
     
     private var moneySectionsJ = ["200", "400", "600", "800", "1000"]
     private var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
+    
     public var db = Firestore.firestore()
-    private let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
+    public let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
     
     init() {
         getSeasons()
         readCustomData() 
         if isVIP {
             menuChoice = .gamepicker
+            gameQueryFromType = .gamepicker
+        } else {
+            gameQueryFromType = .explore
         }
     }
     
@@ -105,7 +111,7 @@ class GamesViewModel: ObservableObject {
         self.gamePhase = .trivio
         self.clues = jeopardyRoundClues
         self.responses = jeopardyRoundResponses
-        self.usedAnswers = [String]()
+        self.usedAnswers.removeAll()
         self.moneySections = moneySectionsJ
         self.categories = jeopardyCategories
         self.clearCategoryDones()
@@ -120,46 +126,6 @@ class GamesViewModel: ObservableObject {
         self.moneySections = moneySectionsDJ
         self.categories = doubleJeopardyCategories
         self.clearCategoryDones()
-    }
-    
-    func getSeasons() {
-        loadingGame = true
-        getSeasonsWithHandler { (success) in
-            if success {
-                self.loadingGame = true
-            }
-        }
-    }
-    
-    func getSeasonsWithHandler(completion: @escaping (Bool) -> Void) {
-        db.collection("folders").order(by: "collection_index", descending: true).addSnapshotListener { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            } else {
-                guard let data = snap?.documents else { return }
-                
-                DispatchQueue.main.async {
-                    self.loadingGame = true
-                    
-                    self.seasonFolders = data.compactMap({ (querySnapshot) -> SeasonFolder? in
-                        var folder = try? querySnapshot.data(as: SeasonFolder.self)
-                        folder?.setID(id: querySnapshot.documentID)
-                        return folder
-                    })
-                    
-                    if self.isVIP {
-                        if let season = self.seasonFolders.first {
-                            if let seasonID = season.id {
-                                self.getEpisodes(seasonID: seasonID)
-                                self.setSeason(folder: season)
-                                completion(true)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     
     func setSeason(folder: SeasonFolder) {
@@ -190,6 +156,7 @@ class GamesViewModel: ObservableObject {
         self.jeopardyRoundResponses.removeAll()
         self.doubleJeopardyRoundResponses.removeAll()
         self.gamePhase = .trivio
+        self.gameSetupMode = .settings
         self.fjClue.removeAll()
         self.fjResponse.removeAll()
         self.jeopardyDailyDoubles.removeAll()
@@ -207,6 +174,7 @@ class GamesViewModel: ObservableObject {
         self.djCategoryCompletesReference = [Int](repeating: 0, count: 6)
         self.jRoundCompletes = 0
         self.djRoundCompletes = 0
+        self.queriedUserName.removeAll()
     }
     
     func addToCompletes(colIndex: Int) {
@@ -245,6 +213,18 @@ class GamesViewModel: ObservableObject {
             self.categoryCompletes[i] = 0
         }
     }
+    
+    func gameInProgress() -> Bool {
+        if gamePhase == .trivio && usedAnswers.count == 0 {
+            return false
+        } else {
+            return true
+        }
+    }
+}
+
+enum GameSetupMode {
+    case settings, participants, play
 }
 
 enum GamePhase {

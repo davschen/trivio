@@ -71,7 +71,7 @@ struct ParticipantsHeaderView: View {
                     .cornerRadius(formatter.cornerRadius(5))
             })
             Button(action: {
-                gamesVM.menuChoice = .game
+                gamesVM.gameSetupMode = .settings
             }, label: {
                 HStack {
                     Image(systemName: "gamecontroller.fill")
@@ -95,7 +95,7 @@ struct SavedPlayersView: View {
     
     var body: some View {
         ScrollView (.horizontal) {
-            HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+            HStack {
                 Text("Saved Players")
                     .font(formatter.font(fontSize: .mediumLarge))
                     .padding(.trailing, 15)
@@ -168,7 +168,7 @@ struct ActiveParticipantsView: View {
                             .minimumScaleFactor(0.5)
                         Spacer()
                         Button(action: {
-                            participantsVM.removeTeam(index: team.index)
+                            participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                         }, label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: participantsVM.teams.count > 3 ? 30 : 40, weight: .bold))

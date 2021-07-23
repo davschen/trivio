@@ -11,6 +11,48 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 extension GamesViewModel {
+    
+    // Fetching seasons
+    func getSeasons() {
+        loadingGame = true
+        getSeasonsWithHandler { (success) in
+            if success {
+                self.loadingGame = true
+            }
+        }
+    }
+    
+    func getSeasonsWithHandler(completion: @escaping (Bool) -> Void) {
+        db.collection("folders").order(by: "collection_index", descending: true).addSnapshotListener { (snap, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            } else {
+                guard let data = snap?.documents else { return }
+                
+                DispatchQueue.main.async {
+                    self.loadingGame = true
+                    
+                    self.seasonFolders = data.compactMap({ (querySnapshot) -> SeasonFolder? in
+                        var folder = try? querySnapshot.data(as: SeasonFolder.self)
+                        folder?.setID(id: querySnapshot.documentID)
+                        return folder
+                    })
+                    
+                    if self.isVIP {
+                        if let season = self.seasonFolders.first {
+                            if let seasonID = season.id {
+                                self.getEpisodes(seasonID: seasonID)
+                                self.setSeason(folder: season)
+                                completion(true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // Read previews
     func getEpisodes(seasonID: String) {
         db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).addSnapshotListener { (snap, error) in
@@ -147,6 +189,7 @@ extension GamesViewModel {
     
     // firestore things
     func getEpisodeData(gameID: String) {
+        gameQueryFromType = .gamepicker
         self.loadingGame = true
         self.getEpisodeDataWithCompletion(gameID: gameID) { (success) in
             if success {

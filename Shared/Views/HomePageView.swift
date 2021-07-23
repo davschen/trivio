@@ -80,10 +80,7 @@ struct MainView: View {
             ExploreView()
                 .transition(.identity)
         case .game:
-            GameplayView()
-                .transition(.identity)
-        case .participants:
-            ParticipantsView()
+            GameView()
                 .transition(.identity)
         case .gamepicker:
             GamePickerView()
@@ -110,7 +107,6 @@ struct TabBarView: View {
                 if isVIP {
                     TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "square.grid.3x2", selectedIconName: "square.grid.3x2.fill", myMenuChoice: .gamepicker)
                 }
-                TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "person.3", selectedIconName: "person.3.fill", myMenuChoice: .participants)
                 TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "gamecontroller", selectedIconName: "gamecontroller.fill", myMenuChoice: .game)
                 TabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "person.circle", selectedIconName: "person.circle.fill", myMenuChoice: .profile)
             }

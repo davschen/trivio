@@ -9,55 +9,67 @@ import Foundation
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var reportVM: ReportViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var reportVM: ReportViewModel
     @EnvironmentObject var searchVM: SearchViewModel
+    
     @State var isShowingMenu = true
     @State var menuOffset: CGFloat = 0
-    @State var editOn = false
-    
-    @EnvironmentObject var formatter: MasterHandler
     
     var body: some View {
         ZStack {
-            if !buildVM.showingBuildView {
-                HStack (spacing: 30) {
-                    // Menu
-                    VStack {
-                        AccountInfoView()
-                        ProfileMenuSelectionView()
-                        Spacer()
-                        ProfileBottomButtonsView()
-                    }
-                    .frame(width: UIScreen.main.bounds.width * 0.25)
-                    .padding([.leading, .vertical], 30)
-                    ZStack {
-                        if !editOn {
-                            switch profileVM.menuSelectedItem {
-                            case "Summary":
-                                SummaryView()
-                            case "My Drafts":
-                                DraftsView()
-                            case "Past Games":
-                                ReportsView()
-                            default:
-                                MySetsView()
-                            }
-                        } else {
-                            Spacer()
-                        }
-                    }
-                    .padding([.trailing, .top], 30)
-                }
-            } else {
+            if buildVM.showingBuildView {
                 BuildView()
-                    .environmentObject(searchVM)
-                    .environmentObject(buildVM)
+                    .transition(.move(edge: .bottom))
+            } else if profileVM.showingSettingsView {
+                SettingsView()
+                    .transition(.move(edge: .bottom))
+            } else {
+                ProfileMainView()
             }
+        }
+    }
+}
+
+struct ProfileMainView: View {
+    @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var reportVM: ReportViewModel
+    @EnvironmentObject var searchVM: SearchViewModel
+    
+    var body: some View {
+        HStack (spacing: 30) {
+            // Menu
+            VStack {
+                AccountInfoView()
+                ProfileMenuSelectionView()
+                Spacer()
+                ProfileBottomButtonsView()
+            }
+            .frame(width: UIScreen.main.bounds.width * 0.25)
+            .padding([.leading, .vertical], 30)
+            ZStack {
+                switch profileVM.menuSelectedItem {
+                case "Summary":
+                    SummaryView()
+                case "My Drafts":
+                    DraftsView()
+                case "Past Games":
+                    ReportsView()
+                default:
+                    MySetsView()
+                }
+            }
+            .padding([.trailing, .top], 30)
         }
     }
 }
@@ -130,10 +142,12 @@ struct ProfileMenuSelectionView: View {
     func menuSelectionView(label: String) -> some View {
         Text(label)
             .font(formatter.font())
+            .foregroundColor(formatter.color(profileVM.menuSelectedItem == label ? .highContrastWhite : .mediumContrastWhite))
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(formatter.color(profileVM.menuSelectedItem == label ? .primaryAccent : .primaryBG))
             .cornerRadius(5)
+            .animation(nil)
             .onTapGesture {
                 profileVM.menuSelectedItem = label
             }
@@ -165,7 +179,7 @@ struct ProfileBottomButtonsView: View {
             })
             
             Button(action: {
-                profileVM.logOut()
+                profileVM.showingSettingsView.toggle()
             }, label: {
                 HStack {
                     Image(systemName: "gear")

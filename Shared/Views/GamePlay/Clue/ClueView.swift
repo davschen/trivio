@@ -27,10 +27,12 @@ struct ClueView: View {
     @State var ddWagerMade = false
     
     var body: some View {
-        if isDailyDouble && !ddWagerMade {
-            DailyDoubleWagerView(ddWagerMade: $ddWagerMade, wager: $wager, clue: clue)
-        } else {
-            ClueResponseView(unsolved: $unsolved, wager: $wager, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper, clue: clue, category: category, response: response, amount: amount)
+        ZStack {
+            if isDailyDouble && !ddWagerMade {
+                DailyDoubleWagerView(ddWagerMade: $ddWagerMade, wager: $wager, clue: clue)
+            } else {
+                ClueResponseView(unsolved: $unsolved, wager: $wager, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper, clue: clue, category: category, response: response, amount: amount)
+            }
         }
     }
 }
@@ -62,24 +64,26 @@ struct ClueResponseView: View {
         VStack {
             ClueCountdownTimerView(usedBlocks: $usedBlocks)
             VStack {
-                
                 // Volume control and category name
                 ZStack {
                     HStack {
                         VolumeControlView()
                         Spacer()
+                        Image(systemName: "xmark")
+                            .font(.system(size: 20, weight: .bold))
                     }
                     Text("\(category.uppercased()) - $\(amount)")
                         .font(formatter.font(fontSize: .mediumLarge))
                         .padding(formatter.padding())
-                        .background(Color.gray.opacity(0.3))
+                        .background(formatter.color(.lowContrastWhite))
                         .cornerRadius(5)
-                        .padding()
                 }
+                .padding()
                 Spacer()
                 Text(clue.uppercased())
                     .font(formatter.font(fontSize: .large))
                     .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.5)
                     .padding()
                 if self.showResponse {
                     VStack (spacing: 0) {
@@ -131,7 +135,6 @@ struct ClueResponseView: View {
                             self.showResponse.toggle()
                         }
                 }
-                .padding()
             }
             .padding(20)
             .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
@@ -191,8 +194,7 @@ struct ClueCountdownTimerView: View {
             }
         }
         .clipShape(Capsule())
-        .padding(.vertical)
-        .padding(.horizontal, 5)
+        .padding(.vertical, 5)
     }
 }
 
@@ -289,7 +291,7 @@ struct VolumeControlView: View {
         VStack (alignment: .leading, spacing: 0) {
             HStack {
                 Image(systemName: speakerIconName)
-                    .font(.system(size: formatter.shrink(iPadSize: 20, factor: 1.5)))
+                    .font(.system(size: 20, weight: .bold))
                 if showingVolumeSlider {
                     Slider(value: Binding(get: {
                         self.formatter.volume
@@ -298,6 +300,7 @@ struct VolumeControlView: View {
                         self.formatter.setVolume()
                     }))
                     .accentColor(formatter.color(.secondaryAccent))
+                    .foregroundColor(formatter.color(.mediumContrastWhite))
                 }
                 Spacer()
             }
@@ -311,6 +314,5 @@ struct VolumeControlView: View {
                     .font(formatter.font(fontSize: .small))
             }
         }
-        .padding(.horizontal, formatter.shrink(iPadSize: 40))
     }
 }

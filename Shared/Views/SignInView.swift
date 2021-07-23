@@ -310,6 +310,7 @@ struct AuthVerifyNumberView: View {
                 HStack (spacing: 15) {
                     if isLoading {
                         LoadingView()
+                            .padding(.vertical, 10)
                     } else {
                         Text("Continue")
                     }
@@ -543,7 +544,7 @@ struct LoadingView: View {
     @State var timeElapsed = 0
     
     let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
-    let color: ColorType = .highContrastWhite
+    var color: ColorType = .highContrastWhite
     
     var ticker: Int {
         return timeElapsed % 3

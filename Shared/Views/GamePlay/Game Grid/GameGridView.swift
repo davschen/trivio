@@ -26,7 +26,9 @@ struct GameGridView: View {
     
     var body: some View {
         VStack (spacing: 5) {
-            HStack (spacing: 10) {
+            HStack (spacing: 7) {
+                
+                // Category name
                 ForEach(0..<(gamesVM.categories.count), id: \.self) { i in
                     let category: String = gamesVM.categories[i]
                     ZStack {
@@ -42,13 +44,13 @@ struct GameGridView: View {
                     .cornerRadius(10)
                 }
             }
-            .frame(height: formatter.deviceType == .iPad ? 150 : 75)
-            .padding(.bottom, formatter.deviceType == .iPad ? 10 : 5)
+            .frame(height: 130)
+            .padding(.bottom, 5)
 
             // grid where the clue magic happens
-            HStack (spacing: 10) {
+            HStack (spacing: 7) {
                 ForEach(0..<gamesVM.categories.count, id: \.self) { i in
-                    VStack (spacing: 10) {
+                    VStack (spacing: 7) {
                         ForEach(0..<gamesVM.moneySections.count, id: \.self) { j in
                             let clueCounts: Int = gamesVM.clues[i].count
                             let responsesCounts: Int = gamesVM.responses[i].count
@@ -59,24 +61,7 @@ struct GameGridView: View {
                                 .cornerRadius(formatter.cornerRadius(iPadSize: 5))
                                 .shadow(color: Color.black.opacity(0.2), radius: 10)
                                 .onTapGesture {
-                                    if !(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty) {
-                                        gamesVM.addToCompletes(colIndex: i)
-                                        unsolved = false
-                                        updateDailyDouble(i: i, j: j)
-                                        updateTripleStumper(i: i, j: j)
-                                        clue = gridClue
-                                        response = gridResponse
-                                        amount = Int(gamesVM.moneySections[j]) ?? 0
-                                        category = gamesVM.categories[i]
-                                        value = gamesVM.moneySections[j]
-                                        
-                                        participantsVM.setDefaultIndex()
-                                        gamesVM.gameplayDisplay = .clue
-                                        
-                                        if !isDailyDouble {
-                                            formatter.speaker.speak(clue)
-                                        }
-                                    }
+                                    gameCellTapped(gridClue: gridClue, gridResponse: gridResponse, i: i, j: j)
                                 }
                                 .onLongPressGesture {
                                     if gamesVM.usedAnswers.contains(gridClue) && !gridClue.isEmpty {
@@ -87,6 +72,27 @@ struct GameGridView: View {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    func gameCellTapped(gridClue: String, gridResponse: String, i: Int, j: Int) {
+        if !(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty) {
+            gamesVM.addToCompletes(colIndex: i)
+            unsolved = false
+            updateDailyDouble(i: i, j: j)
+            updateTripleStumper(i: i, j: j)
+            clue = gridClue
+            response = gridResponse
+            amount = Int(gamesVM.moneySections[j]) ?? 0
+            category = gamesVM.categories[i]
+            value = gamesVM.moneySections[j]
+            
+            participantsVM.setDefaultIndex()
+            gamesVM.gameplayDisplay = .clue
+            
+            if !isDailyDouble {
+                formatter.speaker.speak(clue)
             }
         }
     }
@@ -128,6 +134,5 @@ struct GameCellView: View {
                 .minimumScaleFactor(0.1)
         }
         .cornerRadius(10)
-        .shadow(color: Color.black.opacity(0.2), radius: 10)
     }
 }

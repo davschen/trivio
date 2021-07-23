@@ -30,21 +30,21 @@ class ExploreViewModel: ObservableObject {
     @Published var tags = [String:Int]()
     
     @Published var viewingUsername = ""
+    @Published var viewingName = ""
     @Published var isShowingUserView = false
     @Published var usernameIDDict = [String:String]()
     
     private var db = Firestore.firestore()
     
-    private var searchFillerText: String {
-        switch currentSearchBy {
-        case .title:
-            return "Search by Title"
-        case .category:
-            return "Search by Category"
-        case .allrecents:
-            return "Showing all public sets"
-        default:
-            return "Search by Tags (tags are single words that describe the set)"
+    private var currentSort: String {
+        if filterBy == "dateCreated" && descending == true {
+            return "Date created (newest)"
+        } else if filterBy == "dateCreated" && descending == false {
+            return "Date created (oldest)"
+        } else if filterBy == "rating" && descending == true {
+            return "Highest rating"
+        } else {
+            return "Most plays"
         }
     }
     
@@ -210,11 +210,30 @@ class ExploreViewModel: ObservableObject {
             }
             guard let doc = docSnap else { return }
             self.viewingUsername = doc.get("username") as? String ?? ""
+            self.viewingName = doc.get("name") as? String ?? ""
         }
     }
     
-    func getSearchFillerText() -> String {
-        return searchFillerText
+    func getCurrentSort() -> String {
+        return currentSort
+    }
+    
+    func applyCurrentSort(sortByOption: String) {
+        switch sortByOption {
+        case "Date created (newest)":
+            filterBy = "dateCreated"
+            descending = true
+        case "Date created (oldest)":
+            filterBy = "dateCreated"
+            descending = false
+        case "Highest rating":
+            filterBy = "rating"
+            descending = true
+        default:
+            filterBy = "plays"
+            descending = true
+        }
+        pullAllRecents()
     }
 }
 

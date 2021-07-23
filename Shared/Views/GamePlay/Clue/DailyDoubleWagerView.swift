@@ -36,6 +36,7 @@ struct DailyDoubleWagerView: View {
             VStack {
                 Slider(value: $wager, in: 0...Double(max(maxScore, participantsVM.teams.indices.contains(participantsVM.selectedTeam.index) ? participantsVM.teams[participantsVM.selectedTeam.index].score : 0)), step: 100)
                     .accentColor(formatter.color(.secondaryAccent))
+                    .foregroundColor(formatter.color(.mediumContrastWhite))
                 HStack {
                     Text("Wager: \(Int(self.wager))")
                         .font(formatter.font())
@@ -43,7 +44,7 @@ struct DailyDoubleWagerView: View {
                     Spacer(minLength: 30)
                     Button(action: {
                         self.ddWagerMade.toggle()
-                        self.formatter.speaker.speak(self.clue)
+                        self.formatter.speaker.speak(clue)
                     }) {
                         Text("Done")
                             .font(formatter.font(fontSize: .mediumLarge))

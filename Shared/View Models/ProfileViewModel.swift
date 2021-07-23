@@ -17,6 +17,9 @@ class ProfileViewModel: ObservableObject {
     @Published var name = ""
     @Published var usernameValid = false
     @Published var drafts = [CustomSet]()
+    @Published var searchItem = ""
+    @Published var showingSettingsView = false
+    @Published var settingsMenuSelectedItem = "Game Settings"
     
     private var db = Firestore.firestore()
     public var myUID = Auth.auth().currentUser?.uid
@@ -165,6 +168,10 @@ class ProfileViewModel: ObservableObject {
             }
         }
         return initials
+    }
+    
+    func updatePhoneNumber(newPhoneNumber: String) {
+        
     }
     
     func logOut() {

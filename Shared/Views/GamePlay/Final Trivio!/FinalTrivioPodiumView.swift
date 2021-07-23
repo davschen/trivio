@@ -180,11 +180,11 @@ struct SinglePodiumView: View {
                     case .first:
                         Image("medal.1")
                         Spacer()
-                            .frame(height: 80)
+                            .frame(maxHeight: 80)
                     case .second:
                         Image("medal.2")
                         Spacer()
-                            .frame(height: 40)
+                            .frame(maxHeight: 40)
                     default:
                         Image("medal.3")
                     }

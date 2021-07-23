@@ -58,12 +58,13 @@ struct SummaryView: View {
                                     CustomSetCellView(set: set, isMine: true)
                                         .frame(width: 400)
                                         .onTapGesture {
-                                            guard let setID = set.id else { return }
-                                            gamesVM.getCustomData(setID: setID)
-                                            gamesVM.previewViewShowing = true
-                                            gamesVM.setEpisode(ep: setID)
-                                            participantsVM.resetScores()
-                                            profileVM.menuSelectedItem = "My Sets"
+                                            if gamesVM.gameInProgress() {
+                                                formatter.setAlertSettings(alertAction: {
+                                                    selectSet(set: set)
+                                                }, alertTitle: "Cancel current game?", alertSubtitle: "It looks like you have a game in progress. Choosing this one would erase all of your progress.", hasCancel: true, actionLabel: "Yes, choose this game")
+                                            } else {
+                                                selectSet(set: set)
+                                            }
                                         }
                                 }
                                 Spacer()
@@ -136,6 +137,16 @@ struct SummaryView: View {
                     .cornerRadius(10)
                 }
             }
+        }
+        
+        func selectSet(set: CustomSet) {
+            guard let setID = set.id else { return }
+            gamesVM.getCustomData(setID: setID)
+            gamesVM.previewViewShowing = true
+            gamesVM.setEpisode(ep: setID)
+            gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
+            participantsVM.resetScores()
+            profileVM.menuSelectedItem = "My Sets"
         }
     }
 }

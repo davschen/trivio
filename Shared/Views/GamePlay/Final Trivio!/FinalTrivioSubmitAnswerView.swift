@@ -14,25 +14,26 @@ struct FinalTrivioSubmitAnswerView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     var body: some View {
-        VStack (spacing: 15) {
-            
-            // Category name
-            Text(gamesVM.fjCategory.uppercased())
-                .font(formatter.font())
-                .padding()
-                .frame(width: 350, height: 150)
-                .background(formatter.color(.lowContrastWhite))
-                .cornerRadius(10)
-            
-            // Final Trivio Clue
-            Text(gamesVM.fjClue)
-                .font(formatter.font(fontSize: .large))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 100)
-                .padding()
-            
-            // Vertical scrollview for answer submissions
-            ScrollView (.vertical, showsIndicators: false) {
+        ScrollView (.vertical, showsIndicators: false) {
+            VStack (spacing: 15) {
+                
+                // Category name
+                Text(gamesVM.fjCategory.uppercased())
+                    .font(formatter.font())
+                    .padding()
+                    .frame(width: 300, height: 130)
+                    .background(formatter.color(.lowContrastWhite))
+                    .cornerRadius(10)
+                
+                // Final Trivio Clue
+                Text(gamesVM.fjClue.uppercased())
+                    .font(formatter.font(fontSize: .semiLarge))
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, 100)
+                    .padding()
+                
+                // Answer submissions
                 VStack {
                     ForEach(participantsVM.teams, id: \.self) { team in
                         SubmitAnswerView(teamIndex: team.index)
@@ -53,12 +54,12 @@ struct FinalTrivioSubmitAnswerView: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .opacity(participantsVM.answersValid() ? 1 : 0.5)
                 })
+                .keyboardAware()
+                
+                Spacer()
             }
-            .keyboardAware()
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
         .padding(30)
         .background(formatter.color(.primaryAccent))
         .cornerRadius(40)
@@ -90,6 +91,7 @@ struct SubmitAnswerView: View {
                     .foregroundColor(ColorMap().getColor(color: team.color))
                 Text(team.name)
                     .font(formatter.font(fontSize: .large))
+                    .minimumScaleFactor(0.3)
                 Spacer()
             }
             .frame(width: 200)

@@ -10,7 +10,8 @@ import Firebase
 import FirebaseFirestoreSwift
 
 class BuildViewModel: ObservableObject {
-    @Published var buildStage: BuildStage = .jeopardyRound
+    @Published var buildStage: BuildStage = .trivioRound
+    @Published var currentDisplay: CurrentDisplay = .grid
     @Published var isEditing = false
     @Published var isEditingDraft = false
     
@@ -42,14 +43,13 @@ class BuildViewModel: ObservableObject {
     @Published var cluePreview = ""
     @Published var responsePreview = ""
     @Published var processPending = false
+    @Published var showingBuildView = false
     
     private var moneySectionsJ = ["200", "400", "600", "800", "1000"]
     private var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
     private var db = Firestore.firestore()
     private var emptyStrings = ["", "", "", "", ""]
     private var myUID = Auth.auth().currentUser?.uid ?? "no_one"
-    
-    @Published var showingBuildView = false
     
     init() {
         self.fillBlanks()
@@ -77,6 +77,9 @@ class BuildViewModel: ObservableObject {
         self.gameID = UUID().uuidString
         self.moneySections = moneySectionsDJ
         self.fillBlanks()
+        
+        self.buildStage = .trivioRound
+        self.currentDisplay = .grid
     }
     
     func writeToFirestore(isDraft: Bool = false, completion: @escaping (Bool) -> Void) {
@@ -213,7 +216,7 @@ class BuildViewModel: ObservableObject {
             self.processPending = true
             if success {
                 self.processPending = false
-                self.buildStage = .jeopardyRound
+                self.buildStage = .trivioRound
                 self.showingBuildView.toggle()
             }
         }
@@ -243,7 +246,7 @@ class BuildViewModel: ObservableObject {
         }
         gameID = UUID().uuidString
         moneySections = moneySectionsJ
-        buildStage = .jeopardyRound
+        buildStage = .trivioRound
     }
     
     func start() {
@@ -277,14 +280,14 @@ class BuildViewModel: ObservableObject {
     }
     
     func addCategory() {
-        if buildStage == .jeopardyRound {
+        if buildStage == .trivioRound {
             if self.jRoundLen == 6 { return }
             self.jRoundLen += 1
             jCategoriesShowing[jRoundLen - 1] = true
             if jCategories.count <= jRoundLen {
                 self.jCategories.append(Empty().category(index: jRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
             }
-        } else if buildStage == .djRound {
+        } else if buildStage == .dtRound {
             if self.djRoundLen == 6 { return }
             self.djRoundLen += 1
             djCategoriesShowing[djRoundLen - 1] = true
@@ -295,11 +298,11 @@ class BuildViewModel: ObservableObject {
     }
     
     func subtractCategory(index: Int, last: Bool) {
-        if buildStage == .jeopardyRound {
+        if buildStage == .trivioRound {
             if self.jRoundLen == 3 { return }
             self.jRoundLen -= 1
             jCategoriesShowing[jRoundLen] = false
-        } else if buildStage == .djRound {
+        } else if buildStage == .dtRound {
             if self.djRoundLen == 3 { return }
             self.djRoundLen -= 1
             djCategoriesShowing[djRoundLen] = false
@@ -330,16 +333,16 @@ class BuildViewModel: ObservableObject {
     }
     
     func clearDailyDoubles() {
-        if buildStage == .jeopardyRoundDD {
+        if buildStage == .trivioRoundDD {
             self.jeopardyDailyDoubles.removeAll()
-        } else if buildStage == .djRoundDD {
+        } else if buildStage == .dtRoundDD {
             self.djDailyDoubles1.removeAll()
             self.djDailyDoubles2.removeAll()
         }
     }
     
     func randomDDs() {
-        if buildStage == .jeopardyRoundDD {
+        if buildStage == .trivioRoundDD {
             while self.jeopardyDailyDoubles.isEmpty {
                 let randCol = Int.random(in: 0..<jRoundLen)
                 let randRow = Int.random(in: 0..<5)
@@ -348,7 +351,7 @@ class BuildViewModel: ObservableObject {
                     self.jeopardyDailyDoubles = [randCol, randRow]
                 }
             }
-        } else if buildStage == .djRoundDD {
+        } else if buildStage == .dtRoundDD {
             while self.djDailyDoubles1.isEmpty || self.djDailyDoubles2.isEmpty {
                 let randCol = Int.random(in: 0..<djRoundLen)
                 let randRow = Int.random(in: 0..<5)
@@ -367,7 +370,7 @@ class BuildViewModel: ObservableObject {
     }
     
     func getCategoryName(catIndex: Int) -> String {
-        if buildStage == .jeopardyRound || buildStage == .jeopardyRoundDD {
+        if buildStage == .trivioRound || buildStage == .trivioRoundDD {
             return jCategories[catIndex].name
         } else {
             return djCategories[catIndex].name
@@ -375,7 +378,7 @@ class BuildViewModel: ObservableObject {
     }
     
     func getClueResponsePair(crIndex: Int, catIndex: Int) -> (clue: String, response: String) {
-        if buildStage == .jeopardyRound {
+        if buildStage == .trivioRound {
             return (jCategories[catIndex].clues[crIndex], jCategories[catIndex].responses[crIndex])
         } else {
             return (djCategories[catIndex].clues[crIndex], djCategories[catIndex].responses[crIndex])
@@ -383,7 +386,7 @@ class BuildViewModel: ObservableObject {
     }
     
     func addCategoryName(name: String, catIndex: Int) {
-        if buildStage == .jeopardyRound || buildStage == .jeopardyRoundDD {
+        if buildStage == .trivioRound || buildStage == .trivioRoundDD {
             jCategories[catIndex].name = name
         } else {
             djCategories[catIndex].name = name
@@ -391,7 +394,7 @@ class BuildViewModel: ObservableObject {
     }
     
     func addClueResponsePair(clue: String, response: String, crIndex: Int, catIndex: Int) {
-        if buildStage == .jeopardyRound {
+        if buildStage == .trivioRound {
             jCategories[catIndex].clues[crIndex] = clue
             jCategories[catIndex].responses[crIndex] = response
         } else {
@@ -402,7 +405,7 @@ class BuildViewModel: ObservableObject {
     
     func ddsFilled() -> Bool {
         switch buildStage {
-        case .djRoundDD:
+        case .dtRoundDD:
             return !djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty
         default:
             return !jeopardyDailyDoubles.isEmpty
@@ -416,12 +419,16 @@ class BuildViewModel: ObservableObject {
     func stepStringHandler() -> String {
         var stepString = ""
         switch buildStage {
-        case .jeopardyRound, .jeopardyRoundDD:
-            stepString = "Trivio Round"
-        case .djRound, .djRoundDD:
-            stepString = "Double Trivio Round"
-        case .finalJeopardy:
-            stepString = "Final Trivio Round"
+        case .trivioRound:
+            stepString = "Trivio! Round"
+        case .trivioRoundDD:
+            stepString = "Trivio! Round DDs"
+        case .dtRound:
+            stepString = "Double Trivio! Round"
+        case .dtRoundDD:
+            stepString = "Double Trivio! Round DDs"
+        case .finalTrivio:
+            stepString = "Final Trivio! Round"
         default:
             stepString = "Finishing Touches"
         }
@@ -431,15 +438,15 @@ class BuildViewModel: ObservableObject {
     func descriptionHandler() -> String {
         var description = ""
         switch buildStage {
-        case .jeopardyRound:
-            description = "Add & Edit Categories (hold tile to preview)"
-        case .jeopardyRoundDD:
+        case .trivioRound:
+            description = "Add & Edit Categories"
+        case .trivioRoundDD:
             description = "Select One Duplex of the Day"
-        case .djRound:
-            description = "Add & Edit Categories (hold tile to preview)"
-        case .djRoundDD:
+        case .dtRound:
+            description = "Add & Edit Categories"
+        case .dtRoundDD:
             description = "Select Two Duplex of the Days"
-        case .finalJeopardy:
+        case .finalTrivio:
             description = "Add A Category, Clue, and Response"
         default:
             description = "Add a title, at least 2 tags, and decide if the set should be public"
@@ -450,9 +457,9 @@ class BuildViewModel: ObservableObject {
     func backStringHandler() -> String {
         var backString = ""
         switch buildStage {
-        case .jeopardyRoundDD, .djRoundDD:
+        case .trivioRoundDD, .dtRoundDD:
             backString = "Back to Editing Categories"
-        case .djRound, .finalJeopardy:
+        case .dtRound, .finalTrivio:
             backString = "Back to Choosing Duplex of the Days"
         case .details:
             backString = "Back to Final Trivio"
@@ -464,37 +471,42 @@ class BuildViewModel: ObservableObject {
     
     func back() {
         switch buildStage {
-        case .jeopardyRoundDD:
-            buildStage = .jeopardyRound
-        case .djRound:
+        case .trivioRoundDD:
+            buildStage = .trivioRound
+            currentDisplay = .grid
+        case .dtRound:
             moneySections = moneySectionsJ
-            buildStage = .jeopardyRoundDD
-        case .djRoundDD:
-            buildStage = .djRound
-        case .finalJeopardy:
-            buildStage = .djRoundDD
+            buildStage = .trivioRoundDD
+            currentDisplay = .grid
+        case .dtRoundDD:
+            buildStage = .dtRound
+            currentDisplay = .grid
+        case .finalTrivio:
+            buildStage = .dtRoundDD
+            currentDisplay = .grid
         default:
-            buildStage = .finalJeopardy
+            buildStage = .finalTrivio
+            currentDisplay = .finalTrivio
         }
     }
     
     func nextPermitted() -> Bool {
         switch buildStage {
-        case .jeopardyRound:
+        case .trivioRound:
             var numFilled = 0
             for category in jCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
             return numFilled >= jRoundLen
-        case .djRound:
+        case .dtRound:
             var numFilled = 0
             for category in djCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
             return numFilled >= djRoundLen
-        case .jeopardyRoundDD:
+        case .trivioRoundDD:
             return !jeopardyDailyDoubles.isEmpty
-        case .djRoundDD:
+        case .dtRoundDD:
             return (!djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty)
         case .details:
             return tags.count >= 2 && !setName.isEmpty
@@ -525,24 +537,26 @@ class BuildViewModel: ObservableObject {
     
     func nextButtonHandler() {
         switch buildStage {
-        case .jeopardyRound:
-            buildStage = .jeopardyRoundDD
-        case .jeopardyRoundDD:
-            buildStage = .djRound
+        case .trivioRound:
+            buildStage = .trivioRoundDD
+        case .trivioRoundDD:
+            buildStage = .dtRound
             moneySections = moneySectionsDJ
-        case .djRound:
-            buildStage = .djRoundDD
+        case .dtRound:
+            buildStage = .dtRoundDD
             isRandomDD = false
-        case .djRoundDD:
-            buildStage = .finalJeopardy
-        case .finalJeopardy:
+        case .dtRoundDD:
+            buildStage = .finalTrivio
+            currentDisplay = .finalTrivio
+        case .finalTrivio:
             buildStage = .details
+            currentDisplay = .finishingTouches
         default:
             writeToFirestore() { (success) -> Void in
                 self.processPending = true
                 if success {
                     self.processPending = false
-                    self.buildStage = .jeopardyRound
+                    self.buildStage = .trivioRound
                     self.showingBuildView.toggle()
                     self.clearAll()
                 }
@@ -552,7 +566,7 @@ class BuildViewModel: ObservableObject {
     
     func addDailyDouble(i: Int, j: Int) {
         switch buildStage {
-        case .djRoundDD:
+        case .dtRoundDD:
             if djDailyDoubles1 == [i, j] {
                 djDailyDoubles1.removeAll()
             } else if djDailyDoubles2 == [i, j] {
@@ -570,9 +584,9 @@ class BuildViewModel: ObservableObject {
     }
     
     func isDailyDouble(i: Int, j: Int) -> Bool {
-        if buildStage == .djRoundDD {
+        if buildStage == .dtRoundDD {
             return self.djDailyDoubles1 == [i, j] || self.djDailyDoubles2 == [i, j]
-        } else if buildStage == .jeopardyRoundDD {
+        } else if buildStage == .trivioRoundDD {
             return self.jeopardyDailyDoubles == [i, j]
         }
         return false
@@ -643,7 +657,7 @@ class BuildViewModel: ObservableObject {
     
     func swap(currentIndex: Int, swapToIndex: Int, categoryIndex: Int) {
         // good old fashioned swapping
-        if buildStage == .jeopardyRound {
+        if buildStage == .trivioRound {
             let tempClue = jCategories[categoryIndex].clues[currentIndex]
             let tempResponse = jCategories[categoryIndex].responses[currentIndex]
             jCategories[categoryIndex].clues[currentIndex] = jCategories[categoryIndex].clues[swapToIndex]
@@ -716,5 +730,9 @@ struct Empty {
 }
 
 enum BuildStage {
-    case jeopardyRound, jeopardyRoundDD, djRound, djRoundDD, finalJeopardy, details, tags
+    case trivioRound, trivioRoundDD, dtRound, dtRoundDD, finalTrivio, details
+}
+
+enum CurrentDisplay {
+    case grid, categoryName, clueResponse, finalTrivio, finishingTouches, saveDraft
 }

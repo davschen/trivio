@@ -18,7 +18,7 @@ struct MySetsView: View {
     @State var idSelected = ""
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 15) {
+        VStack (alignment: .leading, spacing: 5) {
             Text("My Sets")
                 .font(formatter.font(fontSize: .extraLarge))
                 .foregroundColor(formatter.color(.highContrastWhite))
@@ -27,7 +27,7 @@ struct MySetsView: View {
                     .padding(5)
             }
             if gamesVM.customSets.count > 0 {
-                CustomSetView(isMine: true, customSets: gamesVM.customSets)
+                CustomSetView(searchItem: $profileVM.searchItem, isMine: true, customSets: gamesVM.customSets)
                     .padding(5)
             } else {
                 HStack {
@@ -41,6 +41,7 @@ struct MySetsView: View {
             }
             Spacer()
         }
+        .keyboardAware()
     }
 }
 
@@ -49,11 +50,12 @@ struct CustomSetView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
-    @State var searchItem = ""
+    
+    @Binding var searchItem: String
+    
     var isMine: Bool
     var customSets: [CustomSet]
-    
-    let columns = [GridItem](repeating: GridItem(spacing: 15), count: 2)
+    var columns: [GridItem] = [GridItem](repeating: GridItem(spacing: 15), count: 2)
     
     var body: some View {
         VStack {
@@ -88,19 +90,32 @@ struct CustomSetView: View {
                     .frame(height: 10)
                 LazyVGrid(columns: columns, spacing: 15) {
                     ForEach(customSets, id: \.self) { set in
-                        CustomSetCellView(set: set, isMine: isMine)
-                            .onTapGesture {
-                                guard let setID = set.id else { return }
-                                gamesVM.getCustomData(setID: setID)
-                                gamesVM.previewViewShowing = true
-                                gamesVM.setEpisode(ep: setID)
-                                participantsVM.resetScores()
-                            }
+                        if searchItem.isEmpty || set.title.contains(searchItem) {
+                            CustomSetCellView(set: set, isMine: isMine)
+                                .onTapGesture {
+                                    if gamesVM.gameInProgress() {
+                                        formatter.setAlertSettings(alertAction: {
+                                            selectSet(set: set)
+                                        }, alertTitle: "Cancel current game?", alertSubtitle: "It looks like you have a game in progress. Choosing this one would erase all of your progress.", hasCancel: true, actionLabel: "Yes, choose this game")
+                                    } else {
+                                        selectSet(set: set)
+                                    }
+                                }
+                        }
                     }
                 }
                 .padding(.horizontal, 2)
             }
         }
+    }
+    
+    func selectSet(set: CustomSet) {
+        guard let setID = set.id else { return }
+        gamesVM.getCustomData(setID: setID)
+        gamesVM.previewViewShowing = true
+        gamesVM.setEpisode(ep: setID)
+        gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
+        participantsVM.resetScores()
     }
 }
 
@@ -199,9 +214,11 @@ struct CustomSetCellView: View {
                             .cornerRadius(5)
                     })
                 }
-            } else {
+            } else if !exploreVM.isShowingUserView {
                 Button(action: {
                     exploreVM.isShowingUserView.toggle()
+                    exploreVM.pullAllFromUser(withID: set.userID)
+                    gamesVM.previewViewShowing = false
                 }, label: {
                     HStack {
                         Image(systemName: "person.circle")

@@ -15,8 +15,6 @@ class MasterHandler: ObservableObject {
     @Published var volume: Float = 1
     @Published var speaker = Speaker()
     
-    @Namespace var namespace
-    
     var alertStyle: AlertStyle = .standard
     var alertAction: () -> () = { print("default alert") }
     var alertTitle = ""
