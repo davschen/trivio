@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import Firebase
 import FirebaseFirestore
 import FirebaseFirestoreSwift
@@ -15,7 +16,7 @@ extension GamesViewModel {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
         db.collection("userSets")
             .whereField("userID", isEqualTo: myUID)
-            .order(by: "dateCreated", descending: true).addSnapshotListener { (snap, error) in
+            .order(by: "dateCreated", descending: true).getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
@@ -47,7 +48,7 @@ extension GamesViewModel {
         reset()
         setEpisode(ep: setID)
         let group = DispatchGroup()
-        db.collection("userSets").document(setID).addSnapshotListener { (doc, err) in
+        db.collection("userSets").document(setID).getDocument { (doc, err) in
             group.enter()
             if err != nil {
                 print(err!.localizedDescription)
@@ -164,5 +165,10 @@ extension GamesViewModel {
             }
         }
         customSets = copyOfCustomSets
+    }
+    
+    func getUnitPoint() -> UnitPoint {
+        let categoryCount = gamePhase == .trivio ? jRoundLen : djRoundLen
+        return currentCategoryIndex == categoryCount - 1 ? .trailing : .center
     }
 }

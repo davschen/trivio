@@ -87,8 +87,10 @@ class ProfileViewModel: ObservableObject {
     }
     
     func checkUsernameExists(completion: @escaping (Bool) -> Void) {
+        guard let uid = myUID else { return }
         let docRef = db.collection("users")
             .whereField("username", isEqualTo: username.lowercased())
+        print(username)
         docRef.addSnapshotListener { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -96,7 +98,7 @@ class ProfileViewModel: ObservableObject {
             }
             guard let data = snap?.documents else { return }
             if let doc = data.first {
-                if (doc.documentID == Auth.auth().currentUser?.uid ?? "NID") {
+                if (doc.documentID == uid) {
                     completion(true)
                 } else {
                     completion(false)
@@ -130,7 +132,7 @@ class ProfileViewModel: ObservableObject {
     
     func getUserInfo() {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
-        db.collection("users").document(myUID).addSnapshotListener { (docSnap, error) in
+        db.collection("users").document(myUID).getDocument { (docSnap, error) in
             if error != nil { return }
             guard let doc = docSnap else { return }
             let name = doc.get("name") as? String ?? ""
@@ -168,6 +170,19 @@ class ProfileViewModel: ObservableObject {
             }
         }
         return initials
+    }
+    
+    func editAccountInfo() {
+        guard let uid = myUID else { return }
+        db.collection("users").document(uid).setData([
+            "name": self.name,
+            "username": self.username.lowercased()
+        ], merge: true)
+        getUserInfo()
+    }
+    
+    func getPhoneNumber() -> String {
+        return Auth.auth().currentUser?.phoneNumber ?? ""
     }
     
     func updatePhoneNumber(newPhoneNumber: String) {

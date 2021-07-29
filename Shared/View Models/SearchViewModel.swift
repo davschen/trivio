@@ -219,4 +219,8 @@ struct Game: Decodable, Hashable, Identifiable {
     mutating func setID(id: String) {
         self.id = id
     }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

@@ -23,6 +23,8 @@ extension MasterHandler {
         }
         
         switch fontSize {
+        case .micro:
+            sizeFloat = deviceType == .iPhone ? 8 : 10
         case .small:
             sizeFloat = deviceType == .iPhone ? 12 : 14
         case .regular:
@@ -30,16 +32,20 @@ extension MasterHandler {
         case .medium:
             sizeFloat = deviceType == .iPhone ? 16 : 20
         case .mediumLarge:
-            sizeFloat = deviceType == .iPhone ? 18 : 25
+            sizeFloat = deviceType == .iPhone ? 20 : 25
         case .semiLarge:
-            sizeFloat = deviceType == .iPhone ? 20 : 30
+            sizeFloat = deviceType == .iPhone ? 25 : 30
         case .large:
-            sizeFloat = deviceType == .iPhone ? 22 : 35
+            sizeFloat = deviceType == .iPhone ? 30 : 35
         case .extraLarge:
-            sizeFloat = deviceType == .iPhone ? 30 : 45
+            sizeFloat = deviceType == .iPhone ? 35 : 45
         }
         
         return Font.custom("Metropolis-" + styleString, size: sizeFloat)
+    }
+    
+    func iconFont(_ systemFontSize: SystemFontSize = .medium) -> Font {
+        return .system(size: systemFontSize.rawValue, weight: .bold)
     }
 }
 
@@ -48,5 +54,12 @@ enum FontStyle {
 }
 
 enum FontSize {
-    case small, regular, medium, mediumLarge, semiLarge, large, extraLarge
+    case micro, small, regular, medium, mediumLarge, semiLarge, large, extraLarge
+}
+
+enum SystemFontSize: CGFloat {
+    case small = 15
+    case medium = 20
+    case mediumLarge = 25
+    case large = 30
 }

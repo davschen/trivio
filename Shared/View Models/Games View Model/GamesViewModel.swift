@@ -22,8 +22,6 @@ class GamesViewModel: ObservableObject {
     @Published var seasonFolders = [SeasonFolder]()
     @Published var currentSeason = SeasonFolder(id: "", collection_index: 0, num_games: 0, title: "")
     
-    @Published var pullFromCustom = false
-    @Published var customSetIDs = [String]()
     @Published var categories = [String]()
     @Published var clues: [[String]] = []
     @Published var responses: [[String]] = []
@@ -63,7 +61,6 @@ class GamesViewModel: ObservableObject {
     @Published var queriedUserName = ""
     
     // From profile view
-    @Published var menuSelectedItem = "My Sets"
     @Published var previewViewShowing = false
     @Published var playedGames = [String]()
     @Published var setOffsets = [String:CGFloat]()
@@ -73,11 +70,12 @@ class GamesViewModel: ObservableObject {
     @Published var finalTrivioStage: FinalTrivioStage = .makeWager
     @Published var gameQueryFromType: MenuChoice = .explore
     
-    var categoryCompletes = [Int](repeating: 0, count: 6)
-    var jCategoryCompletesReference = [Int](repeating: 0, count: 6)
-    var djCategoryCompletesReference = [Int](repeating: 0, count: 6)
-    var jRoundCompletes = 0
-    var djRoundCompletes = 0
+    public var currentCategoryIndex = 0
+    public var categoryCompletes = [Int](repeating: 0, count: 6)
+    public var jCategoryCompletesReference = [Int](repeating: 0, count: 6)
+    public var djCategoryCompletesReference = [Int](repeating: 0, count: 6)
+    public var jRoundCompletes = 0
+    public var djRoundCompletes = 0
     
     public var dateFormatter: DateFormatter {
         let df = DateFormatter()
@@ -93,7 +91,7 @@ class GamesViewModel: ObservableObject {
     
     init() {
         getSeasons()
-        readCustomData() 
+        readCustomData()
         if isVIP {
             menuChoice = .gamepicker
             gameQueryFromType = .gamepicker
@@ -116,6 +114,7 @@ class GamesViewModel: ObservableObject {
         self.categories = jeopardyCategories
         self.clearCategoryDones()
         self.finalTrivioStage = .notBegun
+        self.currentCategoryIndex = 0
     }
     
     func moveOntoDoubleJeopardy() {
@@ -126,6 +125,7 @@ class GamesViewModel: ObservableObject {
         self.moneySections = moneySectionsDJ
         self.categories = doubleJeopardyCategories
         self.clearCategoryDones()
+        self.currentCategoryIndex = 0
     }
     
     func setSeason(folder: SeasonFolder) {

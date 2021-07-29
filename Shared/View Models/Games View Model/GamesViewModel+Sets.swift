@@ -17,13 +17,13 @@ extension GamesViewModel {
         loadingGame = true
         getSeasonsWithHandler { (success) in
             if success {
-                self.loadingGame = true
+                self.loadingGame = false
             }
         }
     }
     
     func getSeasonsWithHandler(completion: @escaping (Bool) -> Void) {
-        db.collection("folders").order(by: "collection_index", descending: true).addSnapshotListener { (snap, error) in
+        db.collection("folders").order(by: "collection_index", descending: true).getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
@@ -31,8 +31,6 @@ extension GamesViewModel {
                 guard let data = snap?.documents else { return }
                 
                 DispatchQueue.main.async {
-                    self.loadingGame = true
-                    
                     self.seasonFolders = data.compactMap({ (querySnapshot) -> SeasonFolder? in
                         var folder = try? querySnapshot.data(as: SeasonFolder.self)
                         folder?.setID(id: querySnapshot.documentID)
@@ -55,7 +53,7 @@ extension GamesViewModel {
     
     // Read previews
     func getEpisodes(seasonID: String) {
-        db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).addSnapshotListener { (snap, error) in
+        db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
@@ -93,9 +91,9 @@ extension GamesViewModel {
                         print(error!.localizedDescription)
                         return
                     }
+                    let index = doc?.get("index") as? Int ?? 0
+                    let clues = doc?.get("clues") as? [String] ?? []
                     DispatchQueue.main.async {
-                        let index = doc?.get("index") as? Int ?? 0
-                        let clues = doc?.get("clues") as? [String] ?? []
                         if self.jeopardyRoundClues.isEmpty {
                             let toAdd = (j_round_len - self.jeopardyRoundClues.count)
                             self.jeopardyRoundClues = [[String]](repeating: [""], count: toAdd)
@@ -123,9 +121,9 @@ extension GamesViewModel {
                         print(error!.localizedDescription)
                         return
                     }
+                    let index = doc?.get("index") as? Int ?? 0
+                    let clues = doc?.get("clues") as? [String] ?? []
                     DispatchQueue.main.async {
-                        let index = doc?.get("index") as? Int ?? 0
-                        let clues = doc?.get("clues") as? [String] ?? []
                         if self.doubleJeopardyRoundClues.isEmpty {
                             let toAdd = (dj_round_len - self.doubleJeopardyRoundClues.count)
                             self.doubleJeopardyRoundClues = [[String]](repeating: [""], count: toAdd)
@@ -143,7 +141,7 @@ extension GamesViewModel {
                 }
             }
             
-            gameDocRef.collection("j_round_triple_stumpers").addSnapshotListener { (snap, error) in
+            gameDocRef.collection("j_round_triple_stumpers").getDocuments { (snap, error) in
                 if error != nil {
                     print(error!.localizedDescription)
                     return
@@ -157,7 +155,7 @@ extension GamesViewModel {
                 }
             }
             
-            gameDocRef.collection("dj_round_triple_stumpers").addSnapshotListener { (snap, error) in
+            gameDocRef.collection("dj_round_triple_stumpers").getDocuments { (snap, error) in
                 if error != nil {
                     print(error!.localizedDescription)
                     return

@@ -25,6 +25,8 @@ class ParticipantsViewModel: ObservableObject {
     
     @Published var scores: [[Int]] = []
     @Published var solved = 0
+    @Published var myTeam = Empty().team
+    @Published var teamToEdit = Empty().team
     
     private var db = Firestore.firestore()
     private static let suffix = ["", "K", "M", "B", "T", "P", "E"]
@@ -89,6 +91,16 @@ class ParticipantsViewModel: ObservableObject {
         getAllTeams()
     }
     
+    func editTeamInDB(team: Team) { 
+        guard let uid = myUID else { return }
+        try? self.db.collection("users")
+            .document(uid)
+            .collection("contestants")
+            .document(team.id)
+            .setData(from: team)
+        getAllTeams()
+    }
+    
     func getAllTeams() {
         guard let uid = myUID else { return }
         self.db.collection("users")
@@ -107,6 +119,7 @@ class ParticipantsViewModel: ObservableObject {
                     var shouldAddSelf = true
                     for team in self.historicalTeams {
                         if team.id == uid {
+                            self.myTeam = team
                             shouldAddSelf = false
                             if !self.teams.contains(team) {
                                 self.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
@@ -140,6 +153,17 @@ class ParticipantsViewModel: ObservableObject {
     
     func addTeam(id: String = "", name: String, members: [String], score: Int, color: String) {
         teams.append(Team(id: id, index: teams.count, name: name, members: members, score: score, color: color))
+        wagers.append("")
+        finalJeopardyAnswers.append("")
+        spokespeople.append("")
+        toSubtracts.append(false)
+        fjCorrects.append(false)
+        fjReveals.append(false)
+        scores.append([Int](repeating: 0, count: questionTicker))
+    }
+    
+    func addTeam(team: Team) {
+        teams.append(team)
         wagers.append("")
         finalJeopardyAnswers.append("")
         spokespeople.append("")
@@ -190,7 +214,9 @@ class ParticipantsViewModel: ObservableObject {
     }
     
     func editColor(index: Int, color: String) {
-        teams[index].editColor(color: color)
+        if teams.indices.contains(index) {
+            teams[index].editColor(color: color)
+        }
     }
     
     func resetSubtracts() {

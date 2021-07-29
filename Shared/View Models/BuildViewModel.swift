@@ -45,6 +45,8 @@ class BuildViewModel: ObservableObject {
     @Published var processPending = false
     @Published var showingBuildView = false
     
+    public var editingCategoryIndex = 0
+    
     private var moneySectionsJ = ["200", "400", "600", "800", "1000"]
     private var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
     private var db = Firestore.firestore()
@@ -422,11 +424,11 @@ class BuildViewModel: ObservableObject {
         case .trivioRound:
             stepString = "Trivio! Round"
         case .trivioRoundDD:
-            stepString = "Trivio! Round DDs"
+            stepString = "Trivio! Round Duplexes"
         case .dtRound:
             stepString = "Double Trivio! Round"
         case .dtRoundDD:
-            stepString = "Double Trivio! Round DDs"
+            stepString = "Double Trivio! Round Duplexes"
         case .finalTrivio:
             stepString = "Final Trivio! Round"
         default:
@@ -539,12 +541,16 @@ class BuildViewModel: ObservableObject {
         switch buildStage {
         case .trivioRound:
             buildStage = .trivioRoundDD
+            currentDisplay = .grid
+            editingCategoryIndex = 0
         case .trivioRoundDD:
             buildStage = .dtRound
             moneySections = moneySectionsDJ
         case .dtRound:
             buildStage = .dtRoundDD
             isRandomDD = false
+            currentDisplay = .grid
+            editingCategoryIndex = 0
         case .dtRoundDD:
             buildStage = .finalTrivio
             currentDisplay = .finalTrivio
@@ -724,6 +730,7 @@ struct CustomSet: Decodable, Hashable, Identifiable, Encodable {
 struct Empty {
     var customSet = CustomSet(id: "", jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
     var game = Game(id: "", date: Date(), dj_category_ids: [], dj_dds_1: [], dj_dds_2: [], dj_round_len: 0, fj_category: "", fj_clue: "", fj_response: "", game_id: "", group_index: 0, j_category_ids: [], j_round_len: 0, title: "", type: "", userID: "")
+    var team = Team(id: "", index: 0, name: "", members: [], score: 0, color: "blue")
     func category(index: Int, emptyStrings: [String], gameID: String) -> Category {
         return Category(id: UUID().uuidString, name: "", index: index, clues: emptyStrings, responses: emptyStrings, gameID: gameID, imageURLs: [:], audioURLs: [:])
     }
