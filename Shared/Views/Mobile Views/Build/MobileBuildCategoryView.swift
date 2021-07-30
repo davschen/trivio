@@ -30,6 +30,8 @@ struct MobileBuildCategoryView: View {
                 .background(formatter.color(.primaryAccent))
                 .cornerRadius(10)
                 .onTapGesture {
+                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                    
                     if buildVM.buildStage == .trivioRoundDD || buildVM.buildStage == .dtRoundDD {
                         return
                     }

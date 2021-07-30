@@ -160,6 +160,10 @@ class ParticipantsViewModel: ObservableObject {
         fjCorrects.append(false)
         fjReveals.append(false)
         scores.append([Int](repeating: 0, count: questionTicker))
+        
+        if !teams.indices.contains(selectedTeam.index) {
+            setSelectedTeam(index: teams.count - 1)
+        }
     }
     
     func addTeam(team: Team) {
@@ -171,6 +175,10 @@ class ParticipantsViewModel: ObservableObject {
         fjCorrects.append(false)
         fjReveals.append(false)
         scores.append([Int](repeating: 0, count: questionTicker))
+        
+        if !teams.indices.contains(selectedTeam.index) {
+            setSelectedTeam(index: teams.count - 1)
+        }
     }
     
     func editScore(index: Int, amount: Int) {
@@ -180,10 +188,6 @@ class ParticipantsViewModel: ObservableObject {
     func addMember(index: Int, name: String) {
         teams[index].addMember(name: name)
         spokespeople[index] = name
-        
-        if !teams.indices.contains(selectedTeam.index) {
-            setSelectedTeam(index: index)
-        }
     }
     
     func editName(index: Int, name: String) {

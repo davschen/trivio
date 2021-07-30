@@ -213,13 +213,15 @@ class BuildViewModel: ObservableObject {
         }
     }
     
-    func saveDraft() {
+    func saveDraft(isExiting: Bool = false) {
         writeToFirestore(isDraft: true) { (success) in
             self.processPending = true
             if success {
                 self.processPending = false
                 self.buildStage = .trivioRound
-                self.showingBuildView.toggle()
+                if isExiting {
+                    self.showingBuildView.toggle()
+                }
             }
         }
     }

@@ -58,6 +58,7 @@ struct MobileSummaryMySetsView: View {
         VStack (alignment: .leading) {
             ZStack {
                 Button(action: {
+                    formatter.hapticFeedback(style: .light)
                     profileVM.menuSelectedItem = "My Sets"
                     selectionViewActive.toggle()
                 }, label: {
@@ -121,6 +122,7 @@ struct MobileSummaryMySetsView: View {
     }
     
     func selectSet(set: CustomSet) {
+        formatter.hapticFeedback(style: .light)
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
         gamesVM.setEpisode(ep: setID)
@@ -140,6 +142,7 @@ struct MobileSummaryMyDraftsView: View {
         VStack (alignment: .leading) {
             ZStack {
                 Button(action: {
+                    formatter.hapticFeedback(style: .light)
                     profileVM.menuSelectedItem = "My Drafts"
                     selectionViewActive.toggle()
                 }, label: {
@@ -196,6 +199,7 @@ struct MobileSummaryPastGamesView: View {
         VStack (alignment: .leading) {
             ZStack {
                 Button(action: {
+                    formatter.hapticFeedback(style: .light)
                     profileVM.menuSelectedItem = "Past Games"
                     selectionViewActive.toggle()
                 }, label: {
@@ -218,6 +222,13 @@ struct MobileSummaryPastGamesView: View {
                             .frame(width: 0, height: 0)
                         ForEach(reportVM.allGames, id: \.self) { game in
                             MobilePastGamePreviewView(game: game)
+                                .onTapGesture {
+                                    formatter.hapticFeedback(style: .light)
+                                    selectionViewActive.toggle()
+                                    if let gameID = game.id {
+                                        reportVM.selectedGameID = gameID
+                                    }
+                                }
                         }
                         Spacer()
                             .frame(width: 0, height: 0)

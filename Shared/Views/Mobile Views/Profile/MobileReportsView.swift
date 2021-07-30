@@ -15,13 +15,13 @@ struct MobileReportsView: View {
     
     var body: some View {
         ZStack {
-            VStack (alignment: .leading, spacing: 20) {
+            VStack (alignment: .leading, spacing: 10) {
                 if reportVM.allGames.count == 0 {
                     MobileEmptyListView(label: "You haven't played any games yet. Once you do, they will show up here with detailed in-game reports")
-                        .padding(.vertical, 30)
+                        .padding()
                 } else {
                     ScrollView (.horizontal, showsIndicators: false) {
-                        HStack (spacing: 15) {
+                        HStack (spacing: 10) {
                             Spacer()
                                 .frame(width: 0)
                             ForEach(reportVM.allGames, id: \.self) { game in
@@ -76,6 +76,7 @@ struct MobileReportPreviewView: View {
         .cornerRadius(10)
         .padding(.top)
         .onTapGesture {
+            formatter.hapticFeedback(style: .medium)
             if reportVM.selectedGameID != gameID {
                 self.reportVM.getGameInfo(id: gameID)
             }
@@ -132,6 +133,7 @@ struct MobileAnalysisView: View {
                     
                     // "game played" label with set title
                     Button(action: {
+                        formatter.hapticFeedback(style: .light)
                         gamesVM.menuChoice = .game
                         if game.episode_played.contains("game_id") {
                             gamesVM.getEpisodeData(gameID: game.episode_played)
@@ -214,6 +216,7 @@ struct MobileAnalysisInfoView: View {
                             .background(formatter.color(.secondaryFG))
                             .cornerRadius(5)
                             .onTapGesture {
+                                formatter.hapticFeedback(style: .medium)
                                 reportVM.selectedID = (reportVM.selectedID == id) ? "" : id
                             }
                         }

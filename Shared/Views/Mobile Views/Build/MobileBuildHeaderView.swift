@@ -11,6 +11,7 @@ import SwiftUI
 struct MobileBuildHeaderView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
     @Binding var showingEdit: Bool
@@ -31,16 +32,17 @@ struct MobileBuildHeaderView: View {
             Spacer()
             
             // Save and Next/Finish buttons
-            HStack {
+            HStack (spacing: 5) {
                 if buildVM.currentDisplay == .grid {
                     Button(action: {
                         if buildVM.isEditing && !buildVM.isEditingDraft {
-                            buildVM.writeToFirestore { (success) in
-                                if success {
-                                    buildVM.showingBuildView.toggle()
-                                    
-                                }
-                            }
+                            formatter.setAlertSettings(alertAction: {
+                                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                                buildVM.saveDraft()
+                            }, alertTitle: "Save and Leave?", alertSubtitle: "Choose whether you want to leave or stay after saving.", hasCancel: true, actionLabel: "Stay", hasSecondaryAction: true, secondaryAction: {
+                                buildVM.saveDraft()
+                                buildVM.showingBuildView.toggle()
+                            }, secondaryActionLabel: "Leave")
                         } else {
                             buildVM.currentDisplay = .saveDraft
                         }
@@ -56,12 +58,16 @@ struct MobileBuildHeaderView: View {
                         .foregroundColor(formatter.color(.primaryFG))
                         .padding(10)
                         .background(formatter.color(.highContrastWhite))
-                        .cornerRadius(5)
+                        .cornerRadius(3)
                     }
                 }
                 Button(action: {
                     if buildVM.nextPermitted() {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         buildVM.nextButtonHandler()
+                        if buildVM.buildStage == .details {
+                            gamesVM.readCustomData()
+                        }
                     }
                 }, label: {
                     ZStack {
@@ -75,7 +81,7 @@ struct MobileBuildHeaderView: View {
                     .foregroundColor(formatter.color(.primaryFG))
                     .padding(10)
                     .background(formatter.color(buildVM.nextPermitted() ? .highContrastWhite : .lowContrastWhite))
-                    .cornerRadius(5)
+                    .cornerRadius(3)
                 })
             }
         }
@@ -99,6 +105,7 @@ struct MobileBuildHeaderView: View {
                     }
                 }
             } else {
+                buildVM.saveDraft(isExiting: true)
                 showingSaveDraft.toggle()
             }
         },

@@ -48,6 +48,7 @@ struct MobileSwapCellView: View {
         .cornerRadius(10)
         .frame(width: 110)
         .onTapGesture {
+            formatter.hapticFeedback(style: .rigid, intensity: .weak)
             formatter.resignKeyboard()
             if preSwapIndex == clueIndex {
                 preSwapIndex = -1

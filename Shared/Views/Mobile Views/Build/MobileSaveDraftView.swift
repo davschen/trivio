@@ -14,10 +14,10 @@ struct MobileSaveDraftView: View {
     
     var body: some View {
         ZStack {
-            VStack (spacing: 30) {
+            VStack (spacing: 15) {
                 Text("SAVE DRAFT")
                     .font(formatter.font(fontSize: .large))
-                VStack (spacing: 15) {
+                VStack (spacing: 10) {
                     HStack {
                         TextField("TITLE YOUR SET", text: $buildVM.setName, onCommit: {
                             buildVM.currentDisplay = .grid
@@ -33,12 +33,13 @@ struct MobileSaveDraftView: View {
                                 }
                         }
                     }
-                    .padding(20)
+                    .padding()
                     .background(formatter.color(.lowContrastWhite))
-                    .cornerRadius(10)
+                    .cornerRadius(5)
                     
                     Button(action: {
                         if !buildVM.setName.isEmpty {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             buildVM.currentDisplay = .grid
                             buildVM.saveDraft()
                         }
@@ -47,30 +48,31 @@ struct MobileSaveDraftView: View {
                             Text("Save")
                                 .font(formatter.font())
                             if buildVM.processPending {
-                                ProgressView()
+                                LoadingView()
                                     .padding(.leading, 5)
                             }
                         }
-                        .padding(20)
+                        .padding()
                         .frame(maxWidth: .infinity)
                         .background(formatter.color(.lowContrastWhite))
                         .clipShape(Capsule())
                         .opacity(buildVM.setName.isEmpty ? 0.5 : 1)
                     })
                     Button {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         buildVM.currentDisplay = .grid
                     } label: {
                         Text("Cancel")
                             .font(formatter.font())
                     }
-                    .keyboardAware()
+                    .keyboardAware(heightFactor: 0.6)
                 }
             }
-            .frame(width: 400)
+            .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(formatter.color(.primaryAccent))
-        .cornerRadius(30)
+        .cornerRadius(20)
     }
 }
 

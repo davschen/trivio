@@ -42,6 +42,7 @@ struct MobileDuplexWagerView: View {
                         .multilineTextAlignment(.center)
                     Spacer(minLength: 30)
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         self.ddWagerMade.toggle()
                         self.formatter.speaker.speak(clue)
                     }) {

@@ -135,6 +135,7 @@ struct MobileGameSettingsContestantsView: View {
                                             participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                         }, alertTitle: "Remove \(team.name)?", alertSubtitle: "If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                                     } else {
+                                        formatter.hapticFeedback(style: .soft, intensity: .weak)
                                         participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                     }
                                 }
@@ -223,6 +224,7 @@ struct MobileGameSettingsSelectedGameView: View {
                     Text("No game selected")
                         .font(formatter.font(.regularItalic, fontSize: .medium))
                     Button {
+                        formatter.hapticFeedback(style: .light)
                         gamesVM.menuChoice = .explore
                     } label: {
                         Text("Pick a game")

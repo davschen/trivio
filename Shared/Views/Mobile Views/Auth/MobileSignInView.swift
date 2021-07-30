@@ -35,60 +35,25 @@ struct MobileSignInView: View {
         ZStack {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
-            HStack {
-                VStack (alignment: .leading, spacing: 20) {
-                    Spacer()
-                    HStack {
-                        Text("Welcome to")
-                            .foregroundColor(formatter.color(.highContrastWhite))
-                        Text("Trivio!")
-                            .foregroundColor(formatter.color(.secondaryAccent))
-                        Spacer()
-                    }
-                    .font(formatter.font(fontSize: .extraLarge))
-                    VStack (alignment: .leading) {
-                        Text("If it’s your first time here, please sign up by tapping on the button below.")
-                        Text("Our Terms of Agreement can be found here.")
-                            .underline()
-                            .onTapGesture {
-                                let url = URL.init(string: "https://www.privacypolicies.com/live/3779e433-e05a-43db-8ca5-9d6df7e7a136")
-                                guard let privURL = url, UIApplication.shared.canOpenURL(privURL) else { return }
-                                UIApplication.shared.open(privURL)
-                            }
-                    }
-                    .font(formatter.font(.regular, fontSize: .small))
-                    Button {
-                        isLogin.toggle()
-                    } label: {
-                        Text(isLogin ? "Sign Up" : "Log In")
-                            .font(formatter.font())
-                            .padding()
-                            .padding(.horizontal, 30)
-                            .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: 3))
-                    }
-
-                }
-                .padding(80)
-                .keyboardAware()
-                Spacer()
-                VStack (alignment: .leading, spacing: formatter.padding()) {
-                    AuthHUDView(signInStage: $signInStage, isLogin: $isLogin)
-                        .padding(.trailing, 100)
+            VStack (alignment: .leading, spacing: formatter.padding()) {
+                MobileAuthHUDView(signInStage: $signInStage, isLogin: $isLogin)
+                    .padding(.trailing, 100)
+                ScrollView(.vertical, showsIndicators: false) {
                     switch signInStage {
                     case .enterNumber:
-                        AuthEnterNumberView(signInStage: $signInStage, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
+                        MobileAuthEnterNumberView(signInStage: $signInStage, number: $number, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
                     case .verifyNumber:
-                        AuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
+                        MobileAuthVerifyNumberView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, number: $number, code: $code, ID: $ID, alert: $alert, alertMessage: $alertMessage, isLogin: $isLogin)
                     default:
-                        AuthNameUsernameView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, name: $name, username: $username, isLogin: $isLogin)
+                        MobileAuthNameUsernameView(isLoggedIn: $isLoggedIn, signInStage: $signInStage, name: $name, username: $username, isLogin: $isLogin)
                     }
                 }
-                .frame(width: UIScreen.main.bounds.width * 0.4)
-                .background(formatter.color(.primaryFG))
             }
-            .animation(.easeInOut)
+            .frame(maxWidth: .infinity)
+            .background(formatter.color(.primaryFG))
             .edgesIgnoringSafeArea(.all)
-            AlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
+            
+            MobileAlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                 formatter.alertAction()
             })
         }
@@ -121,36 +86,35 @@ struct MobileAuthHUDView: View {
     
     var body: some View {
         ZStack (alignment: .bottomTrailing) {
-            VStack (alignment: .leading, spacing: 20) {
-                Spacer()
-                Text(isLogin ? "Log In" : "Sign Up")
-                    .font(formatter.font(fontSize: .extraLarge))
+            VStack (alignment: .leading, spacing: 10) {
                 HStack (spacing: 0) {
                     if signInStage != .enterNumber {
                         Button {
-                            switch signInStage {
-                            case .verifyNumber:
-                                signInStage = .enterNumber
-                            default:
-                                signInStage = .verifyNumber
-                            }
+                            formatter.setAlertSettings(alertAction: {
+                                switch signInStage {
+                                case .verifyNumber:
+                                    signInStage = .enterNumber
+                                default:
+                                    signInStage = .verifyNumber
+                                }
+                            }, alertTitle: "Go Back?", alertSubtitle: "If you go back, you'll lose whatever sign in progress you made on this page.", hasCancel: true, actionLabel: "Yes, go back")
+                            
                         } label: {
-                            HStack (spacing: 3) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 10, weight: .bold))
-                                Text("Back")
-                            }
-                            .font(formatter.font())
-                            .padding(.trailing)
+                            Image(systemName: "arrow.left")
+                                .font(formatter.iconFont())
                         }
                     }
-                    Text(text)
-                        .font(formatter.font(.regular))
                     Spacer()
                 }
+                .padding(.top, 40)
+                Spacer()
+                Text(isLogin ? "Log In" : "Sign Up")
+                    .font(formatter.font(fontSize: .large))
+                Text(text)
+                    .font(formatter.font(.regular))
             }
-            .padding(30)
-            .padding(.trailing, 30)
+            .padding()
+            .padding(.trailing)
             .foregroundColor(formatter.color(.highContrastWhite))
             .background(formatter.color(.primaryAccent))
             .clipShape(RoundedCorners(br: 70))
@@ -170,7 +134,7 @@ struct MobileAuthEnterNumberView: View {
     @Binding var alertMessage: String
     @Binding var isLogin: Bool
     
-    @State var countryCode = ""
+    @State var countryCode = "1"
     @State var showingPicker = false
     
     var body: some View {
@@ -184,6 +148,7 @@ struct MobileAuthEnterNumberView: View {
                     Text("+")
                     TextField("1", text: $countryCode)
                         .keyboardType(.numberPad)
+                        .frame(width: 10)
                 }
                 TextField("Enter your number", text: $number)
                     .fixedSize(horizontal: false, vertical: true)
@@ -196,8 +161,15 @@ struct MobileAuthEnterNumberView: View {
             .background(formatter.color(.secondaryFG))
             .accentColor(formatter.color(.secondaryAccent))
             .cornerRadius(5)
+            
+            Text("Your personal information will never be used to contact you. It’s simply used for user verification, then we never touch it again.")
+                .font(formatter.font(.regular, fontSize: .small))
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.bottom, 20)
+            
             Button {
                 if hasValidEntry() {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
                     formatter.resignKeyboard()
                     signInStage = .verifyNumber
                     PhoneAuthProvider.provider().verifyPhoneNumber("+" + countryCode + number, uiDelegate: nil) { (ID, err) in
@@ -219,13 +191,30 @@ struct MobileAuthEnterNumberView: View {
             }
             .opacity(hasValidEntry() ? 1 : 0.5)
             Spacer()
-                .frame(height: 100)
-            Text("Your personal information will never be used to contact you. It’s simply used for user verification, then we never touch it again.")
-                .font(formatter.font(.regular, fontSize: .small))
-                .padding(.bottom, 60)
+                .frame(height: 50)
+            VStack (spacing: 10) {
+                HStack (spacing: 5) {
+                    Text(isLogin ? "New to Trivio?" : "Already have an account?")
+                        .font(formatter.font(.regular, fontSize: .small))
+                    Button {
+                        isLogin.toggle()
+                    } label: {
+                        Text(isLogin ? "Sign Up" : "Log In")
+                    }
+                }
+                Text("Terms of Agreement")
+                    .underline()
+                    .onTapGesture {
+                        let url = URL.init(string: "https://www.privacypolicies.com/live/3779e433-e05a-43db-8ca5-9d6df7e7a136")
+                        guard let privURL = url, UIApplication.shared.canOpenURL(privURL) else { return }
+                        UIApplication.shared.open(privURL)
+                    }
+            }
+            .font(formatter.font(fontSize: .small))
+            .padding(.bottom)
+            .keyboardAware(heightFactor: 0.7)
         }
-        .padding(30)
-        .keyboardAware(heightFactor: 0.7)
+        .padding()
     }
     
     func hasValidEntry() -> Bool {
@@ -268,6 +257,7 @@ struct MobileAuthVerifyNumberView: View {
             .accentColor(formatter.color(.secondaryAccent))
             .cornerRadius(5)
             Button {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
                 isLoading = true
                 if hasValidCode() {
                     formatter.resignKeyboard()
@@ -323,10 +313,9 @@ struct MobileAuthVerifyNumberView: View {
             }
             .opacity(hasValidCode() ? 1 : 0.5)
             Spacer()
-                .frame(height: 100)
+                .frame(height: 40)
         }
-        .padding(30)
-        .keyboardAware(heightFactor: 0.7)
+        .padding()
     }
     
     func hasValidCode() -> Bool {
@@ -381,7 +370,6 @@ struct MobileAuthNameUsernameView: View {
                         .frame(width: 1, height: 20)
                     TextField("Name", text: $name)
                         .fixedSize(horizontal: false, vertical: true)
-                        .keyboardType(.numberPad)
                 }
                 .font(formatter.font(fontSize: .mediumLarge))
                 .foregroundColor(formatter.color(.highContrastWhite))
@@ -400,7 +388,6 @@ struct MobileAuthNameUsernameView: View {
                         .frame(width: 1, height: 20)
                     TextField("Username", text: $username)
                         .fixedSize(horizontal: false, vertical: true)
-                        .keyboardType(.numberPad)
                         .onChange(of: username) { change in
                             checkUsernameValid()
                         }
@@ -432,6 +419,7 @@ struct MobileAuthNameUsernameView: View {
                 .frame(height: formatter.padding(size: 30))
             Button {
                 if allValid {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
                     isLoading = true
                     usernameFinishedUploading { success in
                         UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
@@ -458,7 +446,7 @@ struct MobileAuthNameUsernameView: View {
             Spacer()
                 .frame(height: 100)
         }
-        .padding(30)
+        .padding()
         .keyboardAware(heightFactor: 0.7)
     }
     

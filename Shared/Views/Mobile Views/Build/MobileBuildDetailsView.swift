@@ -87,6 +87,7 @@ struct MobileBuildDetailsView: View {
                                 .font(formatter.iconFont(.mediumLarge))
                                 .foregroundColor(formatter.color(buildVM.tag.isEmpty ? .lowContrastWhite : .highContrastWhite))
                                 .onTapGesture {
+                                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
                                     buildVM.addTag()
                                 }
                             TextField("ADD TAG", text: $buildVM.tag)
@@ -113,6 +114,7 @@ struct MobileBuildDetailsView: View {
                             .foregroundColor(formatter.color(.primaryAccent))
                             .cornerRadius(4)
                             .onTapGesture {
+                                formatter.hapticFeedback(style: .rigid, intensity: .weak)
                                 buildVM.isPublic.toggle()
                             }
                         

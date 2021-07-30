@@ -21,6 +21,7 @@ struct MobileExploreView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .background(formatter.color(.primaryBG))
+        .transition(.identity)
     }
 }
 

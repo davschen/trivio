@@ -105,6 +105,7 @@ struct MobileGameplayHeaderView: View {
                 
                 Text("\(headerString)")
                     .font(formatter.font(fontSize: .large))
+                    .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 
                 Spacer()

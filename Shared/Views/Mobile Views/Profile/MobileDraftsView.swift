@@ -31,7 +31,7 @@ struct MobileDraftsView: View {
                     .frame(height: 15)
             } else {
                 EmptyListView(label: "No drafts! Come back here when you save a draft.")
-                    .padding(.vertical, 30)
+                    .padding(.vertical)
             }
         }
         .padding(.horizontal)
@@ -102,6 +102,7 @@ struct MobileDraftCellView: View {
         .background(formatter.color(.secondaryFG))
         .cornerRadius(10)
         .onTapGesture {
+            formatter.hapticFeedback(style: .light)
             buildVM.edit(isDraft: true, gameID: setID)
             buildVM.isEditingDraft = true
         }

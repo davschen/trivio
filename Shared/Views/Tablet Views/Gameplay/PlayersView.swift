@@ -71,8 +71,8 @@ struct PlayersView: View {
                         }
                     }
                     .onAppear {
-                        if participantsVM.selectedTeam.name.isEmpty {
-                            self.participantsVM.setSelectedTeam(index: 0)
+                        if !participantsVM.teams.contains(participantsVM.selectedTeam) {
+                            participantsVM.setSelectedTeam(index: 0)
                         }
                     }
                 }

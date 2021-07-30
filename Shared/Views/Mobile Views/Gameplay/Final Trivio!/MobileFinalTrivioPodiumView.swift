@@ -37,16 +37,13 @@ struct MobileFinalTrivioPodiumView: View {
             
             // Finished button
             Button(action: {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
                 participantsVM.incrementGameStep()
                 profileVM.markAsPlayed(gameID: gamesVM.selectedEpisode)
                 participantsVM.writeToFirestore(gameID: gamesVM.selectedEpisode, myRating: rating)
                 participantsVM.resetScores()
                 gamesVM.reset()
                 gamesVM.clearAll()
-                
-                // go to the report
-                gamesVM.menuChoice = .profile
-                profileVM.menuSelectedItem = "Past Games"
             }, label: {
                 Text("Finish Game!")
                     .font(formatter.font())
@@ -83,6 +80,7 @@ struct MobileRatingView: View {
                     .font(formatter.iconFont(.small))
                     .foregroundColor(formatter.color(rating >= i + 1 ? .secondaryAccent : .secondaryFG))
                     .onTapGesture {
+                        formatter.hapticFeedback(style: .rigid, intensity: .weak)
                         rating = i + 1
                     }
             }

@@ -28,6 +28,7 @@ struct MobileEditCategoryNameView: View {
                     MobileCategoryNameTextFieldView(categoryName: $category.name)
                     
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         buildVM.currentDisplay = .grid
                     }, label: {
                         Text("Done")

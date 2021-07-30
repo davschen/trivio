@@ -69,7 +69,7 @@ struct MobilePlayersView: View {
                         }
                     }
                     .onAppear {
-                        if participantsVM.selectedTeam.name.isEmpty {
+                        if !participantsVM.teams.contains(participantsVM.selectedTeam) {
                             participantsVM.setSelectedTeam(index: 0)
                         }
                     }

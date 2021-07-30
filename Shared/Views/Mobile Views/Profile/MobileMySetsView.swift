@@ -23,7 +23,7 @@ struct MobileMySetsView: View {
                 MobileCustomSetView(searchItem: $profileVM.searchItem, isMine: true, customSets: gamesVM.customSets)
             } else {
                 MobileEmptyListView(label: "Nothing yet! When you make a set, it’ll show up here.")
-                    .padding(.vertical, 30)
+                    .padding()
             }
         }
         .keyboardAware()
@@ -81,7 +81,6 @@ struct MobileCustomSetView: View {
                         if searchItem.isEmpty || set.title.contains(searchItem) {
                             MobileCustomSetCellView(isInUserView: isInUserView, set: set, isMine: isMine)
                                 .onTapGesture {
-                                    formatter.hapticFeedback(style: .light)
                                     if gamesVM.gameInProgress() {
                                         formatter.setAlertSettings(alertAction: {
                                             selectSet(set: set)
@@ -108,6 +107,7 @@ struct MobileCustomSetView: View {
     }
     
     func selectSet(set: CustomSet) {
+        formatter.hapticFeedback(style: .light)
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
         gamesVM.setEpisode(ep: setID)

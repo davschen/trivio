@@ -88,6 +88,7 @@ struct MobileGamePreviewView: View {
 
 struct MobileCategoryPreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
     let category: String
@@ -104,6 +105,11 @@ struct MobileCategoryPreviewView: View {
                 .frame(maxWidth: .infinity)
                 .minimumScaleFactor(0.1)
                 .padding(2)
+                .onTapGesture {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    gamesVM.menuChoice = .game
+                    gamesVM.reset()
+                }
         }
         .frame(maxHeight: .infinity)
         .frame(width: 130)

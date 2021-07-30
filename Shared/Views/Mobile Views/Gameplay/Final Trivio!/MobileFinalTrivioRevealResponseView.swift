@@ -20,6 +20,7 @@ struct MobileFinalTrivioRevealResponseView: View {
                 // Category name
                 HStack {
                     Text(gamesVM.fjCategory.uppercased())
+                        .fixedSize(horizontal: false, vertical: true)
                         .font(formatter.font())
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -59,6 +60,7 @@ struct MobileFinalTrivioRevealResponseView: View {
                 
                 // Finished button
                 Button(action: {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
                     gamesVM.finalTrivioFinishedAction()
                 }, label: {
                     Text("Finished")
@@ -69,7 +71,6 @@ struct MobileFinalTrivioRevealResponseView: View {
                         .clipShape(Capsule())
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 })
-                .keyboardAware()
                 
                 Spacer()
             }
@@ -118,6 +119,7 @@ struct MobileRevealGradeView: View {
             .contentShape(Rectangle())
             .cornerRadius(5)
             .onTapGesture {
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
                 if !participantsVM.fjReveals[teamIndex] {
                     participantsVM.fjReveals[teamIndex].toggle()
                     participantsVM.setSelectedTeam(index: teamIndex)
@@ -130,6 +132,7 @@ struct MobileRevealGradeView: View {
                 // Grade answer
                 HStack {
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         if self.participantsVM.fjCorrects[teamIndex] {
                             self.participantsVM.addFJCorrect(index: teamIndex)
                         }
@@ -143,6 +146,7 @@ struct MobileRevealGradeView: View {
                     Text(participantsVM.teams[teamIndex].name)
                         .font(formatter.font(fontSize: .mediumLarge))
                     Button(action: {
+                        formatter.hapticFeedback(style: .heavy, intensity: .strong)
                         if self.participantsVM.toSubtracts[teamIndex] {
                             self.participantsVM.addFJIncorrect(index: teamIndex)
                         }

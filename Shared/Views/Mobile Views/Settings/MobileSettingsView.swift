@@ -17,6 +17,7 @@ struct MobileSettingsView: View {
         VStack (spacing: -25) {
             HStack (spacing: 15) {
                 Button(action: {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
                     profileVM.showingSettingsView.toggle()
                     profileVM.settingsMenuSelectedItem = "Game Settings"
                 }, label: {
@@ -62,6 +63,7 @@ struct MobileSettingsView: View {
             .background(formatter.color(profileVM.settingsMenuSelectedItem == label ? .primaryAccent : .primaryBG))
             .cornerRadius(5)
             .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
                 profileVM.settingsMenuSelectedItem = label
             }
     }
@@ -99,6 +101,7 @@ struct MobileSettingsAccountSettingsView: View {
                 HStack {
                     if isEditingAccountSettings {
                         Button {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             isEditingAccountSettings.toggle()
                         } label: {
                             Text("Cancel")
@@ -112,14 +115,17 @@ struct MobileSettingsAccountSettingsView: View {
                         if isEditingAccountSettings {
                             profileVM.checkUsernameValidWithHandler { (success) in
                                 if success {
+                                    formatter.hapticFeedback(style: .soft, intensity: .strong)
                                     profileVM.editAccountInfo()
                                     isEditingAccountSettings.toggle()
                                     usernameTaken = false
                                 } else {
+                                    formatter.hapticFeedback(style: .rigid, intensity: .strong)
                                     usernameTaken = true
                                 }
                             }
                         } else {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             isEditingAccountSettings.toggle()
                         }
                     } label: {

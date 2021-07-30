@@ -85,6 +85,7 @@ struct MobileEditClueResponseView: View {
                         Spacer()
                         
                         Button(action: {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             showingPreview.toggle()
                         }, label: {
                             Text("Preview")
@@ -96,6 +97,7 @@ struct MobileEditClueResponseView: View {
                         })
                         
                         Button(action: {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             buildVM.currentDisplay = .grid
                         }, label: {
                             Text("Done")
@@ -114,6 +116,7 @@ struct MobileEditClueResponseView: View {
                                     .font(formatter.font(fontSize: .mediumLarge))
                                 if swapToIndex != -1 {
                                     Button {
+                                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                                         buildVM.swap(currentIndex: buildVM.editingIndex, swapToIndex: swapToIndex, categoryIndex: category.index)
                                         swapToIndex = -1
                                     } label: {
@@ -182,6 +185,7 @@ struct MobileBuildPreviewClueResponseView: View {
             .font(formatter.font(fontSize: .mediumLarge))
             Spacer()
             Button {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
                 isShowingResponse.toggle()
             } label: {
                 Text(isShowingResponse ? "Hide Response" : "Show Response")

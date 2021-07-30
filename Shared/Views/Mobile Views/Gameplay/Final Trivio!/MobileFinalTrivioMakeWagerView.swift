@@ -28,6 +28,7 @@ struct MobileFinalTrivioMakeWagerView: View {
                         .background(formatter.color(.lowContrastWhite))
                         .cornerRadius(10)
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         isShowingInstructions.toggle()
                     }, label: {
                         Image(systemName: isShowingInstructions ? "questionmark.circle.fill" : "questionmark.circle")
@@ -53,6 +54,7 @@ struct MobileFinalTrivioMakeWagerView: View {
                 // Finished button
                 Button(action: {
                     if participantsVM.wagersValid() {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         gamesVM.finalTrivioFinishedAction()
                     }
                 }, label: {
@@ -110,6 +112,7 @@ struct MobileMakeWagerView: View {
                             .minimumScaleFactor(0.3)
                         Spacer()
                         Button(action: {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             hidden.toggle()
                         }, label: {
                             Image("eye")
@@ -123,6 +126,7 @@ struct MobileMakeWagerView: View {
                             .keyboardType(.numberPad)
                         Spacer()
                         Button(action: {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
                             hidden.toggle()
                         }, label: {
                             Image("eye.slash")
@@ -139,6 +143,7 @@ struct MobileMakeWagerView: View {
             .contentShape(Rectangle())
             .onTapGesture {
                 if hidden {
+                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
                     hidden.toggle()
                 }
             }

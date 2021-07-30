@@ -184,6 +184,7 @@ struct AuthEnterNumberView: View {
                     Text("+")
                     TextField("1", text: $countryCode)
                         .keyboardType(.numberPad)
+                        .frame(width: 10)
                 }
                 TextField("Enter your number", text: $number)
                     .fixedSize(horizontal: false, vertical: true)
@@ -381,7 +382,6 @@ struct AuthNameUsernameView: View {
                         .frame(width: 1, height: 20)
                     TextField("Name", text: $name)
                         .fixedSize(horizontal: false, vertical: true)
-                        .keyboardType(.numberPad)
                 }
                 .font(formatter.font(fontSize: .mediumLarge))
                 .foregroundColor(formatter.color(.highContrastWhite))
@@ -400,7 +400,6 @@ struct AuthNameUsernameView: View {
                         .frame(width: 1, height: 20)
                     TextField("Username", text: $username)
                         .fixedSize(horizontal: false, vertical: true)
-                        .keyboardType(.numberPad)
                         .onChange(of: username) { change in
                             checkUsernameValid()
                         }
