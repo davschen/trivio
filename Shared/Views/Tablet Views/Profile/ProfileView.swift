@@ -92,18 +92,6 @@ struct AccountInfoView: View {
             .padding(.bottom)
             
             Button(action: {
-                
-            }, label: {
-                Text("Upgrade my Account")
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .font(formatter.font(.bold, fontSize: .medium))
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(formatter.color(.primaryAccent))
-                    .cornerRadius(5)
-            })
-            
-            Button(action: {
                 profileVM.showingSettingsView.toggle()
                 profileVM.settingsMenuSelectedItem = "Account"
             }, label: {
@@ -112,7 +100,7 @@ struct AccountInfoView: View {
                     .font(formatter.font(.bold, fontSize: .medium))
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(formatter.color(.secondaryFG))
+                    .background(formatter.color(.primaryAccent))
                     .cornerRadius(5)
             })
         }

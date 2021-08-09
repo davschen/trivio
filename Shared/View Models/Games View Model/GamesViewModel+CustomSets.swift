@@ -16,7 +16,7 @@ extension GamesViewModel {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
         db.collection("userSets")
             .whereField("userID", isEqualTo: myUID)
-            .order(by: "dateCreated", descending: true).getDocuments { (snap, error) in
+            .order(by: "dateCreated", descending: true).addSnapshotListener { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return

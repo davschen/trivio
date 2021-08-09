@@ -1561,6 +1561,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-iOS";
 				PRODUCT_NAME = "Trivio!";
 				SDKROOT = iphoneos;
@@ -1586,6 +1587,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.trivio.Trivio-iOS";
 				PRODUCT_NAME = "Trivio!";
 				SDKROOT = iphoneos;

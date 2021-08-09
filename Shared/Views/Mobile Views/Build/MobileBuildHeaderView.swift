@@ -64,10 +64,10 @@ struct MobileBuildHeaderView: View {
                 Button(action: {
                     if buildVM.nextPermitted() {
                         formatter.hapticFeedback(style: .soft, intensity: .strong)
-                        buildVM.nextButtonHandler()
                         if buildVM.buildStage == .details {
                             gamesVM.readCustomData()
                         }
+                        buildVM.nextButtonHandler()
                     }
                 }, label: {
                     ZStack {

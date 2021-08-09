@@ -137,7 +137,7 @@ struct MobileGameplayHeaderView: View {
                 }
                 .frame(height: 30)
             } else if gamesVM.finalTrivioStage == .submitAnswer {
-                FinalTrivioCountdownTimerView()
+                MobileFinalTrivioCountdownTimerView()
             }
         }
     }

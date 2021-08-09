@@ -170,7 +170,7 @@ struct AuthEnterNumberView: View {
     @Binding var alertMessage: String
     @Binding var isLogin: Bool
     
-    @State var countryCode = ""
+    @State var countryCode = "1"
     @State var showingPicker = false
     
     var body: some View {

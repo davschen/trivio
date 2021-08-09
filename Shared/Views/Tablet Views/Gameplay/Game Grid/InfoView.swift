@@ -75,8 +75,9 @@ struct InfoView: View {
                             
                             // Rating counter
                             VStack {
-                                Text("\(String(customSet.rating.description.prefix(3)))")
+                                Text(customSet.rating == 0 ? "N/A" : "\(String(customSet.rating.description.prefix(3)))")
                                     .font(formatter.font(fontSize: .large))
+                                    .foregroundColor(formatter.color(customSet.rating == 0 ? .mediumContrastWhite : .lowContrastWhite))
                                 Text("Rating")
                                     .padding(10)
                                     .background(formatter.color(.primaryAccent))

@@ -58,7 +58,7 @@ struct MobileBuildDetailsView: View {
                         }
                         
                         // Tags view
-                        FlexibleView(data: buildVM.tags, spacing: 8, alignment: .leading) { item in
+                        FlexibleView(data: buildVM.tags, spacing: 3, alignment: .leading) { item in
                             HStack (spacing: 0) {
                                 Text("#")
                                 Text(verbatim: item.uppercased())
@@ -162,7 +162,7 @@ struct MobileBuildCustomSetPreviewView: View {
             .font(formatter.font(.regular, fontSize: .small))
             .foregroundColor(formatter.color(.highContrastWhite))
             ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
+                HStack (spacing: 3) {
                     ForEach(buildVM.tags, id: \.self) { tag in
                         Text("#" + tag.uppercased())
                             .font(formatter.font(.boldItalic, fontSize: .small))

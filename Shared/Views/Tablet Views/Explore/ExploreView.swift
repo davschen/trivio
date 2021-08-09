@@ -47,11 +47,13 @@ struct ExploreSearchView: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .font(.system(size: 15, weight: .bold))
-                        TextField("Search sets", text: $exploreVM.searchItem)
+                        TextField("Search sets", text: $exploreVM.searchItem, onCommit: {
+                            exploreVM.searchAndPull()
+                        })
                             .font(formatter.font())
                             .accentColor(formatter.color(.secondaryAccent))
                             .foregroundColor(formatter.color(.highContrastWhite))
-                        if exploreVM.searchItem.isEmpty {
+                        if !exploreVM.searchItem.isEmpty {
                             Button {
                                 exploreVM.searchItem.removeAll()
                                 formatter.resignKeyboard()

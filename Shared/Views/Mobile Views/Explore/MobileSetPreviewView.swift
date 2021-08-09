@@ -32,7 +32,9 @@ struct MobileSetPreviewView: View {
                         .font(formatter.font(fontSize: .large))
                     Text("Created on \(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
                         .font(formatter.font(.regularItalic))
-                    MobileUserProfileButtonView(userViewActive: $userViewActive, set: customSet)
+                    if customSet.isPublic {
+                        MobileUserProfileButtonView(userViewActive: $userViewActive, set: customSet)
+                    }
                     Button(action: {
                         formatter.hapticFeedback(style: .soft, intensity: .strong)
                         gamesVM.menuChoice = .game
@@ -84,8 +86,9 @@ struct MobileSetPreviewView: View {
                         
                         // Rating counter
                         VStack {
-                            Text("\(String(customSet.rating.description.prefix(3)))")
+                            Text(customSet.rating == 0 ? "N/A" : "\(String(customSet.rating.description.prefix(3)))")
                                 .font(formatter.font(fontSize: .large))
+                                .foregroundColor(formatter.color(customSet.rating == 0 ? .mediumContrastWhite : .lowContrastWhite))
                             Text("Rating")
                                 .padding(10)
                                 .background(formatter.color(.primaryAccent))

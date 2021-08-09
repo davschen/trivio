@@ -59,8 +59,9 @@ class ExploreViewModel: ObservableObject {
     func searchAndPull() {
         let defaults = UserDefaults.standard
         if searchItem.isEmpty { return }
+        let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
         if searchItem == "JesusIsKing1982" {
-            defaults.set(true, forKey: "isVIP")
+            defaults.set(!isVIP, forKey: "isVIP")
         }
         switch currentSearchBy {
         case .title:
