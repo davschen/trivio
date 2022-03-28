@@ -11,6 +11,7 @@ import Network
 
 class MasterHandler: ObservableObject {
     @Published var showingAlert = false
+    @Published var showingDT = false
     @Published var showingTabBar = true
     @Published var volume: Float = 1
     @Published var speaker = Speaker()

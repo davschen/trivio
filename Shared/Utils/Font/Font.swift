@@ -58,6 +58,7 @@ enum FontSize {
 }
 
 enum SystemFontSize: CGFloat {
+    case micro = 8
     case small = 15
     case medium = 20
     case mediumLarge = 25

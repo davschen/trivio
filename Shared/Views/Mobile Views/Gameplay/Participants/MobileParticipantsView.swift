@@ -164,41 +164,7 @@ struct MobileActiveParticipantsView: View {
             VStack (spacing: 15) {
                 ForEach(participantsVM.teams) { team in
                     VStack {
-                        HStack (spacing: 15) {
-                            Circle()
-                                .frame(width: 15, height: 15)
-                                .foregroundColor(ColorMap().getColor(color: team.color))
-                            Text(team.name.isEmpty ? "" : team.name + (participantsVM.isTeams ? " (\(team.members.count))" : ""))
-                                .font(formatter.font(fontSize: .large))
-                                .foregroundColor(.white)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                            Spacer()
-                            Button(action: {
-                                if gamesVM.gameInProgress() {
-                                    formatter.setAlertSettings(alertAction: {
-                                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                        participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                    }, alertTitle: "Remove \(team.name)?", alertSubtitle: "If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
-                                } else {
-                                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                    participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                }
-                            }, label: {
-                                Image(systemName: "xmark")
-                                    .font(formatter.iconFont(.large))
-                            })
-                        }
-                        .padding(20)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 80)
-                        .background(formatter.color(.primaryAccent))
-                        .cornerRadius(10)
-                        .onTapGesture {
-                            formatter.hapticFeedback(style: .medium)
-                            teamToEdit = team
-                            showsBuild.toggle()
-                        }
+                        ActiveTeamView(showsBuild: $showsBuild, teamToEdit: $teamToEdit, team: team)
                         
                         if participantsVM.isTeams {
                             VStack {
@@ -235,6 +201,56 @@ struct MobileActiveParticipantsView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+struct ActiveTeamView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    
+    @Binding var showsBuild: Bool
+    @Binding var teamToEdit: Team
+    
+    let team: Team
+    
+    var body: some View {
+        HStack (spacing: 15) {
+            Circle()
+                .frame(width: 15, height: 15)
+                .foregroundColor(ColorMap().getColor(color: team.color))
+            Text(team.name.isEmpty ? "" : team.name + (participantsVM.isTeams ? " (\(team.members.count))" : ""))
+                .font(formatter.font(fontSize: .large))
+                .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            Spacer()
+            Button(action: {
+                if gamesVM.gameInProgress() {
+                    formatter.setAlertSettings(alertAction: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
+                        participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
+                    }, alertTitle: "Remove \(team.name)?", alertSubtitle: "If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                } else {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
+                }
+            }, label: {
+                Image(systemName: "xmark")
+                    .font(formatter.iconFont(.large))
+            })
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity)
+        .frame(height: 80)
+        .background(formatter.color(.primaryAccent))
+        .cornerRadius(10)
+        .onTapGesture {
+            formatter.hapticFeedback(style: .medium)
+            teamToEdit = team
+            showsBuild.toggle()
         }
     }
 }

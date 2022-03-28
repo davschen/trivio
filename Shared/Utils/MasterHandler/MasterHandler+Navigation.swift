@@ -15,7 +15,7 @@ extension MasterHandler {
         }) {
             HStack {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .heavy))
+                    .font(.system(size: 15, weight: .bold))
                 Text("Back")
                     .font(font())
             }

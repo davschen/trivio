@@ -33,6 +33,7 @@ struct MobileMySetsView: View {
 
 struct MobileCustomSetView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var dtVM: DailyTrivioViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
@@ -77,6 +78,11 @@ struct MobileCustomSetView: View {
                 Spacer()
                     .frame(height: 10)
                 VStack {
+                    DailyTrivioPreviewView()
+                        .onTapGesture {
+                            formatter.showingDT.toggle()
+                            dtVM.handlePullFromDB()
+                        }
                     ForEach(customSets, id: \.self) { set in
                         if searchItem.isEmpty || set.title.contains(searchItem) {
                             MobileCustomSetCellView(isInUserView: isInUserView, set: set, isMine: isMine)
@@ -264,4 +270,5 @@ struct MobileUserProfileButtonView: View {
         }
     }
 }
+
 

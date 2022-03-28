@@ -191,12 +191,17 @@ struct JeopardyGamesView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var searchVM: SearchViewModel
     @EnvironmentObject var formatter: MasterHandler
+    
     var showingGames = true
     var gamePreviews = [GamePreview]()
     var games = [Game]()
     
+    var showJeopardyGames: Bool {
+        return showingGames ? !searchVM.games.isEmpty : !gamesVM.selectedSeason.isEmpty
+    }
+    
     var body: some View {
-        if (showingGames ? !searchVM.games.isEmpty : !gamesVM.selectedSeason.isEmpty) {
+        if showJeopardyGames {
             GeometryReader { geometry in
                 VStack (alignment: .leading, spacing: 15) {
                     if !showingGames {
@@ -210,76 +215,9 @@ struct JeopardyGamesView: View {
                         ScrollView (.vertical) {
                             VStack {
                                 if showingGames {
-                                    ForEach(games, id: \.self) { gamePreview in
-                                        let gamePreviewID = gamePreview.id ?? "NID"
-                                        HStack {
-                                            Text("\(gamePreview.title)")
-                                                .frame(width: geometry.size.width * 0.3, alignment: .leading)
-                                            Spacer()
-                                            Text(gamesVM.dateFormatter.string(from: gamePreview.date))
-                                        }
-                                        .padding(formatter.padding())
-                                        .font(formatter.font())
-                                        .lineLimit(1)
-                                        .foregroundColor(formatter.color(beenPlayed(gameID: gamePreviewID) ? .lowContrastWhite : .highContrastWhite))
-                                        .padding(.vertical, 5)
-                                        .frame(maxWidth: .infinity)
-                                        .shadow(color: Color.black.opacity(0.2), radius: 10)
-                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
-                                        .cornerRadius(formatter.cornerRadius(5))
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            self.gamesVM.getEpisodeData(gameID: gamePreviewID)
-                                            self.gamesVM.setEpisode(ep: gamePreviewID)
-                                            self.gamesVM.previewViewShowing = true
-                                            self.participantsVM.resetScores()
-                                        }
-                                        .id(UUID())
-                                    }
-                                    if searchVM.gameIDs.count >= 100 {
-                                        Button(action: {
-                                            searchVM.changeSearchLimit(increase: true)
-                                        }, label: {
-                                            HStack {
-                                                Text("Show More")
-                                                Image(systemName: "plus")
-                                            }
-                                            .frame(maxWidth: .infinity)
-                                            .padding(formatter.padding())
-                                            .font(formatter.font())
-                                            .foregroundColor(formatter.color(.highContrastWhite))
-                                            .background(formatter.color(.primaryAccent))
-                                            .cornerRadius(5)
-                                        })
-                                    }
+                                    ShowingJeopardyGamesView(geometry: geometry)
                                 } else {
-                                    ForEach(gamePreviews, id: \.self) { gamePreview in
-                                        let gamePreviewID = gamePreview.id ?? "NID"
-                                        HStack {
-                                            Text("\(gamePreview.title)")
-                                                .frame(width: geometry.size.width * 0.3, alignment: .leading)
-                                            Text("\(gamePreview.contestants)")
-                                                .frame(width: geometry.size.width * 0.5, alignment: .leading)
-                                            Spacer()
-                                            Text(gamesVM.dateFormatter.string(from: gamePreview.date))
-                                        }
-                                        .padding(formatter.padding())
-                                        .font(formatter.font())
-                                        .foregroundColor(formatter.color(beenPlayed(gameID: gamePreviewID) ? .lowContrastWhite : .highContrastWhite))
-                                        .lineLimit(1)
-                                        .padding(.vertical, 5)
-                                        .frame(maxWidth: .infinity)
-                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
-                                        .cornerRadius(formatter.cornerRadius(5))
-                                        .contentShape(Rectangle())
-                                        .onTapGesture {
-                                            self.gamesVM.setEpisode(ep: gamePreviewID)
-                                            self.gamesVM.previewViewShowing = true
-                                            self.gamesVM.getEpisodeData(gameID: gamePreviewID)
-                                            self.participantsVM.resetScores()
-                                        }
-                                        .id(UUID())
-                                    }
+                                    NotShowingJeopardyGamesView(geometry: geometry)
                                 }
                             }
                         }
@@ -289,6 +227,115 @@ struct JeopardyGamesView: View {
             }
         } else {
             EmptyListView(label: showingGames ? "No games to show" : "You haven't picked a season yet. Pick a season above to browse games.")
+        }
+    }
+    
+    func beenPlayed(gameID: String) -> Bool {
+        return gamesVM.playedGames.contains(gameID)
+    }
+}
+
+struct ShowingJeopardyGamesView: View {
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var searchVM: SearchViewModel
+    @EnvironmentObject var formatter: MasterHandler
+    
+    var geometry: GeometryProxy
+    
+    var showingGames = true
+    var gamePreviews = [GamePreview]()
+    var games = [Game]()
+    
+    var body: some View {
+        ForEach(games, id: \.self) { gamePreview in
+            let gamePreviewID = gamePreview.id ?? "NID"
+            HStack {
+                Text("\(gamePreview.title)")
+                    .frame(width: geometry.size.width * 0.3, alignment: .leading)
+                Spacer()
+                Text(gamesVM.dateFormatter.string(from: gamePreview.date))
+            }
+            .padding(formatter.padding())
+            .font(formatter.font())
+            .lineLimit(1)
+            .foregroundColor(formatter.color(beenPlayed(gameID: gamePreviewID) ? .lowContrastWhite : .highContrastWhite))
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity)
+            .shadow(color: Color.black.opacity(0.2), radius: 10)
+            .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
+            .cornerRadius(formatter.cornerRadius(5))
+            .contentShape(Rectangle())
+            .onTapGesture {
+                self.gamesVM.getEpisodeData(gameID: gamePreviewID)
+                self.gamesVM.setEpisode(ep: gamePreviewID)
+                self.gamesVM.previewViewShowing = true
+                self.participantsVM.resetScores()
+            }
+            .id(UUID())
+        }
+        if searchVM.gameIDs.count >= 100 {
+            Button(action: {
+                searchVM.changeSearchLimit(increase: true)
+            }, label: {
+                HStack {
+                    Text("Show More")
+                    Image(systemName: "plus")
+                }
+                .frame(maxWidth: .infinity)
+                .padding(formatter.padding())
+                .font(formatter.font())
+                .foregroundColor(formatter.color(.highContrastWhite))
+                .background(formatter.color(.primaryAccent))
+                .cornerRadius(5)
+            })
+        }
+    }
+    
+    func beenPlayed(gameID: String) -> Bool {
+        return gamesVM.playedGames.contains(gameID)
+    }
+}
+
+struct NotShowingJeopardyGamesView: View {
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var searchVM: SearchViewModel
+    @EnvironmentObject var formatter: MasterHandler
+    
+    var geometry: GeometryProxy
+    
+    var showingGames = true
+    var gamePreviews = [GamePreview]()
+    var games = [Game]()
+    
+    var body: some View {
+        ForEach(gamePreviews, id: \.self) { gamePreview in
+            let gamePreviewID = gamePreview.id ?? "NID"
+            HStack {
+                Text("\(gamePreview.title)")
+                    .frame(width: geometry.size.width * 0.3, alignment: .leading)
+                Text("\(gamePreview.contestants)")
+                    .frame(width: geometry.size.width * 0.5, alignment: .leading)
+                Spacer()
+                Text(gamesVM.dateFormatter.string(from: gamePreview.date))
+            }
+            .padding(formatter.padding())
+            .font(formatter.font())
+            .foregroundColor(formatter.color(beenPlayed(gameID: gamePreviewID) ? .lowContrastWhite : .highContrastWhite))
+            .lineLimit(1)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity)
+            .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
+            .cornerRadius(formatter.cornerRadius(5))
+            .contentShape(Rectangle())
+            .onTapGesture {
+                self.gamesVM.setEpisode(ep: gamePreviewID)
+                self.gamesVM.previewViewShowing = true
+                self.gamesVM.getEpisodeData(gameID: gamePreviewID)
+                self.participantsVM.resetScores()
+            }
+            .id(UUID())
         }
     }
     

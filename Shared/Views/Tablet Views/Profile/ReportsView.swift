@@ -12,7 +12,7 @@ struct ReportsView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var reportVM: ReportViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
-    
+     
     var body: some View {
         ZStack {
             VStack (alignment: .leading, spacing: 20) {

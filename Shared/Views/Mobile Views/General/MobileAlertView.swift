@@ -44,11 +44,12 @@ struct MobileAlertView: View {
                     .padding(50)
                     .background(formatter.color(.secondaryFG))
                     .cornerRadius(20)
-                    .shadow(radius: 10)
                 default:
                     VStack {
-                        VStack {
-                            VStack (spacing: 15) {
+                        
+                        // Alert box with 1-2 action buttons
+                        VStack (spacing: 10) {
+                            VStack {
                                 Text(titleText)
                                     .font(formatter.font(fontSize: .mediumLarge))
                                 Text(subtitleText)
@@ -66,18 +67,19 @@ struct MobileAlertView: View {
                                 }, label: secondaryActionLabel)
                             }
                         }
-                        .padding(20)
+                        .padding()
                         .background(formatter.color(.secondaryFG))
-                        .cornerRadius(15)
-                        .shadow(radius: 10)
+                        .cornerRadius(10)
+                        .shadow(color: formatter.color(.primaryBG).opacity(0.8), radius: 10)
+                        
+                        // Cancel button
                         if hasCancel {
                             Button {
                                 formatter.hapticFeedback(style: .soft, intensity: .strong)
                                 formatter.dismissAlert()
                             } label: {
                                 Text("Cancel")
-                                    .font(formatter.font(fontSize: .mediumLarge))
-                                    .foregroundColor(formatter.color(.highContrastWhite))
+                                    .font(formatter.font(fontSize: .medium))
                             }
                             .padding()
                         }
@@ -96,11 +98,11 @@ struct MobileAlertView: View {
             } label: {
                 Text(label)
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(15)
                     .background(formatter.color(.primaryAccent))
-                    .font(formatter.font(fontSize: .mediumLarge))
+                    .font(formatter.font(fontSize: .medium))
                     .foregroundColor(formatter.color(.highContrastWhite))
-                    .cornerRadius(5)
+                    .clipShape(Capsule())
             }
         }
         return body

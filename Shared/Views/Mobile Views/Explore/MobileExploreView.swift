@@ -39,45 +39,46 @@ struct MobileExploreSearchView: View {
     var body: some View {
         ZStack {
             VStack (alignment: .leading, spacing: 10) {
-                VStack (alignment: .leading, spacing: 7) {
-                    // Search bar
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 15, weight: .bold))
-                        TextField("Search sets", text: $exploreVM.searchItem)
-                            .font(formatter.font())
-                            .accentColor(formatter.color(.secondaryAccent))
-                            .foregroundColor(formatter.color(.highContrastWhite))
-                        if !exploreVM.searchItem.isEmpty {
-                            Button {
-                                exploreVM.searchItem.removeAll()
-                                formatter.resignKeyboard()
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 15, weight: .bold))
-                                    .padding(.horizontal, 10)
-                            }
-                        }
-                    }
-                    .foregroundColor(formatter.color(.lowContrastWhite))
-                    .padding()
-                    .background(formatter.color(.secondaryFG))
-                    .cornerRadius(5)
-                    
-                    // Sorting button
-                    Button {
-                        showSortByMenu.toggle()
-                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    } label: {
-                        HStack {
-                            Text(exploreVM.getCurrentSort())
-                                .font(formatter.font())
-                            Image(systemName: "chevron.down")
+                // Search bar
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 15, weight: .bold))
+                    TextField("Search sets", text: $exploreVM.searchItem, onCommit: {
+                        exploreVM.searchAndPull()
+                    })
+                    .font(formatter.font())
+                    .accentColor(formatter.color(.secondaryAccent))
+                    .foregroundColor(formatter.color(.highContrastWhite))
+                    if !exploreVM.searchItem.isEmpty {
+                        Button {
+                            exploreVM.searchItem.removeAll()
+                            formatter.resignKeyboard()
+                        } label: {
+                            Image(systemName: "xmark")
                                 .font(.system(size: 15, weight: .bold))
-                                .rotationEffect(Angle(degrees: showSortByMenu ? 180 : 0))
+                                .padding(.horizontal, 10)
                         }
-                        .foregroundColor(formatter.color(.mediumContrastWhite))
                     }
+                }
+                .foregroundColor(formatter.color(.lowContrastWhite))
+                .padding()
+                .background(formatter.color(.secondaryFG))
+                .cornerRadius(5)
+                .padding(.horizontal)
+                
+                // Sorting button
+                Button {
+                    showSortByMenu.toggle()
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
+                } label: {
+                    HStack {
+                        Text(exploreVM.getCurrentSort())
+                            .font(formatter.font())
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 15, weight: .bold))
+                            .rotationEffect(Angle(degrees: showSortByMenu ? 180 : 0))
+                    }
+                    .foregroundColor(formatter.color(.mediumContrastWhite))
                 }
                 .padding(.horizontal)
                 

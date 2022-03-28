@@ -15,11 +15,12 @@ struct ContentView: View {
     init() {
         UINavigationBar.appearance().tintColor = UIColor(formatter.color(.highContrastWhite))
         UINavigationBar.appearance().barTintColor = UIColor(formatter.color(.primaryFG))
-        UINavigationBar.appearance().largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 40)!]
+        UINavigationBar.appearance().largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 30)!]
         UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 20)!]
         UINavigationBar.appearance().backgroundColor = UIColor(formatter.color(.primaryBG))
         
         UITabBar.appearance().barTintColor = UIColor(formatter.color(.primaryFG))
+        UITabBar.appearance().backgroundColor = UIColor(formatter.color(.secondaryFG))
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 10)!], for: .normal)
         
         UIScrollView.appearance().keyboardDismissMode = .interactive
@@ -46,7 +47,7 @@ struct ContentView: View {
             }
         }
         .foregroundColor(formatter.color(.highContrastWhite))
-        .animation(.easeInOut)
+        .animation(.easeInOut(duration: 0.3))
         .onAppear {
             NotificationCenter.default.addObserver(forName: NSNotification.Name("LogInStatusChange"), object: nil, queue: .main) { (_) in
                 let isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false

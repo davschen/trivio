@@ -17,6 +17,7 @@ struct MobileHomePageView: View {
     @ObservedObject var profileVM = ProfileViewModel()
     @ObservedObject var reportVM = ReportViewModel()
     @ObservedObject var searchVM = SearchViewModel()
+    @ObservedObject var dtVM = DailyTrivioViewModel()
     
     var body: some View {
         VStack (spacing: 0) {
@@ -32,6 +33,7 @@ struct MobileHomePageView: View {
                     .environmentObject(profileVM)
                     .environmentObject(reportVM)
                     .environmentObject(searchVM)
+                    .environmentObject(dtVM)
                 MobileAlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                     formatter.alertAction()
                 }, hasSecondaryAction: formatter.hasSecondaryAction, secondaryAction: {
@@ -45,6 +47,19 @@ struct MobileHomePageView: View {
 }
 
 struct MobileMainView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var dtVM: DailyTrivioViewModel
+    
+    var body: some View {
+        if formatter.showingDT {
+            MobileDailyTrivioView()
+        } else {
+            MobileMainHomepageView()
+        }
+    }
+}
+
+struct MobileMainHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
@@ -81,6 +96,7 @@ struct MobileMainView: View {
                 }
                 .tag(MenuChoice.profile)
         }
+        .background(formatter.color(.secondaryFG))
         .accentColor(formatter.color(.highContrastWhite))
     }
 }

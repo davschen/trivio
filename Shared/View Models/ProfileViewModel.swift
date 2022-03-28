@@ -90,7 +90,6 @@ class ProfileViewModel: ObservableObject {
         guard let uid = myUID else { return }
         let docRef = db.collection("users")
             .whereField("username", isEqualTo: username.lowercased())
-        print(username)
         docRef.addSnapshotListener { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
