@@ -64,53 +64,38 @@ struct MobileClueResponseView: View {
     var body: some View {
         VStack {
             MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
-            VStack {
-                // Volume control and category name
-                ZStack {
-                    HStack {
-                        MobileVolumeControlView(showingVolumeSlider: $showingVolumeSlider)
-                        Spacer()
-                        Image(systemName: isDailyDouble ? "checkmark" : "xmark")
-                            .font(formatter.iconFont(.small))
+            VStack (spacing: 20) {
+                // Category name and amount
+                HStack {
+                    HStack (spacing: 0) {
+                        Text("\(category.uppercased()) for \(amount)")
                     }
-                    if !showingVolumeSlider {
-                        VStack (spacing: 5) {
-                            Text("\(category.uppercased())")
-                            if !isDailyDouble {
-                                Text("$\(amount)")
-                            }
-                        }
-                        .multilineTextAlignment(.center)
-                        .font(formatter.font())
-                        .padding(10)
-                        .background(formatter.color(.lowContrastWhite))
-                        .cornerRadius(5)
-                        .padding(.horizontal, 30)
-                    }
+                    .font(formatter.font())
+                    Spacer()
+                    Image(systemName: isDailyDouble ? "checkmark" : "xmark")
+                        .font(formatter.iconFont(.small))
                 }
-                Spacer()
                 
                 // Clue
-                Text(clue.uppercased())
-                    .font(formatter.font(fontSize: .mediumLarge))
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.5)
-                    .padding()
+                Text(clue)
+                    .font(formatter.font(.regular, fontSize: .semiLarge))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .multilineTextAlignment(.leading)
                 
                 // Response, if showing response
                 if self.showResponse {
                     VStack (spacing: 0) {
-                        Text(response.uppercased())
-                            .font(formatter.font(fontSize: .mediumLarge))
+                        Text(response.capitalized)
+                            .font(formatter.font(.regular, fontSize: .mediumLarge))
                             .foregroundColor(formatter.color(isTripleStumper ? .red : .secondaryAccent))
-                            .shadow(color: Color.black.opacity(0.2), radius: 5)
-                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .multilineTextAlignment(.leading)
                         if isTripleStumper {
                             Text("(Triple Stumper)")
-                                .font(formatter.font(fontSize: .medium))
+                                .font(formatter.font(.regular, fontSize: .medium))
                                 .foregroundColor(formatter.color(.red))
                                 .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                .multilineTextAlignment(.center)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }
@@ -136,16 +121,18 @@ struct MobileClueResponseView: View {
                                 self.ddCorrect.toggle()
                             }
                         }
-                    } else {
+                    } else if showResponse {
                         MobileCorrectSelectorView(teamCorrect: $teamCorrect, amount: self.amount)
                     }
                     Text("  \(self.showResponse ? "Hide" : "Show") Response  ")
-                        .font(formatter.font(fontSize: .mediumLarge))
-                        .shadow(color: Color.black.opacity(0.2), radius: 5)
-                        .padding(15)
+                        .font(formatter.font(fontSize: .regular))
+                        .foregroundColor(formatter.color(showResponse ? .primaryBG : .highContrastWhite))
+                        .padding(.vertical, 20)
                         .frame(maxWidth: .infinity)
-                        .background(formatter.color(.lowContrastWhite).opacity(showResponse ? 1 : 0.4))
+                        .background(showResponse ? formatter.color(.highContrastWhite) : nil)
                         .clipShape(Capsule())
+                        .background(Capsule().stroke(formatter.color(.highContrastWhite), lineWidth: 3))
+                        .contentShape(Capsule())
                         .onTapGesture {
                             formatter.hapticFeedback(style: .soft, intensity: .strong)
                             showResponse.toggle()
@@ -202,12 +189,12 @@ struct MobileClueCountdownTimerView: View {
     
     var body: some View {
         // Countdown timer blocks
-        HStack (spacing: formatter.deviceType == .iPad ? nil : 5) {
+        HStack (spacing: 2) {
             ForEach(0..<Int(self.gamesVM.timeRemaining * 2 - 1)) { i in
                 Rectangle()
                     .foregroundColor(formatter.color(self.usedBlocks.contains(i + 1) ? .primaryFG : .secondaryAccent))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 15)
+                    .frame(height: 7)
             }
         }
         .clipShape(Capsule())

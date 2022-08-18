@@ -43,7 +43,7 @@ class DailyTrivioViewModel: ObservableObject {
     }
     
     init() {
-        handlePullFromDB()
+        //handlePullFromDB()
     }
     
     func addChar(char: String) {
@@ -557,8 +557,8 @@ extension DailyTrivioViewModel {
         let maxCount = attemptCounts.max() ?? 1
         
         for count in attemptCounts {
-            let percent = Int((Double(count * 100)) / Double(totalCount))
-            let height = Float((Double(count) * fixedHeight) / Double(maxCount))
+            let percent = Int((Double(count * 100)) / Double(max(totalCount, 1)))
+            let height = Float((Double(count) * fixedHeight) / Double(max(maxCount, 1)))
             percents.append(percent)
             heights.append(CGFloat(height))
         }

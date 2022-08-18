@@ -99,7 +99,7 @@ struct MobileGameplayHeaderView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     gamesVM.gameSetupMode = .settings
                 } label: {
-                    Image(systemName: "gear")
+                    Image(systemName: "xmark")
                         .font(.system(size: 20, weight: .bold))
                 }
                 
@@ -114,7 +114,7 @@ struct MobileGameplayHeaderView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     showInfoView.toggle()
                 } label: {
-                    Image(systemName: "info.circle.fill")
+                    Image(systemName: "gear")
                         .font(.system(size: 20, weight: .bold))
                 }
             }

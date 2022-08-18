@@ -512,7 +512,7 @@ struct Team: Hashable, Identifiable, Decodable, Encodable {
     var score: Int
     var color: String
     
-    init(id: String = "", index: Int, name: String, members: [String], score: Int, color: String) {
+    init(id: String = "", index: Int, name: String, members: [String], score: Int = 0, color: String) {
         self.id = id == "" ? UUID().uuidString : id
         self.index = index
         self.name = name

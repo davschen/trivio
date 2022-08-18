@@ -177,7 +177,6 @@ struct MobileDTTimerBarView: View {
         .frame(height: 7)
         .clipShape(Capsule())
         .onReceive(dtVM.timer) { time in
-            print("Received \(time)")
             dtVM.incrementTimeElapsed()
         }
     }
