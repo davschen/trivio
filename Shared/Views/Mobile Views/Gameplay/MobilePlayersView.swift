@@ -39,9 +39,6 @@ struct MobileIndividualPlayerView: View {
         VStack (alignment: .leading, spacing: 0) {
             Spacer(minLength: 0)
             HStack (spacing: 5) {
-                Circle()
-                    .frame(width: 5, height: 5)
-                    .foregroundColor(ColorMap().getColor(color: team.color))
                 VStack (alignment: .leading) {
                     Text("\(team.name)")
                         .font(formatter.font(fontSize: participantsVM.teams.count > 3 ? .regular : .medium))
@@ -62,20 +59,28 @@ struct MobileIndividualPlayerView: View {
             }
             .padding(.horizontal, 7)
             Spacer(minLength: 0)
+            Rectangle()
+                .frame(maxWidth: .infinity)
+                .frame(height: 2)
+                .foregroundColor(ColorMap().getColor(color: team.color))
             ZStack {
-                if team.score > 0 {
-                    MovingNumbersView(
-                        number: Double(abs(team.score)),
-                        numberOfDecimalPlaces: 0) { str in
-                            Text(str)
-                                .font(formatter.font(fontSize: .mediumLarge))
+                if abs(participantsVM.teams[team.index].score) > 0 {
+                    HStack (spacing: 0) {
+                        if participantsVM.teams[team.index].score < 0 {
+                            Text("-")
                         }
+                        MovingNumbersView(
+                            number: Double(abs(participantsVM.teams[team.index].score)),
+                            numberOfDecimalPlaces: 0) { str in
+                                Text(str)
+                            }
+                    }
                 } else {
                     Text("0")
-                        .font(formatter.font(fontSize: .mediumLarge))
                 }
             }
-            .foregroundColor(formatter.color(team.score < 0 ? .red : .highContrastWhite))
+            .font(formatter.font(fontSize: .mediumLarge))
+            .foregroundColor(formatter.color(participantsVM.teams[team.index].score < 0 ? .red : .highContrastWhite))
             .frame(maxWidth: .infinity)
             .frame(height: 30)
             .background(formatter.color(.primaryFG))
@@ -88,6 +93,7 @@ struct MobileIndividualPlayerView: View {
         .onTapGesture {
             if !(participantsVM.selectedTeam == team) {
                 participantsVM.setSelectedTeam(index: team.index)
+                print(participantsVM.teams[team.index].score)
             }
         }
         .onAppear {

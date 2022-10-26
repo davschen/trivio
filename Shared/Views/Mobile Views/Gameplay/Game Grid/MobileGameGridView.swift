@@ -131,8 +131,8 @@ struct MobileGameCellView: View {
     var body: some View {
         ZStack {
             formatter.color(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty ? .primaryFG : .primaryAccent)
-            Text("$\(gamesVM.moneySections[j])")
-                .font(formatter.font(.extraBold, fontSize: .large))
+            Text("\(gamesVM.moneySections[j])")
+                .font(formatter.font(.extraBold, fontSize: .extraLarge))
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .shadow(color: Color.black.opacity(0.2), radius: 5)
                 .multilineTextAlignment(.center)

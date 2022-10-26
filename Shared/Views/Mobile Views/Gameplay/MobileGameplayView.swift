@@ -104,7 +104,7 @@ struct MobileGameplayHeaderView: View {
                 }
                 
                 Text("\(headerString)")
-                    .font(formatter.font(fontSize: .large))
+                    .font(formatter.font(fontSize: .semiLarge))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 
@@ -131,7 +131,17 @@ struct MobileGameplayHeaderView: View {
                                 .frame(width: (CGFloat(progressCount) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
                         }
-                        Text("Progress: \(progressCount) of \(cluesInRound) clues completed")
+                        HStack {
+                            Text("Progress: \(progressCount) of \(cluesInRound) clues completed")
+                            Spacer()
+                            Button {
+                                gamesVM.gamePhase = gamesVM.gamePhase.next()
+                            } label: {
+                                Text("Skip round")
+                                    .font(formatter.font(.boldItalic, fontSize: .small))
+                            }
+
+                        }
                     }
                     .font(formatter.font(.regularItalic, fontSize: .small))
                 }

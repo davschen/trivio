@@ -86,17 +86,17 @@ struct MobileSummaryMySetsView: View {
                     HStack (spacing: 15) {
                         Spacer()
                             .frame(width: 0, height: 0)
-                        ForEach(gamesVM.customSets, id: \.self) { set in
+                        ForEach(gamesVM.customSets, id: \.self) { customSet in
                             ZStack {
-                                MobileCustomSetCellView(set: set, isMine: true)
+                                MobileCustomSetCellView(customSet: customSet)
                                     .frame(width: 300)
                                     .onTapGesture {
                                         if gamesVM.gameInProgress() {
                                             formatter.setAlertSettings(alertAction: {
-                                                selectSet(set: set)
+                                                selectSet(set: customSet)
                                             }, alertTitle: "Cancel current game?", alertSubtitle: "It looks like you have a game in progress. Choosing this one would erase all of your progress.", hasCancel: true, actionLabel: "Yes, choose this game")
                                         } else {
-                                            selectSet(set: set)
+                                            selectSet(set: customSet)
                                         }
                                     }
                                 NavigationLink(destination: MobileSetPreviewView()

@@ -227,7 +227,7 @@ enum GameSetupMode {
     case settings, participants, play
 }
 
-enum GamePhase {
+enum GamePhase: CaseIterable {
     case trivio, doubleTrivio, finalTrivio
 }
 

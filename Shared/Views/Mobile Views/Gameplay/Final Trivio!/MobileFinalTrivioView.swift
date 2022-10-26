@@ -22,17 +22,10 @@ struct MobileFinalTrivioView: View {
     
     var body: some View {
         ZStack {
-            switch gamesVM.finalTrivioStage {
-            case .makeWager:
-                MobileFinalTrivioMakeWagerView()
+            if gamesVM.finalTrivioStage == .makeWager {
+                MobileFinalTrivioUserFlowView()
                     .transition(AnyTransition.move(edge: .leading))
-            case .submitAnswer:
-                MobileFinalTrivioSubmitAnswerView()
-                    .transition(AnyTransition.move(edge: .leading))
-            case .revealResponse:
-                MobileFinalTrivioRevealResponseView()
-                    .transition(AnyTransition.move(edge: .leading))
-            default:
+            } else {
                 MobileFinalTrivioPodiumView()
                     .transition(AnyTransition.move(edge: .leading))
             }

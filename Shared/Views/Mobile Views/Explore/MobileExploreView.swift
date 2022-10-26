@@ -13,11 +13,11 @@ struct MobileExploreView: View {
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     var body: some View {
         NavigationView() {
             MobileExploreSearchView(isShowingUserView: $exploreVM.isShowingUserView)
-                .withHeader("Explore")
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .background(formatter.color(.primaryBG))
@@ -30,6 +30,7 @@ struct MobileExploreSearchView: View {
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @Binding var isShowingUserView: Bool
     
@@ -39,32 +40,7 @@ struct MobileExploreSearchView: View {
     var body: some View {
         ZStack {
             VStack (alignment: .leading, spacing: 10) {
-                // Search bar
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 15, weight: .bold))
-                    TextField("Search sets", text: $exploreVM.searchItem, onCommit: {
-                        exploreVM.searchAndPull()
-                    })
-                    .font(formatter.font())
-                    .accentColor(formatter.color(.secondaryAccent))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    if !exploreVM.searchItem.isEmpty {
-                        Button {
-                            exploreVM.searchItem.removeAll()
-                            formatter.resignKeyboard()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 15, weight: .bold))
-                                .padding(.horizontal, 10)
-                        }
-                    }
-                }
-                .foregroundColor(formatter.color(.lowContrastWhite))
-                .padding()
-                .background(formatter.color(.secondaryFG))
-                .cornerRadius(5)
-                .padding(.horizontal)
+                // Search bar that used :searchAndPull from exploreVM
                 
                 // Sorting button
                 Button {
@@ -82,12 +58,17 @@ struct MobileExploreSearchView: View {
                 }
                 .padding(.horizontal)
                 
-                if exploreVM.noMatchesFound() {
-                    LoadingView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                } else {
-                    MobileCustomSetView(searchItem: $exploreVM.searchItem, isMine: false, customSets: exploreVM.allRecents)
+                HStack {
+                    Text("My Sets")
+                    Spacer()
+                    Button {
+                        
+                    } label: {
+                        Text("More")
+                            .foregroundColor(formatter.color(.secondaryAccent))
+                    }
                 }
+                MobileMySetsView()
             }
             if showSortByMenu {
                 ZStack (alignment: .topLeading) {

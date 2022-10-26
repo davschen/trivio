@@ -109,7 +109,7 @@ struct MobileTabBarView: View {
     var body: some View {
         ZStack {
             HStack {
-                MobileTabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "magnifyingglass", selectedIconName: "magnifyingglass", myMenuChoice: .explore)
+                MobileTabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "house", selectedIconName: "house.fill", myMenuChoice: .explore)
                 Spacer(minLength: 0)
                 if isVIP {
                     MobileTabBarItemView(menuChoice: $gamesVM.menuChoice, deselectedIconName: "lock.open", selectedIconName: "lock.open.fill", myMenuChoice: .gamepicker)
@@ -150,8 +150,6 @@ struct MobileTabBarItemView: View {
         VStack {
             Image(systemName: self.menuChoice == myMenuChoice ? selectedIconName : deselectedIconName)
                 .font(formatter.iconFont(.large))
-            Text(tabItemLabel)
-                .font(formatter.font(fontSize: .small))
         }
     }
 }

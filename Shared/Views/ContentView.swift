@@ -47,6 +47,7 @@ struct ContentView: View {
             }
         }
         .foregroundColor(formatter.color(.highContrastWhite))
+        .font(formatter.font())
         .animation(.easeInOut(duration: 0.3))
         .onAppear {
             NotificationCenter.default.addObserver(forName: NSNotification.Name("LogInStatusChange"), object: nil, queue: .main) { (_) in
