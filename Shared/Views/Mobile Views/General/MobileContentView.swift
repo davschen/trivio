@@ -18,6 +18,7 @@ struct MobileContentView: View {
     @ObservedObject var reportVM = ReportViewModel()
     @ObservedObject var searchVM = SearchViewModel()
     @ObservedObject var dtVM = DailyTrivioViewModel()
+    @ObservedObject var appStoreManager = AppStoreManager()
     
     var body: some View {
         VStack (spacing: 0) {
@@ -34,6 +35,7 @@ struct MobileContentView: View {
                     .environmentObject(reportVM)
                     .environmentObject(searchVM)
                     .environmentObject(dtVM)
+                    .environmentObject(appStoreManager)
                 MobileAlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                     formatter.alertAction()
                 }, hasSecondaryAction: formatter.hasSecondaryAction, secondaryAction: {

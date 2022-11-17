@@ -95,7 +95,7 @@ struct ExploreSearchView: View {
                         .font(formatter.font())
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
-                    CustomSetView(searchItem: $exploreVM.searchItem, isMine: false, customSets: exploreVM.allPublicSets, columns: gridItems)
+                    CustomSetView(searchItem: $exploreVM.searchItem, isMine: false, customSets: exploreVM.allPublicSets, columns: gridItems) 
                 }
                 Spacer()
             }

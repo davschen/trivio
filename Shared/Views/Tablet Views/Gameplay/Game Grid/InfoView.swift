@@ -14,7 +14,7 @@ struct InfoView: View {
     
     @Binding var showInfoView: Bool
     
-    var customSet: CustomSet {
+    var customSet: CustomSetCherry {
         return gamesVM.customSet
     }
     
@@ -65,7 +65,7 @@ struct InfoView: View {
                             
                             // Clues counter
                             VStack {
-                                Text("\(customSet.numclues)")
+                                Text("\(customSet.numClues)")
                                     .font(formatter.font(fontSize: .large))
                                 Text("Clues")
                                     .padding(10)

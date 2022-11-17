@@ -23,11 +23,15 @@ class GamesViewModel: ObservableObject {
     @Published var currentSeason = SeasonFolder(id: "", collection_index: 0, num_games: 0, title: "")
     
     @Published var categories = [String]()
+    
+    // Nested arrays clues & responses can be indexed into with [i][j]
+    // where categoryIndex = i and pointValueIndex = j
     @Published var clues: [[String]] = []
     @Published var responses: [[String]] = []
     
     @Published var jeopardySet = JeopardySet()
     @Published var tidyCustomSet = TidyCustomSet()
+    @Published var liveGameCustomSet = LiveGameCustomSet() 
     
     @Published var jRoundLen = 6
     @Published var djRoundLen = 6
@@ -43,7 +47,6 @@ class GamesViewModel: ObservableObject {
     @Published var fjResponse = ""
     
     @Published var selectedSeason = ""
-    @Published var selectedEpisode = ""
     @Published var usedAnswers = [String]()
     @Published var timeRemaining: Double = 5
     
@@ -55,7 +58,7 @@ class GamesViewModel: ObservableObject {
     @Published var djTripleStumpers: [[Int]] = []
     
     // Following @Published variables will be for custom sets
-    @Published var customSet = Empty().customSet
+    @Published var customSet = CustomSetCherry()
     @Published var title = ""
     @Published var queriedUserName = ""
     
@@ -63,7 +66,7 @@ class GamesViewModel: ObservableObject {
     @Published var previewViewShowing = false
     @Published var playedGames = [String]()
     @Published var setOffsets = [String:CGFloat]()
-    @Published var customSets = [CustomSet]()
+    @Published var customSets = [CustomSetCherry]()
     
     @Published var loadingGame = false
     @Published var finalTrivioStage: FinalTrivioStage = .makeWager
@@ -132,11 +135,6 @@ class GamesViewModel: ObservableObject {
         self.currentSeason = folder
     }
     
-    // selectedEpisode is deprecated for all I know
-    func setCustomSetID(ep: String) {
-        self.selectedEpisode = ep
-    }
-    
     func getCountdown(second: Int) -> (lower: Int, upper: Int) {
         let highBound = Int(self.timeRemaining * 2)
         if second <= Int(self.timeRemaining) {
@@ -160,7 +158,7 @@ class GamesViewModel: ObservableObject {
         self.jTripleStumpers.removeAll()
         self.djTripleStumpers.removeAll()
         self.date = Date()
-        self.customSet = Empty().customSet
+        self.customSet = CustomSetCherry(customSet: Empty().customSet)
         self.jRoundScores.removeAll()
         self.djRoundScores.removeAll()
         self.finalScores.removeAll()

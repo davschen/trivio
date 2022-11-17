@@ -17,7 +17,7 @@ struct MobileCustomSetsView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     @State var idSelected = ""
     
-    @Binding var customSets: [CustomSet]
+    @Binding var customSets: [CustomSetCherry]
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
@@ -51,7 +51,7 @@ struct MobileCustomSetCellView: View {
     @State var setPreviewActive = false
     
     var isInUserView = false
-    var customSet: CustomSet
+    var customSet: CustomSetCherry
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -67,20 +67,20 @@ struct MobileCustomSetCellView: View {
             VStack (alignment: .leading, spacing: 7) {
                 Text(customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
-                Text("2 rounds, \(customSet.numclues) clues")
+                Text("2 rounds, \(customSet.numClues) clues")
                     .font(formatter.font(.regular))
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
                     .font(formatter.font(.regular))
                     .foregroundColor(formatter.color(.lowContrastWhite))
                     .padding(.bottom, 5)
                 HStack {
-                    Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
+                    Text("\(exploreVM.getInitialsFromUserID(userID: customSet.creatorUserID))")
                         .font(formatter.font(.boldItalic, fontSize: .small))
                         .frame(width: 35, height: 35)
                         .background(formatter.color(.primaryAccent))
                         .clipShape(Circle())
                     VStack (alignment: .leading, spacing: 2) {
-                        Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
+                        Text("\(exploreVM.getUsernameFromUserID(userID: customSet.creatorUserID))")
                             .font(formatter.font(.regular))
                         HStack {
                             Text("\(customSet.plays) plays")
@@ -110,12 +110,11 @@ struct MobileCustomSetCellView: View {
         }
     }
     
-    func selectSet(customSet: CustomSet) {
+    func selectSet(customSet: CustomSetCherry) {
         formatter.hapticFeedback(style: .light)
         guard let setID = customSet.id else { return }
         gamesVM.reset()
         gamesVM.getCustomData(setID: setID)
-        gamesVM.setCustomSetID(ep: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
     }
@@ -127,7 +126,7 @@ struct MobileUserProfileButtonView: View {
     
     @Binding var userViewActive: Bool
     
-    var set: CustomSet
+    var set: CustomSetCherry
     
     var body: some View {
         ZStack {
@@ -140,13 +139,13 @@ struct MobileUserProfileButtonView: View {
             }.hidden()
             Button(action: {
                 formatter.hapticFeedback(style: .light)
-                exploreVM.pullAllFromUser(withID: set.userID)
+                exploreVM.pullAllFromUser(withID: set.creatorUserID)
                 userViewActive.toggle()
             }, label: {
                 HStack {
                     Image(systemName: "person.circle")
                         .font(.system(size: 15, weight: .bold))
-                    Text("\(exploreVM.getUsernameFromUserID(userID: set.userID))'s Profile")
+                    Text("\(exploreVM.getUsernameFromUserID(userID: set.creatorUserID))'s Profile")
                         .font(formatter.font(fontSize: .medium))
                 }
                 .foregroundColor(formatter.color(.highContrastWhite))

@@ -20,6 +20,7 @@ class ProfileViewModel: ObservableObject {
     @Published var searchItem = ""
     @Published var showingSettingsView = false
     @Published var settingsMenuSelectedItem = "Game Settings"
+    @Published var numLiveTokens = 1
     
     private var db = Firestore.firestore()
     public var myUID = Auth.auth().currentUser?.uid
@@ -140,6 +141,13 @@ class ProfileViewModel: ObservableObject {
                 self.name = name
                 self.username = username
             }
+            guard let numLiveTokens = doc.get("numLiveTokens") as? Int else {
+                self.initializeNumTokens()
+                return
+            }
+            DispatchQueue.main.async {
+                self.numLiveTokens = numLiveTokens
+            }
         }
         db.collection("drafts")
             .whereField("userID", isEqualTo: myUID)
@@ -151,6 +159,24 @@ class ProfileViewModel: ObservableObject {
                 return try? queryDocSnap.data(as: CustomSet.self)
             })
         }
+    }
+    
+    private func initializeNumTokens() {
+        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        let usersRef = db.collection("users").document(myUID)
+        usersRef.setData([
+            "numLiveTokens" : 1,
+        ], merge: true)
+        self.numLiveTokens = 1
+    }
+    
+    public func incrementNumTokens() {
+        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        let usersRef = db.collection("users").document(myUID)
+        usersRef.setData([
+            "numLiveTokens" : FieldValue.increment(Int64(1)),
+        ], merge: true)
+        self.numLiveTokens += 1
     }
     
     func writeKeyValueToFirestore(key: String, value: Any) {

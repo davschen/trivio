@@ -174,7 +174,6 @@ struct MobileSeasonsListView: View {
                     formatter.hapticFeedback(style: .medium, intensity: .strong)
                     gamesVM.getEpisodes(seasonID: seasonID)
                     gamesVM.setSeason(folder: season)
-                    gamesVM.setCustomSetID(ep: "")
                     gamesVM.clearAll()
                     gamesVM.previewViewShowing = false
                 }
@@ -224,7 +223,6 @@ struct MobileJeopardyGamesView: View {
                                         .onTapGesture {
                                             formatter.hapticFeedback(style: .medium, intensity: .strong)
                                             gamesVM.getEpisodeData(gameID: gamePreviewID)
-                                            gamesVM.setCustomSetID(ep: gamePreviewID)
                                             gamesVM.previewViewShowing = true
                                             participantsVM.resetScores()
                                         }
@@ -267,7 +265,6 @@ struct MobileJeopardyGamesView: View {
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             formatter.hapticFeedback(style: .medium, intensity: .strong)
-                                            gamesVM.setCustomSetID(ep: gamePreviewID)
                                             gamesVM.previewViewShowing = true
                                             gamesVM.getEpisodeData(gameID: gamePreviewID)
                                             participantsVM.resetScores()

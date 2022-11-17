@@ -17,14 +17,14 @@ struct FinalTrivioFillView: View {
         ZStack {
             ScrollView (.vertical) {
                 VStack (alignment: .leading) {
-                    CategoryLargeView(categoryName: buildVM.fjCategory)
+                    CategoryLargeView(categoryName: buildVM.currCustomSet.finalCat)
                     Text("CATEGORY")
                         .font(formatter.font(fontSize: .large))
-                    CategoryNameTextFieldView(categoryName: $buildVM.fjCategory)
+                    CategoryNameTextFieldView(categoryName: $buildVM.currCustomSet.finalCat)
                     
                     Text("CLUE")
                         .font(formatter.font(fontSize: .large))
-                    MultilineTextField("ENTER A CLUE", text: $buildVM.fjClue) {
+                    MultilineTextField("ENTER A CLUE", text: $buildVM.currCustomSet.finalClue) {
                         
                     }
                     .accentColor(formatter.color(.secondaryAccent))
@@ -34,7 +34,7 @@ struct FinalTrivioFillView: View {
                     Text("CORRECT RESPONSE")
                         .font(formatter.font(fontSize: .large))
                         .foregroundColor(formatter.color(.secondaryAccent))
-                    MultilineTextField("ENTER A RESPONSE", text: $buildVM.fjResponse) {
+                    MultilineTextField("ENTER A RESPONSE", text: $buildVM.currCustomSet.finalResponse) {
                         
                     }
                     .accentColor(formatter.color(.secondaryAccent))

@@ -177,7 +177,6 @@ struct SeasonsListView: View {
                 .onTapGesture {
                     self.gamesVM.getEpisodes(seasonID: seasonID)
                     self.gamesVM.setSeason(folder: season)
-                    self.gamesVM.setCustomSetID(ep: "")
                     self.gamesVM.clearAll()
                     self.gamesVM.previewViewShowing = false
                 }
@@ -267,8 +266,6 @@ struct ShowingJeopardyGamesView: View {
             .cornerRadius(formatter.cornerRadius(5))
             .contentShape(Rectangle())
             .onTapGesture {
-                self.gamesVM.getEpisodeData(gameID: gamePreviewID)
-                self.gamesVM.setCustomSetID(ep: gamePreviewID)
                 self.gamesVM.previewViewShowing = true
                 self.participantsVM.resetScores()
             }
@@ -326,11 +323,10 @@ struct NotShowingJeopardyGamesView: View {
             .lineLimit(1)
             .padding(.vertical, 5)
             .frame(maxWidth: .infinity)
-            .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
+            .background(formatter.color(.primaryAccent))
             .cornerRadius(formatter.cornerRadius(5))
             .contentShape(Rectangle())
             .onTapGesture {
-                self.gamesVM.setCustomSetID(ep: gamePreviewID)
                 self.gamesVM.previewViewShowing = true
                 self.gamesVM.getEpisodeData(gameID: gamePreviewID)
                 self.participantsVM.resetScores()

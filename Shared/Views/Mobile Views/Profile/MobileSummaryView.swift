@@ -116,11 +116,10 @@ struct MobileSummaryMySetsView: View {
         .cornerRadius(10)
     }
     
-    func selectSet(set: CustomSet) {
+    func selectSet(set: CustomSetCherry) {
         formatter.hapticFeedback(style: .light)
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
-        gamesVM.setCustomSetID(ep: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
         previewViewActive = true

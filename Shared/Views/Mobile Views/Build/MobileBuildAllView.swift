@@ -38,7 +38,7 @@ struct MobileBuildAllView: View {
             // These two are identical, except that iOS 16 devices will not display overlays
             if #available(iOS 16.0, *) {
                 TabView (selection: $categoryIndex) {
-                    ForEach(0..<(isDJ ? buildVM.djRoundLen : buildVM.jRoundLen), id: \.self) { categoryIndex in
+                    ForEach(0..<(isDJ ? buildVM.currCustomSet.round2Len : buildVM.currCustomSet.round1Len), id: \.self) { categoryIndex in
                         MobileBuildAllCategoryView(categoryIndex: $categoryIndex, category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryName: categoryName, clueString: clueString, responseString: responseString)
                             .tag(category.id)
                             .padding(.horizontal)
@@ -48,7 +48,7 @@ struct MobileBuildAllView: View {
                 .persistentSystemOverlays(.hidden)
             } else {
                 TabView (selection: $categoryIndex) {
-                    ForEach(0..<(isDJ ? buildVM.djRoundLen : buildVM.jRoundLen), id: \.self) { categoryIndex in
+                    ForEach(0..<(isDJ ? buildVM.currCustomSet.round2Len : buildVM.currCustomSet.round1Len), id: \.self) { categoryIndex in
                         MobileBuildAllCategoryView(categoryIndex: $categoryIndex, category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryName: categoryName, clueString: clueString, responseString: responseString)
                             .tag(category.id)
                             .padding(.horizontal)
@@ -167,7 +167,7 @@ struct MobileBuildAllHeaderView: View {
     }
     
     var roundLen: Int {
-        return isDJ ? buildVM.djRoundLen : buildVM.jRoundLen
+        return isDJ ? buildVM.currCustomSet.round2Len : buildVM.currCustomSet.round1Len
     }
     
     var body: some View {

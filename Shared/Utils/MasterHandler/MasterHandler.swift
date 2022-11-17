@@ -140,5 +140,13 @@ class MasterHandler: ObservableObject {
     func setVolume() {
         speaker.updateVolume(value: volume)
     }
+    
+    func nestedStringArrayToDict(_ nestedStringArray: [[String]]) -> [Int:[String]] {
+        var toReturn = [Int:[String]]()
+        for stringArrayIndex in nestedStringArray.indices {
+            toReturn[stringArrayIndex] = nestedStringArray[stringArrayIndex]
+        }
+        return toReturn
+    }
 }
 

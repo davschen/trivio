@@ -20,7 +20,7 @@ struct MobileSetPreviewView: View {
         return !gamesVM.queriedUserName.isEmpty
     }
     
-    var customSet: CustomSet {
+    var customSet: CustomSetCherry {
         return gamesVM.customSet
     }
     
@@ -77,7 +77,7 @@ struct MobileSetPreviewView: View {
                         
                         // Clues counter
                         VStack {
-                            Text("\(customSet.numclues)")
+                            Text("\(customSet.numClues)")
                                 .font(formatter.font(fontSize: .large))
                             Text("Clues")
                                 .padding(10)

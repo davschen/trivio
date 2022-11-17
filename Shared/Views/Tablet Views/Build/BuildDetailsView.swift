@@ -32,7 +32,7 @@ struct BuildDetailsView: View {
                     VStack (alignment: .leading, spacing: 3) {
                         Text("TITLE")
                             .font(formatter.font(fontSize: .large))
-                        TextField("Title your set", text: $buildVM.setName)
+                        TextField("Title your set", text: $buildVM.currCustomSet.title)
                             .accentColor(formatter.color(.secondaryAccent))
                             .font(formatter.font(fontSize: .large))
                             .padding(20)
@@ -54,7 +54,7 @@ struct BuildDetailsView: View {
                         }
                         
                         // Tags view
-                        FlexibleView(data: buildVM.tags, spacing: 8, alignment: .leading) { item in
+                        FlexibleView(data: buildVM.currCustomSet.tags, spacing: 8, alignment: .leading) { item in
                             HStack (spacing: 0) {
                                 Text("#")
                                 Text(verbatim: item.uppercased())
@@ -102,11 +102,11 @@ struct BuildDetailsView: View {
                         Image(systemName: "checkmark")
                             .padding(5)
                             .background(RoundedRectangle(cornerRadius: 4).stroke(formatter.color(.highContrastWhite), lineWidth: 5))
-                            .background(formatter.color(buildVM.isPublic ? .highContrastWhite : .primaryAccent))
+                            .background(formatter.color(buildVM.currCustomSet.isPublic ? .highContrastWhite : .primaryAccent))
                             .foregroundColor(formatter.color(.primaryAccent))
                             .cornerRadius(4)
                             .onTapGesture {
-                                buildVM.isPublic.toggle()
+                                buildVM.currCustomSet.isPublic.toggle()
                             }
                         
                         Text("Make this set available to the public")
@@ -130,13 +130,13 @@ struct BuildCustomSetPreviewView: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 15) {
             HStack {
-                if !buildVM.isPublic {
+                if !buildVM.currCustomSet.isPublic {
                     Image(systemName: "lock.fill")
                         .font(.system(size: 20, weight: .bold))
                 }
-                Text("\(buildVM.setName.isEmpty ? "No Title" : buildVM.setName)")
+                Text("\(buildVM.currCustomSet.title.isEmpty ? "No Title" : buildVM.currCustomSet.title)")
                     .font(formatter.font(fontSize: .mediumLarge))
-                    .foregroundColor(formatter.color(buildVM.setName.isEmpty ? .lowContrastWhite : .highContrastWhite))
+                    .foregroundColor(formatter.color(buildVM.currCustomSet.title.isEmpty ? .lowContrastWhite : .highContrastWhite))
                 Spacer()
             }
             HStack {
@@ -154,7 +154,7 @@ struct BuildCustomSetPreviewView: View {
             .foregroundColor(formatter.color(.highContrastWhite))
             ScrollView (.horizontal, showsIndicators: false) {
                 HStack (spacing: formatter.deviceType == .iPad ? nil : 3) {
-                    ForEach(buildVM.tags, id: \.self) { tag in
+                    ForEach(buildVM.currCustomSet.tags, id: \.self) { tag in
                         Text("#" + tag.uppercased())
                             .font(formatter.font(.boldItalic, fontSize: .small))
                             .foregroundColor(formatter.color(.primaryFG))

@@ -70,7 +70,6 @@ struct MobileDraftCellView: View {
             HStack {
                 Button(action: {
                     buildVM.edit(isDraft: true, gameID: setID)
-                    buildVM.isEditingDraft = true
                 }, label: {
                     Text("Edit")
                         .foregroundColor(formatter.color(.highContrastWhite))
@@ -103,7 +102,6 @@ struct MobileDraftCellView: View {
         .onTapGesture {
             formatter.hapticFeedback(style: .light)
             buildVM.edit(isDraft: true, gameID: setID)
-            buildVM.isEditingDraft = true
         }
     }
 }

@@ -44,7 +44,7 @@ struct MobileBuildDetailsView: View {
                                 .font(formatter.font(.boldItalic, fontSize: .mediumLarge))
                         }
                         TextField("", text: $setTitle, onEditingChanged: { newTitle in
-                            buildVM.setName = setTitle
+                            buildVM.currCustomSet.title = setTitle
                         })
                         .accentColor(formatter.color(.secondaryAccent))
                         .font(formatter.font(fontSize: .mediumLarge))
@@ -54,8 +54,8 @@ struct MobileBuildDetailsView: View {
                     .background(formatter.color(.primaryFG))
                     .cornerRadius(5)
                     .onAppear {
-                        setTitle = buildVM.setName
-                        setDescription = buildVM.setDescription
+                        setTitle = buildVM.currCustomSet.title
+                        setDescription = buildVM.currCustomSet.description
                     }
                 }
                 VStack (alignment: .leading, spacing: 5) {
@@ -69,7 +69,7 @@ struct MobileBuildDetailsView: View {
                                     .foregroundColor(formatter.color(.lowContrastWhite))
                             }
                             MobileMultilineTextField("", text: $setDescription) {
-                                buildVM.setDescription = setDescription
+                                buildVM.currCustomSet.description = setDescription
                             }
                             .accentColor(formatter.color(.highContrastWhite))
                             .offset(x: -5)
@@ -101,7 +101,7 @@ struct MobileBuildDetailsView: View {
                     }
                     
                     // Tags view
-                    FlexibleView(data: buildVM.tags, spacing: 3, alignment: .leading) { item in
+                    FlexibleView(data: buildVM.currCustomSet.tags, spacing: 3, alignment: .leading) { item in
                         HStack (spacing: 0) {
                             Text("#")
                             Text(verbatim: item.uppercased())
@@ -134,7 +134,7 @@ struct MobileBuildDetailsView: View {
                             buildVM.addTag()
                             tagString = ""
                             // insurance
-                            buildVM.setDescription = setDescription
+                            buildVM.currCustomSet.description = setDescription
                         })
                         .accentColor(formatter.color(.secondaryAccent))
                         .font(formatter.font(.boldItalic, fontSize: .mediumLarge))
@@ -167,18 +167,18 @@ struct MobileBuildDetailsView: View {
                         Text("1")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(formatter.color(!buildVM.hasTwoRounds ? .primaryAccent : .primaryFG))
+                            .background(formatter.color(!buildVM.currCustomSet.hasTwoRounds ? .primaryAccent : .primaryFG))
                             .cornerRadius(5)
                             .onTapGesture {
-                                buildVM.hasTwoRounds = false
+                                buildVM.currCustomSet.hasTwoRounds = false
                             }
                         Text("2")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(formatter.color(buildVM.hasTwoRounds ? .primaryAccent : .primaryFG))
+                            .background(formatter.color(buildVM.currCustomSet.hasTwoRounds ? .primaryAccent : .primaryFG))
                             .cornerRadius(5)
                             .onTapGesture {
-                                buildVM.hasTwoRounds = true
+                                buildVM.currCustomSet.hasTwoRounds = true
                             }
                     }
                     .font(formatter.font(fontSize: .mediumLarge))
@@ -189,7 +189,7 @@ struct MobileBuildDetailsView: View {
                         Text("Round 1 Categories")
                             .font(formatter.font(.regularItalic, fontSize: .regular))
                         HStack (spacing: 2) {
-                            Text("\(buildVM.jRoundLen)")
+                            Text("\(buildVM.currCustomSet.round1Len)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Button {
@@ -197,14 +197,14 @@ struct MobileBuildDetailsView: View {
                             } label: {
                                 Image(systemName: "minus.circle.fill")
                                     .font(formatter.iconFont(.medium))
-                                    .opacity(buildVM.jRoundLen == 3 ? 0.4 : 1)
+                                    .opacity(buildVM.currCustomSet.round1Len == 3 ? 0.4 : 1)
                             }
                             Button {
                                 buildVM.addRound1()
                             } label: {
                                 Image(systemName: "plus.circle.fill")
                                     .font(formatter.iconFont(.medium))
-                                    .opacity(buildVM.jRoundLen == 6 ? 0.4 : 1)
+                                    .opacity(buildVM.currCustomSet.round1Len == 6 ? 0.4 : 1)
                             }
                         }
                         .font(formatter.font(fontSize: .mediumLarge))
@@ -212,12 +212,12 @@ struct MobileBuildDetailsView: View {
                         .background(formatter.color(.primaryFG))
                         .cornerRadius(5)
                     }
-                    if buildVM.hasTwoRounds {
+                    if buildVM.currCustomSet.hasTwoRounds {
                         VStack (alignment: .leading) {
                             Text("Round 2 Categories")
                                 .font(formatter.font(.regularItalic, fontSize: .regular))
                             HStack (spacing: 2) {
-                                Text("\(buildVM.djRoundLen)")
+                                Text("\(buildVM.currCustomSet.round2Len)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 Spacer()
                                 Button {
@@ -225,14 +225,14 @@ struct MobileBuildDetailsView: View {
                                 } label: {
                                     Image(systemName: "minus.circle.fill")
                                         .font(formatter.iconFont(.medium))
-                                        .opacity(buildVM.djRoundLen == 3 ? 0.4 : 1)
+                                        .opacity(buildVM.currCustomSet.round2Len == 3 ? 0.4 : 1)
                                 }
                                 Button {
                                     buildVM.addRound2()
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(formatter.iconFont(.medium))
-                                        .opacity(buildVM.djRoundLen == 6 ? 0.4 : 1)
+                                        .opacity(buildVM.currCustomSet.round2Len == 6 ? 0.4 : 1)
                                 }
                             }
                             .font(formatter.font(fontSize: .mediumLarge))
@@ -243,19 +243,19 @@ struct MobileBuildDetailsView: View {
                     }
                 }
                 HStack (spacing: 10) {
-                    ZStack(alignment: (buildVM.isPublic ? .trailing : .leading)) {
+                    ZStack(alignment: (buildVM.currCustomSet.isPublic ? .trailing : .leading)) {
                         Capsule()
                             .frame(width: 30, height: 15)
-                            .foregroundColor(formatter.color(buildVM.isPublic ? .secondaryAccent : .primaryFG))
+                            .foregroundColor(formatter.color(buildVM.currCustomSet.isPublic ? .secondaryAccent : .primaryFG))
                         Circle()
                             .frame(width: 15, height: 15)
                     }
                     .animation(.easeInOut(duration: 0.1), value: UUID().uuidString)
                     .onTapGesture {
-                        buildVM.isPublic.toggle()
+                        buildVM.currCustomSet.isPublic.toggle()
                     }
                     
-                    Text("\(buildVM.isPublic ? "Public: anyone can play this set" : "Private: only I can see this set")")
+                    Text("\(buildVM.currCustomSet.isPublic ? "Public: anyone can play this set" : "Private: only I can see this set")")
                         .font(formatter.font(.regular))
                 }
                 Text("Tip: Each category is considered complete when it has one or more clues. So, if you’re stuck on a category, just finish one clue and move on. You can always come back to it later, or you can leave it empty!")
@@ -265,53 +265,3 @@ struct MobileBuildDetailsView: View {
         }
     }
 }
-
-struct MobileBuildCustomSetPreviewView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var gamesVM: GamesViewModel
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: 15) {
-            HStack {
-                if !buildVM.isPublic {
-                    Image(systemName: "lock.fill")
-                        .font(formatter.iconFont())
-                }
-                Text("\(buildVM.setName.isEmpty ? "No Title" : buildVM.setName)")
-                    .font(formatter.font(fontSize: .mediumLarge))
-                    .foregroundColor(formatter.color(buildVM.setName.isEmpty ? .lowContrastWhite : .highContrastWhite))
-                Spacer()
-            }
-            HStack {
-                Text("\(buildVM.getNumClues()) clues")
-                RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 10)
-                HStack (spacing: 3) {
-                    Text("N/A")
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10, weight: .bold))
-                }
-                RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 10)
-                Text("\(gamesVM.dateFormatter.string(from: Date()))")
-            }
-            .font(formatter.font(.regular, fontSize: .small))
-            .foregroundColor(formatter.color(.highContrastWhite))
-            ScrollView (.horizontal, showsIndicators: false) {
-                HStack (spacing: 3) {
-                    ForEach(buildVM.tags, id: \.self) { tag in
-                        Text("#" + tag.uppercased())
-                            .font(formatter.font(.boldItalic, fontSize: .small))
-                            .foregroundColor(formatter.color(.primaryFG))
-                            .padding(7)
-                            .background(Color.white)
-                            .clipShape(Capsule())
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(formatter.color(.secondaryFG))
-        .cornerRadius(10)
-    }
-}
-

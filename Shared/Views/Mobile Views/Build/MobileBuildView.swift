@@ -51,23 +51,13 @@ struct MobileBuildView: View {
         }
         .withBackButton()
         .withBackground()
-        .navigationTitle(buildVM.setName.isEmpty ? "Build set" : buildVM.setName)
+        .navigationTitle(buildVM.currCustomSet.title.isEmpty ? "Build set" : buildVM.currCustomSet.title)
         .navigationBarTitleDisplayMode(.inline)
         .ignoresSafeArea(edges: .bottom)
         .toolbar {
             ToolbarItem {
                 Button(action: {
-                    if buildVM.isEditing && !buildVM.isEditingDraft {
-                        formatter.setAlertSettings(alertAction: {
-                            formatter.hapticFeedback(style: .soft, intensity: .strong)
-                            buildVM.saveDraft()
-                        }, alertTitle: "Save and Leave?", alertSubtitle: "Choose whether you want to leave or stay after saving.", hasCancel: true, actionLabel: "Stay", hasSecondaryAction: true, secondaryAction: {
-                            buildVM.saveDraft()
-                            buildVM.showingBuildView.toggle()
-                        }, secondaryActionLabel: "Leave")
-                    } else {
-                        buildVM.currentDisplay = .saveDraft
-                    }
+                    buildVM.saveDraft()
                 }) {
                     ZStack {
                         Text("Save")
@@ -78,7 +68,7 @@ struct MobileBuildView: View {
                     .background(formatter.color(.highContrastWhite))
                     .clipShape(Capsule())
                 }
-                .opacity(buildVM.setName.isEmpty ? 0 : 1)
+                .opacity(buildVM.currCustomSet.title.isEmpty ? 0 : 1)
             }
         }
     }
@@ -139,7 +129,7 @@ struct MobileBuildGridView: View {
                         Spacer()
                             .frame(width: 12)
                         ForEach(0..<(isDJ ? self.buildVM.djCategories.count : self.buildVM.jCategories.count), id: \.self) { i in
-                            let toShow = isDJ ? buildVM.djCategoriesShowing : buildVM.jCategoriesShowing
+                            let toShow = isDJ ? buildVM.round2CatsShowing : buildVM.round1CatsShowing
                             if i <= (toShow.count - 1) && toShow[i] {
                                 MobileBuildCategoryView(
                                     categoryIndex: $categoryIndex,
@@ -175,21 +165,21 @@ struct MobileBuildGridEntryView: View {
     
     var body: some View {
         HStack (spacing: 2) {
-            Text("Categories (\(isDJ ? buildVM.djRoundLen : buildVM.jRoundLen))")
+            Text("Categories (\(isDJ ? buildVM.currCustomSet.round2Len : buildVM.currCustomSet.round1Len))")
                 .font(formatter.font(fontSize: .medium))
             Button {
                 buildVM.subtractCategory()
             } label: {
                 Image(systemName: "minus.circle.fill")
                     .font(formatter.iconFont(.small))
-                    .opacity(isDJ ? (buildVM.djRoundLen == 3 ? 0.4 : 1) : (buildVM.jRoundLen == 3 ? 0.4 : 1))
+                    .opacity(isDJ ? (buildVM.currCustomSet.round2Len == 3 ? 0.4 : 1) : (buildVM.currCustomSet.round1Len == 3 ? 0.4 : 1))
             }
             Button {
                 buildVM.addCategory()
             } label: {
                 Image(systemName: "plus.circle.fill")
                     .font(formatter.iconFont(.small))
-                    .opacity(isDJ ? (buildVM.djRoundLen == 6 ? 0.4 : 1) : (buildVM.jRoundLen == 6 ? 0.4 : 1))
+                    .opacity(isDJ ? (buildVM.currCustomSet.round2Len == 6 ? 0.4 : 1) : (buildVM.currCustomSet.round1Len == 6 ? 0.4 : 1))
             }
             Spacer()
             Text("Preview")

@@ -23,14 +23,14 @@ extension GamesViewModel {
             }
             guard let data = snap?.documents else { return }
             DispatchQueue.main.async {
-                self.customSets = data.compactMap { (queryDocSnap) -> CustomSet? in
-                    var customSet = try? queryDocSnap.data(as: CustomSet.self)
-                    if let customSetCherry = try? queryDocSnap.data(as: CustomSet.self) {
+                self.customSets = data.compactMap { (queryDocSnap) -> CustomSetCherry? in
+                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
+                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
                         // Custom set for version 3.0
                         return customSetCherry
                     } else {
                         // default
-                        return customSet
+                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
                     }
                 }
             }
@@ -53,7 +53,6 @@ extension GamesViewModel {
     func getCustomDataWithCompletion(setID: String, completion: @escaping (Bool) -> Void) {
         clearAll()
         reset()
-        setCustomSetID(ep: setID)
         let group = DispatchGroup()
         db.collection("userSets").document(setID).getDocument { (doc, err) in
             group.enter()
@@ -62,9 +61,18 @@ extension GamesViewModel {
                 return
             }
             guard let doc = doc else { return }
-            guard let customSet = try? doc.data(as: CustomSet.self) else { return }
+            var customSet: CustomSetCherry
+            if let customSetOG = try? doc.data(as: CustomSet.self) {
+                customSet = CustomSetCherry(customSet: customSetOG)
+            } else if let customSetCherry = try? doc.data(as: CustomSetCherry.self) {
+                customSet = customSetCherry
+            } else {
+                return
+            }
             
-            for id in customSet.jCategoryIDs {
+            self.customSet = customSet
+            
+            for id in customSet.round1CatIDs {
                 self.db.collection("userCategories").document(id).getDocument { (doc, err) in
                     if err != nil {
                         print(err!.localizedDescription)
@@ -76,7 +84,7 @@ extension GamesViewModel {
                     DispatchQueue.main.async {
                         let index = customSetCategory.index
                         if self.tidyCustomSet.round1Clues.isEmpty {
-                            let toAdd = (customSet.jRoundLen - self.tidyCustomSet.round1Clues.count)
+                            let toAdd = (customSet.round1Len - self.tidyCustomSet.round1Clues.count)
                             self.tidyCustomSet.round1Clues = [[String]](repeating: [""], count: toAdd)
                             self.tidyCustomSet.round1Responses = [[String]](repeating: [""], count: toAdd)
                             self.tidyCustomSet.round1Cats = [String](repeating: "", count: toAdd)
@@ -88,8 +96,8 @@ extension GamesViewModel {
                             self.clues = self.tidyCustomSet.round1Clues
                             self.responses = self.tidyCustomSet.round1Responses
                             self.categories = self.tidyCustomSet.round1Cats
-                            self.jRoundLen = customSet.jRoundLen
-                            self.djRoundLen = customSet.djRoundLen
+                            self.jRoundLen = customSet.round1Len
+                            self.djRoundLen = customSet.round2Len
                             customSetCategory.clues.forEach {
                                 self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
                                 self.jCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
@@ -99,7 +107,7 @@ extension GamesViewModel {
                 }
             }
             
-            for id in customSet.djCategoryIDs {
+            for id in customSet.round2CatIDs {
                 self.db.collection("userCategories").document(id).getDocument { (doc, err) in
                     if err != nil {
                         print(err!.localizedDescription)
@@ -112,7 +120,7 @@ extension GamesViewModel {
                     DispatchQueue.main.async {
                         let index = customSetCategory.index
                         if self.tidyCustomSet.round2Clues.isEmpty {
-                            let toAdd = (customSet.djRoundLen - self.tidyCustomSet.round2Clues.count)
+                            let toAdd = (customSet.round2Len - self.tidyCustomSet.round2Clues.count)
                             self.tidyCustomSet.round2Clues = [[String]](repeating: [""], count: toAdd)
                             self.tidyCustomSet.round2Responses = [[String]](repeating: [""], count: toAdd)
                             self.tidyCustomSet.round2Cats = [String](repeating: "", count: toAdd)
@@ -131,7 +139,7 @@ extension GamesViewModel {
             }
             
             DispatchQueue.main.async {
-                self.getUserName(userID: customSet.userID)
+                self.getUserName(userID: customSet.creatorUserID)
                 self.customSet = customSet
             }
             group.leave()
@@ -143,6 +151,7 @@ extension GamesViewModel {
     
     func getCustomData(setID: String) {
         self.loadingGame = true
+        print("GamesVM :: getCustomData (1)")
         getCustomDataWithCompletion(setID: setID) { (success) in
             if success {
                 self.loadingGame = false

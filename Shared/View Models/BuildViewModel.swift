@@ -13,37 +13,25 @@ class BuildViewModel: ObservableObject {
     @Published var buildStage: BuildStage = .details
     @Published var buildPhaseType: BuildPhaseType = .rounds1and2
     @Published var currentDisplay: CurrentDisplay = .settings
-    @Published var isEditing = false
-    @Published var isEditingDraft = false
+    @Published var currCustomSet = CustomSetCherry()
 
     @Published var moneySections = ["", "", "", "", ""]
-    @Published var jeopardyDailyDoubles = [Int]()
-    @Published var djDailyDoubles1 = [Int]()
-    @Published var djDailyDoubles2 = [Int]()
-    @Published var fjCategory = ""
-    @Published var fjClue = ""
-    @Published var fjResponse = ""
     
     @Published var isPreviewDisplayModern = true
     @Published var mostAdvancedStage: BuildStage = .details
     @Published var gameID = ""
     @Published var isPublic = true
-    @Published var tags = [String]()
     @Published var tag = ""
-    @Published var setName = ""
-    @Published var setDescription = ""
-    @Published var hasTwoRounds = false
-    @Published var jRoundLen = 0
-    @Published var djRoundLen = 0
     @Published var categories = [CustomSetCategory]()
     @Published var jCategories = [CustomSetCategory]()
     @Published var djCategories = [CustomSetCategory]()
     @Published var isRandomDD = false
     
+    @Published var dirtyBit = 0
     @Published var editingClueIndex = 0
     @Published var choosingDailyDoubles = false
-    @Published var jCategoriesShowing = [Bool]()
-    @Published var djCategoriesShowing = [Bool]()
+    @Published var round1CatsShowing = [Bool]()
+    @Published var round2CatsShowing = [Bool]()
     
     @Published var cluePreview = ""
     @Published var responsePreview = ""
@@ -63,24 +51,15 @@ class BuildViewModel: ObservableObject {
     }
     
     func clearAll() {
-        self.jRoundLen = 6
-        self.djRoundLen = 6
         self.categories.removeAll()
         self.jCategories.removeAll()
         self.djCategories.removeAll()
-        self.setName.removeAll()
-        self.jeopardyDailyDoubles.removeAll()
-        self.djDailyDoubles1.removeAll()
-        self.djDailyDoubles2.removeAll()
-        self.fjCategory.removeAll()
-        self.fjClue.removeAll()
-        self.fjResponse.removeAll()
-        self.tags.removeAll()
+        self.currCustomSet = CustomSetCherry()
         
         self.isRandomDD = false
         self.editingClueIndex = 0
-        self.jCategoriesShowing.removeAll()
-        self.djCategoriesShowing.removeAll()
+        self.round1CatsShowing.removeAll()
+        self.round2CatsShowing.removeAll()
         self.gameID = UUID().uuidString
         self.moneySections = moneySectionsDJ
         self.fillBlanks()
@@ -90,52 +69,17 @@ class BuildViewModel: ObservableObject {
         self.currentDisplay = .grid
     }
     
-    func writeToFirestore(isDraft: Bool = false, completion: @escaping (Bool) -> Void) {
-        let docRef = db.collection(isDraft ? "drafts" : "userSets").document(gameID)
+    func writeToFirestore(completion: @escaping (Bool) -> Void) {
+        let docRef = db.collection(self.currCustomSet.isDraft ? "drafts" : "userSets").document(gameID)
+        currCustomSet.dateLastModified = Date()
         docRef.getDocument { (doc, error) in
             if error != nil { return }
-            guard let doc = doc else { return }
-            let plays = doc.get("plays") as? Int ?? 0
-            let rating = doc.get("rating") as? Double ?? 0
-            let numRatings = doc.get("numRatings") as? Int ?? 0
-            let averageScore = doc.get("averageScore") as? Double ?? 0
-            let date = doc.get("dateCreated") as? Timestamp ?? Timestamp()
-            
             DispatchQueue.main.async {
-                try? docRef.setData(from:
-                                CustomSet(
-                                    jCategoryIDs: self.getCategoryIDs(isDJ: false),
-                                    djCategoryIDs: self.getCategoryIDs(isDJ: true),
-                                    categoryNames: self.getCategoryNames(),
-                                    title: self.setName,
-                                    titleKeywords: self.getKeywords(),
-                                    fjCategory: self.fjCategory.uppercased(),
-                                    fjClue: self.fjClue,
-                                    fjResponse: self.fjResponse,
-                                    dateCreated: date.dateValue(),
-                                    jeopardyDailyDoubles: self.jeopardyDailyDoubles,
-                                    djDailyDoubles1: self.djDailyDoubles1,
-                                    djDailyDoubles2: self.djDailyDoubles2,
-                                    userID: Auth.auth().currentUser?.uid ?? "no_one",
-                                    isPublic: self.isPublic,
-                                    tags: self.tags.compactMap { $0.uppercased() },
-                                    plays: plays,
-                                    rating: rating,
-                                    numRatings: numRatings,
-                                    numclues: self.getNumClues(),
-                                    averageScore: averageScore,
-                                    jRoundLen: self.jRoundLen,
-                                    djRoundLen: self.djRoundLen), completion: { (error) in
-                                        if error != nil {
-                                            return
-                                        } else {
-                                            completion(true)
-                                        }
-                                    }
-                )
+                try? docRef.setData(from: self.currCustomSet)
                 self.writeCategories()
                 self.updateTagsDB()
-                if self.isEditingDraft && !isDraft {
+                self.dirtyBit = 0
+                if !self.currCustomSet.isDraft {
                     self.db.collection("drafts").document(self.gameID).delete()
                 }
             }
@@ -143,13 +87,13 @@ class BuildViewModel: ObservableObject {
     }
     
     func writeCategories() {
-        for i in 0..<self.jRoundLen {
+        for i in 0..<self.currCustomSet.round1Len {
             let category = jCategories[i]
             guard let id = category.id else { return }
             let docRef = db.collection("userCategories").document(id)
             try? docRef.setData(from: category)
         }
-        for i in 0..<self.djRoundLen {
+        for i in 0..<self.currCustomSet.round2Len {
             let category = djCategories[i]
             guard let id = category.id else { return }
             let docRef = db.collection("userCategories").document(id)
@@ -166,7 +110,7 @@ class BuildViewModel: ObservableObject {
             }
             guard let doc = docSnap else { return }
             var dbTags = doc.get("tags") as? [String:Int] ?? [:]
-            let tagsToAdd = tags.isEmpty ? self.tags : tags
+            let tagsToAdd = self.currCustomSet.tags.isEmpty ? self.currCustomSet.tags : tags
             for tag in tagsToAdd {
                 let upperTag = tag.uppercased()
                 if dbTags.keys.contains(upperTag) {
@@ -181,46 +125,42 @@ class BuildViewModel: ObservableObject {
         }
     }
     
-    func edit(isDraft: Bool = false, gameID: String) {
+    func edit(gameID: String) {
         self.showingBuildView.toggle()
-        self.isEditing = true
         self.gameID = gameID
         self.jCategories.removeAll()
         self.djCategories.removeAll()
-        let docRef = db.collection(isDraft ? "drafts" : "userSets").document(gameID)
+        let docRef = db.collection(currCustomSet.isDraft ? "drafts" : "userSets").document(gameID)
         docRef.getDocument { (doc, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
             }
             guard let doc = doc else { return }
-            guard let customSet = try? doc.data(as: CustomSet.self) else { return }
+            let customSet: CustomSetCherry
+            if let customSetOG = try? doc.data(as: CustomSet.self) {
+                customSet = CustomSetCherry(customSet: customSetOG)
+            } else if let customSetCherry = try? doc.data(as: CustomSetCherry.self) {
+                customSet = customSetCherry
+            } else {
+                return
+            }
             DispatchQueue.main.async {
-                self.jRoundLen = customSet.jRoundLen
-                self.djRoundLen = customSet.djRoundLen
-                self.getCategoriesWithIDs(isDJ: false, ids: customSet.jCategoryIDs)
-                self.getCategoriesWithIDs(isDJ: true, ids: customSet.djCategoryIDs)
-                self.setName = customSet.title
-                self.jeopardyDailyDoubles = customSet.jeopardyDailyDoubles
-                self.djDailyDoubles1 = customSet.djDailyDoubles1
-                self.djDailyDoubles2 = customSet.djDailyDoubles2
-                self.fjCategory = customSet.fjCategory
-                self.fjClue = customSet.fjClue
-                self.fjResponse = customSet.fjResponse
-                self.tags = customSet.tags
-                self.isPublic = customSet.isPublic
+                self.currCustomSet = customSet
+                self.getCategoriesWithIDs(isDJ: false, ids: customSet.round1CatIDs)
+                self.getCategoriesWithIDs(isDJ: true, ids: customSet.round2CatIDs)
                 
                 self.categories = self.jCategories
                 self.isRandomDD = true
                 self.editingClueIndex = 0
-                self.jCategoriesShowing = [Bool](repeating: true, count: 6)
-                self.djCategoriesShowing = [Bool](repeating: true, count: 6)
+                self.round1CatsShowing = [Bool](repeating: true, count: 6)
+                self.round2CatsShowing = [Bool](repeating: true, count: 6)
             }
         }
     }
     
     func saveDraft(isExiting: Bool = false) {
-        writeToFirestore(isDraft: true) { (success) in
+        writeToFirestore() { (success) in
             self.processPending = true
             if success {
                 self.processPending = false
@@ -234,7 +174,7 @@ class BuildViewModel: ObservableObject {
     
     func getCategoryIDs(isDJ: Bool) -> [String] {
         var IDs = [String]()
-        for i in 0..<(isDJ ? djRoundLen : jRoundLen) {
+        for i in 0..<(isDJ ? currCustomSet.round2Len : currCustomSet.round2Len) {
             let category = isDJ ? djCategories[i] : jCategories[i]
             if let id = category.id {
                 IDs.append(id)
@@ -244,15 +184,13 @@ class BuildViewModel: ObservableObject {
     }
     
     func fillBlanks() {
-        self.jRoundLen = 6
-        self.djRoundLen = 6
-        for i in 0..<self.jRoundLen {
+        for i in 0..<self.currCustomSet.round1Len {
             self.jCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: gameID))
-            jCategoriesShowing.append(true)
+            round1CatsShowing.append(true)
         }
-        for i in 0..<self.djRoundLen {
+        for i in 0..<self.currCustomSet.round2Len {
             self.djCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: gameID))
-            djCategoriesShowing.append(true)
+            round2CatsShowing.append(true)
         }
         gameID = UUID().uuidString
         moneySections = moneySectionsJ
@@ -262,8 +200,6 @@ class BuildViewModel: ObservableObject {
     func start() {
         clearAll()
         showingBuildView.toggle()
-        isEditing = false
-        isEditingDraft = false
     }
     
     func getCategoriesWithIDs(isDJ: Bool, ids: [String]) {
@@ -289,55 +225,55 @@ class BuildViewModel: ObservableObject {
         }
     }
     
-    func addRound1() {
-        if self.jRoundLen == 6 { return }
-        self.jRoundLen += 1
-        jCategoriesShowing[jRoundLen - 1] = true
-        if jCategories.count <= jRoundLen {
-            self.jCategories.append(Empty().category(index: jRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
+    func addCategoryRound1() {
+        if self.currCustomSet.round1Len == 6 { return }
+        self.currCustomSet.round1Len += 1
+        round1CatsShowing[currCustomSet.round1Len - 1] = true
+        if jCategories.count <= currCustomSet.round1Len {
+            self.jCategories.append(Empty().category(index: currCustomSet.round1Len - 1, emptyStrings: emptyStrings, gameID: gameID))
         }
     }
     
-    func addRound2() {
-        if self.djRoundLen == 6 { return }
-        self.djRoundLen += 1
-        djCategoriesShowing[djRoundLen - 1] = true
-        if djCategories.count <= djRoundLen {
-            self.jCategories.append(Empty().category(index: djRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
+    func addCategoryRound2() {
+        if self.currCustomSet.round2Len == 6 { return }
+        self.currCustomSet.round2Len += 1
+        round2CatsShowing[currCustomSet.round2Len - 1] = true
+        if djCategories.count <= currCustomSet.round2Len {
+            self.jCategories.append(Empty().category(index: currCustomSet.round2Len - 1, emptyStrings: emptyStrings, gameID: gameID))
         }
     }
     
     func addCategory() {
         if buildStage == .trivioRound {
-            addRound1()
+            addCategoryRound1()
         } else if buildStage == .dtRound {
-            addRound2()
+            addCategoryRound2()
         }
     }
     
-    func subtractRound1() {
-        if self.jRoundLen == 3 { return }
-        self.jRoundLen -= 1
-        jCategoriesShowing[jRoundLen] = false
+    func subtractCategoryRound1() {
+        if currCustomSet.round1Len == 3 { return }
+        currCustomSet.round1Len -= 1
+        round1CatsShowing[currCustomSet.round1Len] = false
     }
     
-    func subtractRound2() {
-        if self.djRoundLen == 3 { return }
-        self.djRoundLen -= 1
-        djCategoriesShowing[djRoundLen] = false
+    func subtractCategoryRound2() {
+        if currCustomSet.round2Len == 3 { return }
+        currCustomSet.round2Len -= 1
+        round2CatsShowing[currCustomSet.round2Len] = false
     }
     
     func subtractCategory() {
         if buildStage == .trivioRound {
-            subtractRound1()
+            subtractCategoryRound1()
         } else if buildStage == .dtRound {
-            subtractRound2()
+            subtractCategoryRound2()
         }
     }
     
     func getNumClues() -> Int {
         var numClues = 0
-        for i in 0..<jRoundLen {
+        for i in 0..<currCustomSet.round1Len {
             let clues = jCategories[i].clues
             let responses = jCategories[i].responses
             for j in 0..<emptyStrings.count {
@@ -346,7 +282,7 @@ class BuildViewModel: ObservableObject {
                 }
             }
         }
-        for i in 0..<djRoundLen {
+        for i in 0..<currCustomSet.round2Len {
             let clues = djCategories[i].clues
             let responses = djCategories[i].responses
             for j in 0..<emptyStrings.count {
@@ -360,36 +296,36 @@ class BuildViewModel: ObservableObject {
     
     func clearDailyDoubles() {
         if buildStage == .trivioRoundDD {
-            self.jeopardyDailyDoubles.removeAll()
+            self.currCustomSet.roundOneDaily.removeAll()
         } else if buildStage == .dtRoundDD {
-            self.djDailyDoubles1.removeAll()
-            self.djDailyDoubles2.removeAll()
+            self.currCustomSet.roundTwoDaily1.removeAll()
+            self.currCustomSet.roundTwoDaily2.removeAll()
         }
     }
     
     func randomDDs() {
+        clearDailyDoubles()
         if buildStage == .trivioRoundDD {
-            jeopardyDailyDoubles.removeAll()
-            while self.jeopardyDailyDoubles.isEmpty {
-                let randCol = Int.random(in: 0..<jRoundLen)
+            while self.currCustomSet.roundOneDaily.isEmpty {
+                let randCol = Int.random(in: 0..<currCustomSet.round1Len)
                 let randRow = Int.random(in: 0..<5)
 
                 if !(self.jCategories[randCol].clues[randRow].isEmpty && self.jCategories[randCol].responses[randRow].isEmpty) {
-                    self.jeopardyDailyDoubles = [randCol, randRow]
+                    self.currCustomSet.roundOneDaily = [randCol, randRow]
                 }
             }
         } else if buildStage == .dtRoundDD {
-            while self.djDailyDoubles1.isEmpty || self.djDailyDoubles2.isEmpty {
-                let randCol = Int.random(in: 0..<djRoundLen)
+            while self.currCustomSet.roundTwoDaily1.isEmpty || self.currCustomSet.roundTwoDaily2.isEmpty {
+                let randCol = Int.random(in: 0..<currCustomSet.round2Len)
                 let randRow = Int.random(in: 0..<5)
-                if self.djDailyDoubles1.isEmpty {
+                if self.currCustomSet.roundTwoDaily1.isEmpty {
                     if !self.djCategories[randCol].clues[randRow].isEmpty {
-                        self.djDailyDoubles1 = [randCol, randRow]
+                        self.currCustomSet.roundTwoDaily1 = [randCol, randRow]
                     }
-                } else if self.djDailyDoubles2.isEmpty {
+                } else if self.currCustomSet.roundTwoDaily2.isEmpty {
                     if !self.djCategories[randCol].clues[randRow].isEmpty
-                        && self.djDailyDoubles1[0] != randCol {
-                        self.djDailyDoubles2 = [randCol, randRow]
+                        && self.currCustomSet.roundTwoDaily1[0] != randCol {
+                        self.currCustomSet.roundTwoDaily2 = [randCol, randRow]
                     }
                 }
             }
@@ -433,9 +369,9 @@ class BuildViewModel: ObservableObject {
     func ddsFilled() -> Bool {
         switch buildStage {
         case .dtRoundDD:
-            return !djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty
+            return !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
         default:
-            return !jeopardyDailyDoubles.isEmpty
+            return !currCustomSet.roundOneDaily.isEmpty
         }
     }
     
@@ -512,7 +448,7 @@ class BuildViewModel: ObservableObject {
             buildStage = .dtRound
             currentDisplay = .grid
         case .finalTrivio:
-            if hasTwoRounds {
+            if currCustomSet.hasTwoRounds {
                 buildStage = .dtRoundDD
             } else {
                 buildStage = .trivioRoundDD
@@ -524,45 +460,71 @@ class BuildViewModel: ObservableObject {
         }
     }
     
-    func rectifyNextProhibited(nextIsPermitted: Bool) {
-//        mostAdvancedStage = nextIsPermitted ? buildStage : mostAdvancedStage
+    func rectifyNextProhibited() {
+        // Can't get this to work, but it's supposed to reconsider mostAdvancedStage
+//        mostAdvancedStage = buildStage
+    }
+    
+    func checkForSetIsComplete() -> Bool {
+        var round1FilledCount = 0
+        var round2FilledCount = 0
+        for category in jCategories {
+            round1FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
+        }
+        for category in djCategories {
+            round2FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
+        }
+        
+        let detailsCheck = !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
+        let trivioRoundCheck = round1FilledCount >= currCustomSet.round1Len
+        let dtRoundCheck = round2FilledCount >= currCustomSet.round2Len
+        let roundOneDailyCheck = !currCustomSet.roundOneDaily.isEmpty
+        let roundTwoDailyCheck = !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
+        let finalCheck = !currCustomSet.finalCat.isEmpty && !currCustomSet.finalClue.isEmpty && !currCustomSet.finalResponse.isEmpty
+        
+        return detailsCheck && trivioRoundCheck && dtRoundCheck && roundOneDailyCheck && roundTwoDailyCheck && finalCheck
     }
     
     func nextPermitted() -> Bool {
-        var nextIsPermitted = false
         switch buildStage {
         case .details:
-            nextIsPermitted = !tags.isEmpty && !setName.isEmpty
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if currCustomSet.tags.isEmpty || currCustomSet.title.isEmpty {
+                rectifyNextProhibited()
+            }
+            return !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
         case .trivioRound:
             var numFilled = 0
             for category in jCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
-            nextIsPermitted = numFilled >= jRoundLen
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if numFilled < currCustomSet.round1Len {
+                rectifyNextProhibited()
+            }
+            return numFilled >= currCustomSet.round1Len
         case .dtRound:
             var numFilled = 0
             for category in djCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
-            nextIsPermitted = numFilled >= djRoundLen
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if numFilled < currCustomSet.round2Len {
+                rectifyNextProhibited()
+            }
+            return numFilled >= currCustomSet.round2Len
         case .trivioRoundDD:
-            nextIsPermitted = !jeopardyDailyDoubles.isEmpty
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if currCustomSet.roundOneDaily.isEmpty {
+                rectifyNextProhibited()
+            }
+            return !currCustomSet.roundOneDaily.isEmpty
         case .dtRoundDD:
-            nextIsPermitted = (!djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty)
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if (currCustomSet.roundTwoDaily1.isEmpty  || currCustomSet.roundTwoDaily2.isEmpty) {
+                rectifyNextProhibited()
+            }
+            return (!currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty)
         default:
-            nextIsPermitted = !fjCategory.isEmpty && !fjClue.isEmpty && !fjResponse.isEmpty
-            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
-            return nextIsPermitted
+            if currCustomSet.finalCat.isEmpty || currCustomSet.finalClue.isEmpty || currCustomSet.finalResponse.isEmpty {
+                rectifyNextProhibited()
+            }
+            return checkForSetIsComplete()
         }
     }
     
@@ -595,6 +557,8 @@ class BuildViewModel: ObservableObject {
         let buildStageIndex = buildStageIndexDict.getIndex(from: buildStage)
         let mostAdvancedStageIndex = buildStageIndexDict.getIndex(from: mostAdvancedStage)
         
+        currCustomSet.isDraft = !checkForSetIsComplete()
+        
         switch buildStage {
         case .details:
             buildStage = .trivioRound
@@ -605,7 +569,7 @@ class BuildViewModel: ObservableObject {
             currentDisplay = .grid
             editingCategoryIndex = 0
         case .trivioRoundDD:
-            if hasTwoRounds {
+            if currCustomSet.hasTwoRounds {
                 buildStage = .dtRound
                 changePointValues(isAdvancing: true)
             } else {
@@ -639,40 +603,40 @@ class BuildViewModel: ObservableObject {
     func addDailyDouble(i: Int, j: Int) {
         switch buildStage {
         case .dtRoundDD:
-            if djDailyDoubles1 == [i, j] {
-                djDailyDoubles1.removeAll()
-            } else if djDailyDoubles2 == [i, j] {
-                djDailyDoubles2.removeAll()
+            if currCustomSet.roundTwoDaily1 == [i, j] {
+                currCustomSet.roundTwoDaily1.removeAll()
+            } else if currCustomSet.roundTwoDaily2 == [i, j] {
+                currCustomSet.roundTwoDaily2.removeAll()
             } else {
-                if djDailyDoubles1.isEmpty {
-                    djDailyDoubles1 = [i, j]
-                } else if i != djDailyDoubles1[0] {
-                    djDailyDoubles2 = [i, j]
+                if currCustomSet.roundTwoDaily1.isEmpty {
+                    currCustomSet.roundTwoDaily1 = [i, j]
+                } else if i != currCustomSet.roundTwoDaily1[0] {
+                    currCustomSet.roundTwoDaily2 = [i, j]
                 }
             }
         default:
-            jeopardyDailyDoubles = [i, j]
+            currCustomSet.roundOneDaily = [i, j]
         }
     }
     
     func isDailyDouble(i: Int, j: Int) -> Bool {
         if buildStage == .dtRoundDD {
-            return self.djDailyDoubles1 == [i, j] || self.djDailyDoubles2 == [i, j]
+            return self.currCustomSet.roundTwoDaily1 == [i, j] || self.currCustomSet.roundTwoDaily2 == [i, j]
         } else if buildStage == .trivioRoundDD {
-            return self.jeopardyDailyDoubles == [i, j]
+            return self.currCustomSet.roundOneDaily == [i, j]
         }
         return false
     }
     
     func addTag() {
-        if !tags.contains(tag) {
-            tags.append(contentsOf: tag.split(separator: " ").compactMap { String($0) })
+        if !currCustomSet.tags.contains(tag) {
+            currCustomSet.tags.append(contentsOf: tag.split(separator: " ").compactMap { String($0) })
         }
         self.tag.removeAll()
     }
     
     func removeTag(tag: String) {
-        tags = tags.filter { $0 != tag }
+        currCustomSet.tags = currCustomSet.tags.filter { $0 != tag }
     }
     
     func deleteSet(isDraft: Bool = false, setID: String) {
@@ -691,7 +655,7 @@ class BuildViewModel: ObservableObject {
     
     func getKeywords() -> [String] {
         // example title: Jeopardy with host Alex Trebek
-        let splitTitle = setName.split(separator: " ")
+        let splitTitle = currCustomSet.title.split(separator: " ")
         
         var keywords = [""]
         
@@ -709,12 +673,12 @@ class BuildViewModel: ObservableObject {
     
     func getCategoryNames() -> [String] {
         var names = [String]()
-        for i in 0..<jRoundLen {
+        for i in 0..<currCustomSet.round1Len {
             let name = jCategories[i].name
             let nameSplit = name.split(separator: " ").compactMap { String($0).uppercased() }
             names.append(contentsOf: nameSplit)
         }
-        for i in 0..<djRoundLen {
+        for i in 0..<currCustomSet.round2Len {
             let name = djCategories[i].name
             let nameSplit = name.split(separator: " ").compactMap { String($0).uppercased() }
             names.append(contentsOf: nameSplit)
@@ -764,6 +728,7 @@ struct MobileBuildStageIndexDict {
 
 struct Empty {
     var customSet = CustomSet(id: "", jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
+    
     var game = Game(id: "", date: Date(), dj_category_ids: [], dj_dds_1: [], dj_dds_2: [], dj_round_len: 0, fj_category: "", fj_clue: "", fj_response: "", game_id: "", group_index: 0, j_category_ids: [], j_round_len: 0, title: "", type: "", userID: "")
     var team = Team(id: UUID().uuidString, index: 0, name: "", members: [], score: 0, color: "blue")
     func category(index: Int, emptyStrings: [String], gameID: String) -> CustomSetCategory {

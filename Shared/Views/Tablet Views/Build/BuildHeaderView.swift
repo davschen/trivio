@@ -38,15 +38,10 @@ struct BuildHeaderView: View {
             HStack {
                 if buildVM.currentDisplay == .grid {
                     Button(action: {
-                        if buildVM.isEditing && !buildVM.isEditingDraft {
-                            buildVM.writeToFirestore { (success) in
-                                if success {
-                                    buildVM.showingBuildView.toggle()
-                                    
-                                }
+                        buildVM.writeToFirestore { (success) in
+                            if success {
+                                buildVM.showingBuildView.toggle()
                             }
-                        } else {
-                            buildVM.currentDisplay = .saveDraft
                         }
                     }) {
                         ZStack {
@@ -95,17 +90,13 @@ struct BuildHeaderView: View {
         actionLabel: "Leave without saving",
         hasSecondaryAction: true,
         secondaryAction: {
-            if buildVM.isEditing && !buildVM.isEditingDraft {
-                buildVM.writeToFirestore { (success) in
-                    if success {
-                        buildVM.showingBuildView.toggle()
-                    }
+            buildVM.writeToFirestore { (success) in
+                if success {
+//                    buildVM.showingBuildView.toggle()
                 }
-            } else {
-                showingSaveDraft.toggle()
             }
         },
-        secondaryActionLabel: buildVM.isEditing ? "Save" : "Save draft")
+        secondaryActionLabel: "Save")
     }
 }
 

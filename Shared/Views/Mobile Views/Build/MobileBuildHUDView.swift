@@ -75,7 +75,7 @@ struct MobileBuildHUDView: View {
                         buildVM.currentDisplay = .grid
                     }
                 }
-            if buildVM.hasTwoRounds {
+            if buildVM.currCustomSet.hasTwoRounds {
                 Text("Round 2")
                     .font(formatter.font(fontSize: .small))
                     .frame(maxWidth: .infinity)

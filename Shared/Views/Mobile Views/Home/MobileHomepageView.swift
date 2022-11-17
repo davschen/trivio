@@ -10,6 +10,8 @@ import SwiftUI
 
 struct MobileHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var appStoreManager: AppStoreManager
+    
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
@@ -59,7 +61,7 @@ struct MobileHomepageView: View {
 
 struct MobileSetHorizontalScrollView: View {
     @EnvironmentObject var formatter: MasterHandler
-    @Binding var customSets: [CustomSet]
+    @Binding var customSets: [CustomSetCherry]
     
     let labelText: String
     let promptText: String

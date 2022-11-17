@@ -67,7 +67,6 @@ extension GamesViewModel {
                 }
                 if let gameID = self.gamePreviews.first?.id {
                     self.getEpisodeData(gameID: gameID)
-                    self.setCustomSetID(ep: gameID)
                     self.previewViewShowing = true
                 }
             }

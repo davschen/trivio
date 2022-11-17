@@ -31,7 +31,7 @@ struct MobileFinalTrivioFillView: View {
                                 .foregroundColor(formatter.color(.lowContrastWhite))
                         }
                         TextField("", text: $categoryName) { editingChanged in
-                            buildVM.fjCategory = categoryName
+                            buildVM.currCustomSet.finalCat = categoryName
                         }
                     }
                     .font(formatter.font(.bold, fontSize: .medium))
@@ -39,9 +39,9 @@ struct MobileFinalTrivioFillView: View {
                     .background(formatter.color(.primaryAccent))
                     .cornerRadius(5)
                     .onAppear {
-                        categoryName = buildVM.fjCategory
-                        finalClue = buildVM.fjClue
-                        finalResponse = buildVM.fjResponse
+                        categoryName = buildVM.currCustomSet.finalCat
+                        finalClue = buildVM.currCustomSet.finalClue
+                        finalResponse = buildVM.currCustomSet.finalResponse
                     }
                 }
                 
@@ -49,7 +49,7 @@ struct MobileFinalTrivioFillView: View {
                     Text("Clue")
                         .font(formatter.font(fontSize: .medium))
                     MobileMultilineTextField("Type your clue", text: $finalClue) {
-                        buildVM.fjClue = finalClue
+                        buildVM.currCustomSet.finalClue = finalClue
                     }
                     .accentColor(formatter.color(.secondaryAccent))
                     .padding(10)
@@ -62,7 +62,7 @@ struct MobileFinalTrivioFillView: View {
                         .font(formatter.font(fontSize: .medium))
                         .foregroundColor(formatter.color(.secondaryAccent))
                     MobileMultilineTextField("Type your response", text: $finalResponse) {
-                        buildVM.fjResponse = finalResponse
+                        buildVM.currCustomSet.finalResponse = finalResponse
                     }
                     .accentColor(formatter.color(.secondaryAccent))
                     .padding(10)

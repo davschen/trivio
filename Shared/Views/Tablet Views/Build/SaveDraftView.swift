@@ -19,17 +19,17 @@ struct SaveDraftView: View {
                     .font(formatter.font(fontSize: .large))
                 VStack (spacing: 15) {
                     HStack {
-                        TextField("TITLE YOUR SET", text: $buildVM.setName, onCommit: {
+                        TextField("TITLE YOUR SET", text: $buildVM.currCustomSet.title, onCommit: {
                             buildVM.currentDisplay = .grid
                         })
                         .accentColor(formatter.color(.secondaryAccent))
                         .font(formatter.font(fontSize: .large))
                         
-                        if !buildVM.setName.isEmpty {
+                        if !buildVM.currCustomSet.title.isEmpty {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 20))
                                 .onTapGesture {
-                                    buildVM.setName.removeAll()
+                                    buildVM.currCustomSet.title.removeAll()
                                 }
                         }
                     }
@@ -38,7 +38,7 @@ struct SaveDraftView: View {
                     .cornerRadius(10)
                     
                     Button(action: {
-                        if !buildVM.setName.isEmpty {
+                        if !buildVM.currCustomSet.title.isEmpty {
                             buildVM.currentDisplay = .grid
                             buildVM.saveDraft()
                         }
@@ -55,7 +55,7 @@ struct SaveDraftView: View {
                         .frame(maxWidth: .infinity)
                         .background(formatter.color(.lowContrastWhite))
                         .clipShape(Capsule())
-                        .opacity(buildVM.setName.isEmpty ? 0.5 : 1)
+                        .opacity(buildVM.currCustomSet.title.isEmpty ? 0.5 : 1)
                     })
                     Button {
                         buildVM.currentDisplay = .grid

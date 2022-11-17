@@ -17,9 +17,6 @@ struct TidyCustomSet: Decodable, Hashable, Identifiable, Encodable {
     var round1Responses: [[String]] = []
     var round2Responses: [[String]] = []
     var title: String
-    var finalCategory: String
-    var finalClue: String
-    var finalResponse: String
     var dateCreated: Date
     var authorUserID: String
     var authorUsername: String
@@ -28,7 +25,7 @@ struct TidyCustomSet: Decodable, Hashable, Identifiable, Encodable {
     var round1Len: Int
     var round2Len: Int
     
-    init(id: String? = nil, round1Cats: [String] = [String](repeating: "", count: 6), round2Cats: [String] = [String](repeating: "", count: 6), round1Clues: [[String]] = [], round2Clues: [[String]] = [], round1Responses: [[String]] = [], round2Responses: [[String]] = [], title: String = "", finalCategory: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), authorUserID: String = "", authorUsername: String = "", authorName: String = "", tags: [String] = [String](), round1Len: Int = 0, round2Len: Int = 0) {
+    init(id: String? = nil, round1Cats: [String] = [String](repeating: "", count: 6), round2Cats: [String] = [String](repeating: "", count: 6), round1Clues: [[String]] = [], round2Clues: [[String]] = [], round1Responses: [[String]] = [], round2Responses: [[String]] = [], title: String = "", dateCreated: Date = Date(), authorUserID: String = "", authorUsername: String = "", authorName: String = "", tags: [String] = [String](), round1Len: Int = 0, round2Len: Int = 0) {
         self.id = id
         self.round1Cats = round1Cats
         self.round2Cats = round2Cats
@@ -37,9 +34,6 @@ struct TidyCustomSet: Decodable, Hashable, Identifiable, Encodable {
         self.round1Responses = round1Responses
         self.round2Responses = round2Responses
         self.title = title
-        self.finalCategory = finalCategory
-        self.finalClue = finalClue
-        self.finalResponse = finalResponse
         self.dateCreated = dateCreated
         self.authorUserID = authorUserID
         self.authorUsername = authorUsername

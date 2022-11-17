@@ -71,7 +71,7 @@ struct CategoryCountIncrementView: View {
                         .font(.system(size: 15, weight: .bold))
                         .padding(15)
                 })
-                Text("\(buildVM.buildStage == .trivioRound ? buildVM.jRoundLen : buildVM.djRoundLen)")
+                Text("\(buildVM.buildStage == .trivioRound ? buildVM.currCustomSet.round1Len : buildVM.currCustomSet.round2Len)")
                     .font(formatter.font())
                 Button(action: {
                     buildVM.addCategory()

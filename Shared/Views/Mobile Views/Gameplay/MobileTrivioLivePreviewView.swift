@@ -7,9 +7,11 @@
 
 import Foundation
 import SwiftUI
+import StoreKit
 
 struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var appStoreManager: AppStoreManager
     
     init() {
         Theme.navigationBarColors(
@@ -28,31 +30,48 @@ struct MobileTrivioLivePreviewView: View {
                     MobileGameSettingsHeaderView()
                         .padding(.top)
                     
-                    MobileTrivioLiveCodeCardView()
-                    
-                    MobileTrivioLiveSubscriptionView()
+                    VStack (alignment: .leading, spacing: 5) {
+                        ForEach(appStoreManager.myProducts, id: \.self) { product in
+                            ZStack {
+                                if product.productIdentifier == "iOS.Trivio.3.0.Cherry.OTLHT" {
+                                    MobileTrivioLiveCodeCardView(product: product)
+                                } else {
+                                    MobileTrivioLiveSubscriptionView(product: product)
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .padding(.horizontal)
             .font(formatter.font())
         }
+        .frame(maxWidth: .infinity)
         .navigationTitle("Live Game")
         .withBackButton()
-        .animation(.easeInOut)
     }
 }
 
 struct MobileTrivioLiveCodeCardView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var appStoreManager: AppStoreManager
+    
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    
+    let product: SKProduct
+    
+    @State var isLoading = false
     
     var body: some View {
         VStack (spacing: 0) {
             VStack (spacing: 5) {
-                Text("894156")
+                Text("\(gamesVM.liveGameCustomSet.hostCode)")
                     .font(formatter.fontFloat(.bold, sizeFloat: 45.0))
                 Text("Enter Code at www.trivio.live into a computer’s browser to host your game")
                     .font(formatter.font(.regular, fontSize: .regular))
                     .frame(width: 200)
+                    .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.center)
                 
             }
@@ -70,7 +89,7 @@ struct MobileTrivioLiveCodeCardView: View {
                         Circle()
                             .fill(formatter.color(.secondaryAccent))
                             .frame(width: 65, height: 65)
-                        Text("1")
+                        Text("\(profileVM.numLiveTokens)")
                             .font(formatter.fontFloat(.bold, sizeFloat: 24.0))
                             .foregroundColor(formatter.color(.primaryBG))
                     }
@@ -78,19 +97,28 @@ struct MobileTrivioLiveCodeCardView: View {
                         .font(formatter.font(.regular, fontSize: .medium))
                 }
                 Button {
-                    print("Purchased one more!")
+                    isLoading = true
+                    appStoreManager.purchaseProduct(product: product)
                 } label: {
-                    Text("Buy one more for $0.99")
-                        .padding(.vertical, 15)
-                        .frame(maxWidth: .infinity)
-                        .background(formatter.color(.primaryAccent))
-                        .cornerRadius(5)
+                    ZStack {
+                        if isLoading {
+                            LoadingView()
+                                .padding(.vertical, 19.5)
+                        } else {
+                            Text("Buy one more for $\(product.price)")
+                                .padding(.vertical, 15)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(formatter.color(.primaryAccent))
+                    .cornerRadius(5)
                 }
                 Text("""
                      Note: game tokens will not be spent until you enter the code in a desktop browser
                      """)
                 .font(formatter.font(.regularItalic, fontSize: .regular))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
                 .lineSpacing(2.0)
             }
             .frame(maxWidth: .infinity)
@@ -98,23 +126,40 @@ struct MobileTrivioLiveCodeCardView: View {
             .background(formatter.color(.primaryFG))
         }
         .cornerRadius(10)
+        .onChange(of: appStoreManager.transactionState) { newState in
+            if appStoreManager.currentTransactionProductID != product.productIdentifier {
+                return
+            }
+            if newState == .failed {
+                isLoading = false
+            } else if newState == .purchased {
+                profileVM.incrementNumTokens()
+                isLoading = false
+            }
+        }
     }
 }
 
 struct MobileTrivioLiveSubscriptionView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var appStoreManager: AppStoreManager
+    
+    @State var isLoading = false
+    
+    let product: SKProduct
     
     var body: some View {
         VStack (spacing: 10) {
             VStack (spacing: 10) {
                 Text("Trivio! Pro")
                 HStack (alignment: .top) {
-                    Text("$0.99")
+                    Text("$1")
                         .font(formatter.fontFloat(.bold, sizeFloat: 24.0))
                     Text("/month")
                         .font(formatter.font(.regular, fontSize: .regular))
+                        .offset(y: 2)
                 }
-                Text("$11.88 billed annually")
+                Text("$\(product.price) billed annually")
                     .font(formatter.font(.regular, fontSize: .regular))
                     .foregroundColor(formatter.color(.lowContrastWhite))
             }
@@ -127,17 +172,29 @@ struct MobileTrivioLiveSubscriptionView: View {
             .lineSpacing(2.0)
             
             Button {
-                print("Subscribed!")
+                if UserDefaults.standard.bool(forKey: product.productIdentifier) {
+                    return
+                }
+                appStoreManager.purchaseProduct(product: product)
             } label: {
-                Text("Buy now")
-                    .padding(.vertical, 15)
-                    .frame(maxWidth: .infinity)
-                    .background(formatter.color(.primaryAccent))
-                    .cornerRadius(5)
+                ZStack {
+                    if isLoading {
+                        LoadingView()
+                    } else {
+                        Text(UserDefaults.standard.bool(forKey: product.productIdentifier) ? "Subscribed!" : "Buy Now")
+                    }
+                }
+                .padding(.vertical, 15)
+                .frame(maxWidth: .infinity)
+                .background(formatter.color(UserDefaults.standard.bool(forKey: product.productIdentifier) ? .secondaryAccent : .primaryAccent))
+                .cornerRadius(5)
             }
         }
         .padding(20)
         .background(RoundedRectangle(cornerRadius: 10).stroke(formatter.color(.highContrastWhite), lineWidth: 1))
         .padding(1)
+        .onChange(of: appStoreManager.transactionState) { newState in
+            isLoading = false
+        }
     }
 }

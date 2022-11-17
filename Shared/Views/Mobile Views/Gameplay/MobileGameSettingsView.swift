@@ -75,7 +75,7 @@ struct MobileGameSettingsHeaderView: View {
         VStack (alignment: .leading, spacing: 5) {
             Text("\(gamesVM.customSet.title)")
                 .font(formatter.font(fontSize: .large))
-            Text("Created by \(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.userID)) on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
+            Text("Created by \(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.creatorUserID)) on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
                 .font(formatter.font(.regular, fontSize: .regular))
             // TODO: Space for an optional description
         }
@@ -605,6 +605,7 @@ struct MobileGameSettingsSpeedPickerView: View {
 struct MobileGameSettingsFooterView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @Binding var isPresentingGameView: Bool
@@ -638,8 +639,8 @@ struct MobileGameSettingsFooterView: View {
             Button(action: {
                 if gameIsPlayable {
                     isPresentingTrivioLiveView.toggle()
-                    gamesVM.gameSetupMode = .play
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
                 }
             }, label: {
                 Text("Host this game live!")

@@ -18,12 +18,12 @@ class ExploreViewModel: ObservableObject {
     @Published var hasSearch = false
     @Published var capSplit = [String]()
     
-    @Published var allPublicSets = [CustomSet]()
-    @Published var recentlyPlayedSets = [CustomSet]()
+    @Published var allPublicSets = [CustomSetCherry]()
+    @Published var recentlyPlayedSets = [CustomSetCherry]()
     @Published var titleSearchResults = [CustomSet]()
     @Published var categorySearchResults = [CustomSet]()
     @Published var tagsSearchResults = [CustomSet]()
-    @Published var userResults = [CustomSet]()
+    @Published var userResults = [CustomSetCherry]()
     
     @Published var filterBy = "dateCreated"
     @Published var isDescending = true
@@ -180,12 +180,19 @@ class ExploreViewModel: ObservableObject {
                 return
             }
             guard let data = snap?.documents else { return }
-            self.allPublicSets = data.compactMap({ (queryDocSnap) -> CustomSet? in
+            self.allPublicSets = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
                 let customSet = try? queryDocSnap.data(as: CustomSet.self)
                 if let id = customSet?.userID {
                     self.addUsernameNameToDict(userID: id)
                 }
-                return customSet
+                if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
+                    // Custom set for version 3.0
+                    self.addUsernameNameToDict(userID: customSetCherry.creatorUserID)
+                    return customSetCherry
+                } else {
+                    // default
+                    return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                }
             })
         }
     }
@@ -212,8 +219,17 @@ class ExploreViewModel: ObservableObject {
             .document(customSetID)
             .getDocument { (snap, error) in
                 if error != nil { return }
-                guard let customSet = try? snap?.data(as: CustomSet.self) else { return }
-                self.recentlyPlayedSets.append(customSet)
+                guard let docSnap = snap else { return }
+                let customSet = try? docSnap.data(as: CustomSet.self)
+                if let customSetCherry = try? docSnap.data(as: CustomSetCherry.self) {
+                    // Custom set for version 3.0
+                    self.recentlyPlayedSets.append(customSetCherry)
+                } else if let customSet = customSet {
+                    self.recentlyPlayedSets.append(CustomSetCherry(customSet: customSet))
+                } else {
+                    // default
+                    return
+                }
                 self.recentlyPlayedSets = self.recentlyPlayedSets.sorted(by: { $0.dateCreated > $1.dateCreated })
             }
     }
@@ -245,8 +261,18 @@ class ExploreViewModel: ObservableObject {
                 }
                 guard let data = snap?.documents else { return }
                 
-                self.userResults = data.compactMap({ (queryDocSnap) -> CustomSet? in
-                    return try? queryDocSnap.data(as: CustomSet.self)
+                self.userResults = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
+                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
+                    if let id = customSet?.userID {
+                        self.addUsernameNameToDict(userID: id)
+                    }
+                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
+                        // Custom set for version 3.0
+                        return customSetCherry
+                    } else {
+                        // default
+                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                    }
                 })
             }
         db.collection("users").document(userID).getDocument { (docSnap, error) in

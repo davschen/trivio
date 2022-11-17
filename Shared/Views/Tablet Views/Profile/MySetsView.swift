@@ -48,7 +48,7 @@ struct CustomSetView: View {
     @Binding var searchItem: String
     
     var isMine: Bool
-    var customSets: [CustomSet]
+    var customSets: [CustomSetCherry]
     var columns: [GridItem] = [GridItem](repeating: GridItem(spacing: 15), count: 2)
     
     var body: some View {
@@ -103,11 +103,10 @@ struct CustomSetView: View {
         }
     }
     
-    func selectSet(set: CustomSet) {
+    func selectSet(set: CustomSetCherry) {
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
         gamesVM.previewViewShowing = true
-        gamesVM.setCustomSetID(ep: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
     }
@@ -121,7 +120,7 @@ struct CustomSetCellView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
-    var set: CustomSet
+    var set: CustomSetCherry
     var isMine: Bool
     var setID: String {
         return set.id ?? "NID"
@@ -152,7 +151,7 @@ struct CustomSetCellView: View {
                 Spacer()
             }
             HStack {
-                Text("\(set.numclues) clues")
+                Text("\(set.numClues) clues")
                 RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 10)
                 HStack (spacing: 3) {
                     Text("\(rating)")
@@ -196,7 +195,6 @@ struct CustomSetCellView: View {
                         formatter.setAlertSettings(alertAction: {
                             buildVM.deleteSet(setID: setID)
                             gamesVM.deleteSet(setID: setID)
-                            gamesVM.setCustomSetID(ep: "")
                         }, alertTitle: "Are You Sure?", alertSubtitle: "Deleting your set is irreversible. Your set \"\(set.title)\" has been played \(set.plays) times with a rating of \(String(format: "%.01f", round(set.rating * 10) / 10.0)) out of 5.", hasCancel: true, actionLabel: "Delete")
                     }, label: {
                         Text("Delete")
@@ -211,13 +209,13 @@ struct CustomSetCellView: View {
             } else if !exploreVM.isShowingUserView {
                 Button(action: {
                     exploreVM.isShowingUserView.toggle()
-                    exploreVM.pullAllFromUser(withID: set.userID)
+                    exploreVM.pullAllFromUser(withID: set.creatorUserID)
                     gamesVM.previewViewShowing = false
                 }, label: {
                     HStack {
                         Image(systemName: "person.circle")
                             .font(.system(size: 15, weight: .bold))
-                        Text("\(exploreVM.getUsernameFromUserID(userID: set.userID))'s Profile")
+                        Text("\(exploreVM.getUsernameFromUserID(userID: set.creatorUserID))'s Profile")
                             .font(formatter.font(fontSize: .medium))
                     }
                     .foregroundColor(formatter.color(.highContrastWhite))

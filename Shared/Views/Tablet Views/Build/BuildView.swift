@@ -65,7 +65,7 @@ struct BuildGridView: View {
     var body: some View {
         HStack (spacing: formatter.deviceType == .iPad ? 5 : 2) {
             ForEach(0..<(isDJ ? self.buildVM.djCategories.count : self.buildVM.jCategories.count), id: \.self) { i in
-                let toShow = isDJ ? buildVM.djCategoriesShowing : buildVM.jCategoriesShowing
+                let toShow = isDJ ? buildVM.round2CatsShowing : buildVM.round1CatsShowing
                 if i <= (toShow.count - 1) && toShow[i] {
                     BuildCategoryView(categoryIndex: $categoryIndex,
                                       category: (isDJ ? $buildVM.djCategories[i] : $buildVM.jCategories[i]),

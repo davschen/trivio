@@ -77,8 +77,8 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
     var rating: Double
     var numRatings: Int
     var numClues: Int
-    var jRoundLen: Int
-    var djRoundLen: Int
+    var round1Len: Int
+    var round2Len: Int
     var hasTwoRounds: Bool
     var isDraft: Bool
     var isPublic: Bool
@@ -87,5 +87,63 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
         hasher.combine(id)
     }
     
-    
+    init(customSet: CustomSet) {
+        self.id = customSet.id
+        self.round1CatIDs = customSet.jCategoryIDs
+        self.round2CatIDs = customSet.djCategoryIDs
+        self.categoryNames = customSet.categoryNames
+        self.title = customSet.title
+        self.titleKeywords = customSet.titleKeywords
+        self.description = ""
+        self.finalCat = customSet.fjCategory
+        self.finalClue = customSet.fjClue
+        self.finalResponse = customSet.fjResponse
+        self.dateCreated = customSet.dateCreated
+        self.dateLastModified = customSet.dateCreated
+        self.roundOneDaily = customSet.jeopardyDailyDoubles
+        self.roundTwoDaily1 = customSet.djDailyDoubles1
+        self.roundTwoDaily2 = customSet.djDailyDoubles2
+        self.creatorUserID = customSet.userID
+        self.tags = customSet.tags
+        self.plays = customSet.plays
+        self.rating = customSet.rating
+        self.numRatings = customSet.numRatings
+        self.numClues = customSet.numclues
+        self.round1Len = customSet.jRoundLen
+        self.round2Len = customSet.djRoundLen
+        self.hasTwoRounds = true
+        self.isDraft = false
+        self.isPublic = false
+    }
+}
+
+extension CustomSetCherry {
+    init(id: String? = nil, round1CatIDs: [String] = [], round2CatIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], description: String = "", finalCat: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), dateLastModified: Date = Date(), roundOneDaily: [Int] = [], roundTwoDaily1: [Int] = [], roundTwoDaily2: [Int] = [], creatorUserID: String = "", tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numClues: Int = 0, round1Len: Int = 6, round2Len: Int = 6, hasTwoRounds: Bool = false, isDraft: Bool = true, isPublic: Bool = true) {
+        self.id = id
+        self.round1CatIDs = round1CatIDs
+        self.round2CatIDs = round2CatIDs
+        self.categoryNames = categoryNames
+        self.title = title
+        self.titleKeywords = titleKeywords
+        self.description = description
+        self.finalCat = finalCat
+        self.finalClue = finalClue
+        self.finalResponse = finalResponse
+        self.dateCreated = dateCreated
+        self.dateLastModified = dateLastModified
+        self.roundOneDaily = roundOneDaily
+        self.roundTwoDaily1 = roundTwoDaily1
+        self.roundTwoDaily2 = roundTwoDaily2
+        self.creatorUserID = creatorUserID
+        self.tags = tags
+        self.plays = plays
+        self.rating = rating
+        self.numRatings = numRatings
+        self.numClues = numClues
+        self.round1Len = round1Len
+        self.round2Len = round2Len
+        self.hasTwoRounds = hasTwoRounds
+        self.isDraft = isDraft
+        self.isPublic = isPublic
+    }
 }
