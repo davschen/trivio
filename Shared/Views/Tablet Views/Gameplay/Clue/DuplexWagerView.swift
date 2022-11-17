@@ -19,7 +19,7 @@ struct DuplexWagerView: View {
     let clue: String
     
     var maxScore: Int {
-        if gamesVM.gamePhase == .trivio {
+        if gamesVM.gamePhase == .round1 {
             return 1000
         } else {
             return 2000

@@ -80,7 +80,7 @@ struct MobileTeamBuildView: View {
                     if let uid = profileVM.myUID {
                         if team.id != uid {
                             Button {
-                                if !participantsVM.historicalTeams.contains(team) {
+                                if !participantsVM.savedTeams.contains(team) {
                                     participantsVM.writeTeamToFirestore(team: team)
                                 } else {
                                     formatter.setAlertSettings(alertAction: {
@@ -89,10 +89,10 @@ struct MobileTeamBuildView: View {
                                 }
                             } label: {
                                 HStack {
-                                    Image(systemName: participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
+                                    Image(systemName: participantsVM.savedTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
                                         .font(.system(size: 20, weight: .bold))
                                         .offset(y: -3)
-                                    Text(participantsVM.historicalTeams.contains(team) ? "Unsave" : "Save")
+                                    Text(participantsVM.savedTeams.contains(team) ? "Unsave" : "Save")
                                         .font(formatter.font())
                                 }
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -145,7 +145,7 @@ struct MobileTeamBuildView: View {
     }
     
     func dismissBuild() {
-        if participantsVM.historicalTeams.contains(team) {
+        if participantsVM.savedTeams.contains(team) {
             participantsVM.editTeamInDB(teamIndex: team.index)
         }
         formatter.resignKeyboard()
@@ -157,7 +157,7 @@ struct MobileColorPickerView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @Binding var team: Team
+    @Binding var teamColor: String
     
     @State var color: Color
     @State var colorString: String
@@ -166,25 +166,16 @@ struct MobileColorPickerView: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 2)
                 .foregroundColor(color)
                 .frame(maxWidth: .infinity)
+                .opacity(teamColor == colorString ? 1 : 0.2)
                 .onTapGesture {
                     formatter.hapticFeedback(style: .rigid, intensity: .weak)
-                    team.color = colorString
-                    participantsVM.editColor(index: team.index, color: colorString)
-                    if isSettingsPicker {
-                        participantsVM.editTeamInDB(team: team)
-                    }
+                    teamColor = colorString
                 }
-            if team.color == colorString || (team.color.isEmpty && colorString == "blue") {
-                Circle()
-                    .frame(width: 15, height: 15)
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .transition(.scale)
-            }
         }
-        .frame(height: 50)
+        .frame(height: 20)
     }
 }
 

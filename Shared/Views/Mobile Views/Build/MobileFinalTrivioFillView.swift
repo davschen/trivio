@@ -13,50 +13,65 @@ struct MobileFinalTrivioFillView: View {
     
     @EnvironmentObject var formatter: MasterHandler
     
+    @State var categoryName = ""
+    @State var finalClue = ""
+    @State var finalResponse = ""
+    
     var body: some View {
-        VStack (alignment: .leading, spacing: 5) {
-            Text(buildVM.stepStringHandler())
-                .font(formatter.font(fontSize: .mediumLarge))
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            ScrollView (.vertical, showsIndicators: false) {
-                VStack (alignment: .leading, spacing: 15) {
-                    MobileCategoryLargeView(categoryName: buildVM.fjCategory)
-                    VStack (alignment: .leading, spacing: 3) {
-                        Text("CATEGORY")
-                            .font(formatter.font(fontSize: .mediumLarge))
-                        MobileCategoryNameTextFieldView(categoryName: $buildVM.fjCategory)
-                    }
-                    
-                    VStack (alignment: .leading, spacing: 3) {
-                        Text("CLUE")
-                            .font(formatter.font(fontSize: .mediumLarge))
-                        MobileMultilineTextField("ENTER A CLUE", text: $buildVM.fjClue) {
-                            
+        ScrollView (.vertical, showsIndicators: false) {
+            VStack (alignment: .leading, spacing: 15) {
+                VStack (alignment: .leading, spacing: 3) {
+                    Text("Category name")
+                        .font(formatter.font(fontSize: .medium))
+                        .padding(.top, 20)
+                    ZStack (alignment: .leading) {
+                        if categoryName.isEmpty {
+                            Text("Untitled")
+                                .font(formatter.font(.boldItalic, fontSize: .medium))
+                                .foregroundColor(formatter.color(.lowContrastWhite))
                         }
-                        .accentColor(formatter.color(.secondaryAccent))
-                        .background(formatter.color(.lowContrastWhite))
-                        .cornerRadius(5)
-                    }
-                    
-                    VStack (alignment: .leading, spacing: 3) {
-                        Text("CORRECT RESPONSE")
-                            .font(formatter.font(fontSize: .mediumLarge))
-                            .foregroundColor(formatter.color(.secondaryAccent))
-                        MobileMultilineTextField("ENTER A RESPONSE", text: $buildVM.fjResponse) {
-                            
+                        TextField("", text: $categoryName) { editingChanged in
+                            buildVM.fjCategory = categoryName
                         }
-                        .accentColor(formatter.color(.secondaryAccent))
-                        .background(formatter.color(.lowContrastWhite))
-                        .cornerRadius(5)
+                    }
+                    .font(formatter.font(.bold, fontSize: .medium))
+                    .padding(20)
+                    .background(formatter.color(.primaryAccent))
+                    .cornerRadius(5)
+                    .onAppear {
+                        categoryName = buildVM.fjCategory
+                        finalClue = buildVM.fjClue
+                        finalResponse = buildVM.fjResponse
                     }
                 }
-                .padding()
+                
+                VStack (alignment: .leading, spacing: 3) {
+                    Text("Clue")
+                        .font(formatter.font(fontSize: .medium))
+                    MobileMultilineTextField("Type your clue", text: $finalClue) {
+                        buildVM.fjClue = finalClue
+                    }
+                    .accentColor(formatter.color(.secondaryAccent))
+                    .padding(10)
+                    .background(formatter.color(.secondaryFG))
+                    .cornerRadius(5)
+                }
+                
+                VStack (alignment: .leading, spacing: 3) {
+                    Text("Correct response")
+                        .font(formatter.font(fontSize: .medium))
+                        .foregroundColor(formatter.color(.secondaryAccent))
+                    MobileMultilineTextField("Type your response", text: $finalResponse) {
+                        buildVM.fjResponse = finalResponse
+                    }
+                    .accentColor(formatter.color(.secondaryAccent))
+                    .padding(10)
+                    .background(formatter.color(.secondaryFG))
+                    .cornerRadius(5)
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(formatter.color(.primaryAccent))
-            .cornerRadius(20)
         }
+        .frame(maxWidth: .infinity)
     }
 }
 

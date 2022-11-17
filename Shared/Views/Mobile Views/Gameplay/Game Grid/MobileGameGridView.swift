@@ -25,23 +25,23 @@ struct MobileGameGridView: View {
     @Binding var category: String
     
     var body: some View {
-        VStack (spacing: 5) {
+        VStack (spacing: 0) {
             HStack (spacing: 5) {
-                
                 // Category name
-                ForEach(0..<(gamesVM.categories.count), id: \.self) { i in
-                    let category: String = gamesVM.categories[i]
+                ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
+                    let category: String = gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats[i] : gamesVM.tidyCustomSet.round2Cats[i]
+                    
                     ZStack {
                         formatter.color(gamesVM.categoryDone(colIndex: i) ? .primaryFG : .primaryAccent)
                         Text("\(gamesVM.categoryDone(colIndex: i) ? "" : category.uppercased())")
-                            .font(formatter.font(.extraBold, fontSize: .regular))
+                            .font(formatter.font(.bold, fontSize: .medium))
                             .foregroundColor(formatter.color(.highContrastWhite))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 10)
                             .frame(maxWidth: .infinity)
                             .minimumScaleFactor(0.1)
                     }
-                    .frame(width: 150, height: 90)
+                    .frame(width: 160, height: 90)
                     .cornerRadius(10)
                 }
             }
@@ -51,15 +51,16 @@ struct MobileGameGridView: View {
             HStack (spacing: 5) {
                 Spacer()
                     .frame(width: 12)
-                ForEach(0..<gamesVM.categories.count, id: \.self) { i in
-                    VStack (spacing: 7) {
-                        ForEach(0..<gamesVM.moneySections.count, id: \.self) { j in
+                ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
+                    VStack (spacing: 4) {
+                        ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { j in
                             let clueCounts: Int = gamesVM.clues[i].count
                             let responsesCounts: Int = gamesVM.responses[i].count
                             let gridClue: String = clueCounts - 1 >= j ? gamesVM.clues[i][j] : ""
                             let gridResponse: String = responsesCounts - 1 >= j ? gamesVM.responses[i][j] : ""
+                            
                             MobileGameCellView(gridClue: gridClue, j: j)
-                                .frame(width: 150)
+                                .frame(width: 160)
                                 .frame(maxHeight: .infinity)
                                 .shadow(color: Color.black.opacity(0.2), radius: 10)
                                 .onTapGesture {
@@ -89,9 +90,9 @@ struct MobileGameGridView: View {
             updateTripleStumper(i: i, j: j)
             clue = gridClue
             response = gridResponse
-            amount = Int(gamesVM.moneySections[j]) ?? 0
+            amount = Int(gamesVM.pointValueArray[j]) ?? 0 
             category = gamesVM.categories[i]
-            value = gamesVM.moneySections[j]
+            value = gamesVM.pointValueArray[j]
             
             participantsVM.setDefaultIndex()
             gamesVM.gameplayDisplay = .clue
@@ -105,18 +106,18 @@ struct MobileGameGridView: View {
     
     func updateDailyDouble(i: Int, j: Int) {
         let toCheck: [Int] = gamesVM.queriedUserName.isEmpty ? [j, i] : [i, j]
-        if gamesVM.gamePhase == .trivio {
+        if gamesVM.gamePhase == .round1 {
             isDailyDouble = toCheck == gamesVM.jeopardyDailyDoubles
-        } else if gamesVM.gamePhase == .doubleTrivio {
+        } else if gamesVM.gamePhase == .round2 {
             isDailyDouble = (toCheck == gamesVM.djDailyDoubles1 || toCheck == gamesVM.djDailyDoubles2)
         }
     }
     
     func updateTripleStumper(i: Int, j: Int) {
         let toCheck: [Int] = [i, j]
-        if gamesVM.gamePhase == .trivio {
+        if gamesVM.gamePhase == .round1 {
             isTripleStumper = gamesVM.jTripleStumpers.contains(toCheck)
-        } else if gamesVM.gamePhase == .doubleTrivio {
+        } else if gamesVM.gamePhase == .round2 {
             isTripleStumper = gamesVM.djTripleStumpers.contains(toCheck)
         }
     }
@@ -131,8 +132,8 @@ struct MobileGameCellView: View {
     var body: some View {
         ZStack {
             formatter.color(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty ? .primaryFG : .primaryAccent)
-            Text("\(gamesVM.moneySections[j])")
-                .font(formatter.font(.extraBold, fontSize: .extraLarge))
+            Text("\(gamesVM.pointValueArray[j])")
+                .font(formatter.font(.bold, fontSize: .jumbo))
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .shadow(color: Color.black.opacity(0.2), radius: 5)
                 .multilineTextAlignment(.center)

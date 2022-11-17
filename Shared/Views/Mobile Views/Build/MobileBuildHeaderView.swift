@@ -23,8 +23,8 @@ struct MobileBuildHeaderView: View {
             Button(action: {
                 setSaveDraftAlert()
             }, label: {
-                Image(systemName: "chevron.left")
-                    .font(formatter.iconFont(.mediumLarge))
+                Image(systemName: "xmark")
+                    .font(formatter.iconFont(.medium))
             })
             Text("\(buildVM.isEditing ? "Edit" : "Build")")
                 .font(formatter.font(fontSize: .large))
@@ -48,41 +48,15 @@ struct MobileBuildHeaderView: View {
                         }
                     }) {
                         ZStack {
-                            if buildVM.processPending {
-                                LoadingView(color: .primaryFG)
-                            } else {
-                                Text("Save")
-                            }
+                            Text("Save")
                         }
-                        .font(formatter.font(fontSize: .medium))
+                        .font(formatter.font(fontSize: .regular))
                         .foregroundColor(formatter.color(.primaryFG))
-                        .padding(10)
+                        .padding()
                         .background(formatter.color(.highContrastWhite))
-                        .cornerRadius(3)
+                        .clipShape(Capsule())
                     }
                 }
-                Button(action: {
-                    if buildVM.nextPermitted() {
-                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-                        if buildVM.buildStage == .details {
-                            gamesVM.readCustomData()
-                        }
-                        buildVM.nextButtonHandler()
-                    }
-                }, label: {
-                    ZStack {
-                        if buildVM.processPending {
-                            LoadingView(color: .primaryFG)
-                        } else {
-                            Text(buildVM.buildStage == .details ? "Publish" : "Next")
-                        }
-                    }
-                    .font(formatter.font(fontSize: .medium))
-                    .foregroundColor(formatter.color(.primaryFG))
-                    .padding(10)
-                    .background(formatter.color(buildVM.nextPermitted() ? .highContrastWhite : .lowContrastWhite))
-                    .cornerRadius(3)
-                })
             }
         }
         .padding(.horizontal)
@@ -112,42 +86,3 @@ struct MobileBuildHeaderView: View {
         secondaryActionLabel: buildVM.isEditing ? "Save" : "Save draft")
     }
 }
-
-struct MobileBuildTickerView: View {
-    var body: some View {
-        HStack (alignment: .bottom, spacing: 3) {
-            MobileProgressTextDotView(buildStage: .trivioRound)
-            MobileProgressTextDotView(buildStage: .trivioRoundDD)
-            MobileProgressTextDotView(buildStage: .dtRound)
-            MobileProgressTextDotView(buildStage: .dtRoundDD)
-            MobileProgressTextDotView(buildStage: .finalTrivio)
-            MobileProgressTextDotView(buildStage: .details)
-        }
-    }
-}
-
-struct MobileProgressTextDotView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    
-    let buildStageIndexDict = BuildStageIndexDict()
-    let buildStage: BuildStage
-    
-    var buildStageIndex: Int {
-        return buildStageIndexDict.getIndex(from: buildStage)
-    }
-    
-    var buildVMStageIndex: Int {
-        return buildStageIndexDict.getIndex(from: buildVM.buildStage)
-    }
-    
-    var body: some View {
-        Capsule()
-            .frame(height: 5)
-            .frame(maxWidth: buildStageIndex == buildVMStageIndex ? .infinity : 5)
-            .offset(y: -3)
-            .foregroundColor(formatter.color(buildStageIndex > buildVMStageIndex ? .lowContrastWhite : .highContrastWhite))
-            .animation(.easeInOut(duration: 1))
-    }
-}
-

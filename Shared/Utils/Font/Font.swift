@@ -39,6 +39,23 @@ extension MasterHandler {
             sizeFloat = deviceType == .iPhone ? 30 : 35
         case .extraLarge:
             sizeFloat = deviceType == .iPhone ? 35 : 45
+        case .jumbo:
+            sizeFloat = deviceType == .iPhone ? 45 : 55
+        }
+        
+        return Font.custom("Metropolis-" + styleString, size: sizeFloat)
+    }
+    
+    func fontFloat(_ fontStyle: FontStyle = .bold, sizeFloat: CGFloat = 15) -> Font {
+        var styleString = ""
+        
+        switch fontStyle {
+        case .regular: styleString = "Regular"
+        case .regularItalic: styleString = "RegularItalic"
+        case .medium: styleString = "Medium"
+        case .boldItalic: styleString = "ExtraBoldItalic"
+        case .extraBold: styleString = "ExtraBold"
+        default: styleString = "Bold"
         }
         
         return Font.custom("Metropolis-" + styleString, size: sizeFloat)
@@ -54,7 +71,7 @@ enum FontStyle {
 }
 
 enum FontSize {
-    case micro, small, regular, medium, mediumLarge, semiLarge, large, extraLarge
+    case micro, small, regular, medium, mediumLarge, semiLarge, large, extraLarge, jumbo
 }
 
 enum SystemFontSize: CGFloat {

@@ -12,95 +12,126 @@ struct MobileBuildHUDView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    var shouldDisplayProgressChrevrons: Bool {
-        return buildVM.currentDisplay != .categoryName
-            && buildVM.currentDisplay != .clueResponse
-            && buildVM.currentDisplay != .saveDraft
+    let buildStageIndexDict = MobileBuildStageIndexDict()
+    
+    var mostAdvancedStageIndex: Int {
+        return buildStageIndexDict.getIndex(from: buildVM.mostAdvancedStage)
+    }
+    
+    func getBuildStageIndex(_ buildStage: BuildStage) -> Int {
+        return buildStageIndexDict.getIndex(from: buildStage)
     }
     
     var body: some View {
-        HStack (spacing: 15) {
-            Button {
-                if buildVM.buildStage != .trivioRound {
-                    formatter.hapticFeedback(style: .light, intensity: .strong)
-                    buildVM.back()
+        HStack (spacing: 3) {
+            Image(systemName: "gear")
+                .foregroundColor(formatter.color(.primaryBG))
+                .font(formatter.iconFont(.medium))
+                .frame(width: 50, height: 50)
+                .background(formatter.color(.highContrastWhite))
+                .cornerRadius(5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .details ? 2 : 0)
+                )
+                .onTapGesture {
+                    formatter.hapticFeedback(style: .rigid)
+                    buildVM.buildStage = .details
+                    buildVM.currentDisplay = .settings
                 }
-            } label: {
-                Image(systemName: "chevron.left.square.fill")
-                    .font(formatter.iconFont())
-                    .foregroundColor(formatter.color(buildVM.buildStage == .trivioRound ? .lowContrastWhite : .highContrastWhite))
-            }
-            .opacity(shouldDisplayProgressChrevrons ? 1 : 0)
-            VStack (spacing: 5) {                
-                Text(buildVM.descriptionHandler())
-                    .foregroundColor(formatter.color(.secondaryAccent))
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.75)
-                
-                if buildVM.buildStage == .trivioRoundDD || buildVM.buildStage == .dtRoundDD {
-                    MobileDuplexSelectionMethodView()
-                } else if buildVM.buildStage == .trivioRound || buildVM.buildStage == .dtRound {
-                    if buildVM.currentDisplay == .grid {
-                        MobileCategoryCountIncrementView()
+            Text("Round 1")
+                .font(formatter.font(fontSize: .small))
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(formatter.color(.secondaryFG))
+                .cornerRadius(5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .trivioRound ? 2 : 0)
+                )
+                .opacity(getBuildStageIndex(.trivioRound) <= mostAdvancedStageIndex ? 1 : 0.4)
+                .onTapGesture {
+                    if getBuildStageIndex(.trivioRound) <= mostAdvancedStageIndex {
+                        formatter.hapticFeedback(style: .rigid)
+                        buildVM.changePointValues(isAdvancing: false)
+                        buildVM.buildStage = .trivioRound
+                        buildVM.currentDisplay = .grid
                     }
                 }
-            }
-            .frame(maxWidth: .infinity)
-            Button {
-                if buildVM.nextPermitted() {
-                    formatter.hapticFeedback(style: .light, intensity: .strong)
-                    buildVM.nextButtonHandler()
+            Rectangle()
+                .fill(formatter.color(.primaryAccent))
+                .frame(width: 7, height: 50)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .trivioRoundDD ? 2 : 0)
+                )
+                .opacity(getBuildStageIndex(.trivioRoundDD) <= mostAdvancedStageIndex ? 1 : 0.4)
+                .onTapGesture {
+                    if getBuildStageIndex(.trivioRoundDD) <= mostAdvancedStageIndex {
+                        formatter.hapticFeedback(style: .rigid)
+                        buildVM.changePointValues(isAdvancing: false)
+                        buildVM.buildStage = .trivioRoundDD
+                        buildVM.currentDisplay = .grid
+                    }
                 }
-            } label: {
-                Image(systemName: "chevron.right.square.fill")
-                    .font(formatter.iconFont())
-                    .foregroundColor(formatter.color(buildVM.nextPermitted() ? .highContrastWhite : .lowContrastWhite))
+            if buildVM.hasTwoRounds {
+                Text("Round 2")
+                    .font(formatter.font(fontSize: .small))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(formatter.color(.secondaryFG))
+                    .cornerRadius(5)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .dtRound ? 2 : 0)
+                    )
+                    .opacity(getBuildStageIndex(.dtRound) <= mostAdvancedStageIndex ? 1 : 0.4)
+                    .onTapGesture {
+                        if getBuildStageIndex(.dtRound) <= mostAdvancedStageIndex {
+                            formatter.hapticFeedback(style: .rigid)
+                            buildVM.changePointValues(isAdvancing: true)
+                            buildVM.buildStage = .dtRound
+                            buildVM.currentDisplay = .grid
+                        }
+                    }
+                Rectangle()
+                    .fill(formatter.color(.primaryAccent))
+                    .frame(width: 7, height: 50)
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                            .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .dtRoundDD ? 2 : 0)
+                    )
+                    .opacity(getBuildStageIndex(.dtRoundDD) <= mostAdvancedStageIndex ? 1 : 0.4)
+                    .onTapGesture {
+                        if getBuildStageIndex(.dtRoundDD) <= mostAdvancedStageIndex {
+                            formatter.hapticFeedback(style: .rigid)
+                            buildVM.changePointValues(isAdvancing: true)
+                            buildVM.buildStage = .dtRoundDD
+                            buildVM.currentDisplay = .grid
+                        }
+                    }
             }
-            .opacity(shouldDisplayProgressChrevrons ? 1 : 0)
+            Text("Final Round")
+                .font(formatter.font(fontSize: .small))
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(formatter.color(.secondaryFG))
+                .cornerRadius(5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .finalTrivio ? 2 : 0)
+                )
+                .opacity(getBuildStageIndex(.finalTrivio) <= mostAdvancedStageIndex ? 1 : 0.4)
+                .onTapGesture {
+                    if getBuildStageIndex(.finalTrivio) <= mostAdvancedStageIndex {
+                        buildVM.buildStage = .finalTrivio
+                        buildVM.currentDisplay = .finalTrivio
+                    }
+                }
         }
-        .font(formatter.font())
-        .padding(10)
-        .frame(height: 80)
-        .background(formatter.color(.primaryFG))
-        .cornerRadius(5)
-    }
-}
-
-struct MobileCategoryCountIncrementView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    
-    var body: some View {
-        HStack (spacing: 15) {
-            Text("Categories: ")
-                .lineLimit(1)
-            
-            HStack (spacing: 5) {
-                Button(action: {
-                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    buildVM.subtractCategory(index: 0, last: true)
-                }, label: {
-                    Image(systemName: "minus")
-                        .font(formatter.iconFont(.small))
-                        .padding(7)
-                })
-                Text("\(buildVM.buildStage == .trivioRound ? buildVM.jRoundLen : buildVM.djRoundLen)")
-                    .font(formatter.font(fontSize: .regular))
-                    .frame(width: 15)
-                Button(action: {
-                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    buildVM.addCategory()
-                }, label: {
-                    Image(systemName: "plus")
-                        .font(formatter.iconFont(.small))
-                        .padding(7)
-                })
-            }
-            .padding(.horizontal, 5)
-            .background(formatter.color(.secondaryFG))
-            .clipShape(Capsule())
-        }
-        .fixedSize(horizontal: false, vertical: true)
+        .padding([.top, .horizontal])
     }
 }
 

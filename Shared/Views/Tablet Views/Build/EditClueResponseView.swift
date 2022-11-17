@@ -12,7 +12,7 @@ struct EditClueResponseView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     
     @State var swapToIndex = -1
     @State var showingPreview = false
@@ -33,7 +33,7 @@ struct EditClueResponseView: View {
                             .padding(.leading)
                     }
                 }
-                Text("\(self.category.name.uppercased()) - $\(buildVM.moneySections[buildVM.editingIndex])")
+                Text("\(self.category.name.uppercased()) - $\(buildVM.moneySections[buildVM.editingClueIndex])")
                     .font(formatter.font(fontSize: .mediumLarge))
                     .padding(20)
                     .background(formatter.color(.lowContrastWhite))
@@ -45,8 +45,8 @@ struct EditClueResponseView: View {
             
             if showingPreview {
                 BuildPreviewClueResponseView(categoryName: category.name,
-                                             clue: category.clues[buildVM.editingIndex],
-                                             response: category.responses[buildVM.editingIndex])
+                                             clue: category.clues[buildVM.editingClueIndex],
+                                             response: category.responses[buildVM.editingClueIndex])
             } else {
                 ScrollView (.vertical, showsIndicators: false) {
                     
@@ -55,7 +55,7 @@ struct EditClueResponseView: View {
                         VStack (alignment: .leading, spacing: 5) {
                             Text("CLUE")
                                 .font(formatter.font(fontSize: .large))
-                            MultilineTextField("ENTER A CLUE", text: $category.clues[buildVM.editingIndex]) {
+                            MultilineTextField("ENTER A CLUE", text: $category.clues[buildVM.editingClueIndex]) {
                                 
                             }
                             .accentColor(formatter.color(.secondaryAccent))
@@ -66,7 +66,7 @@ struct EditClueResponseView: View {
                             Text("CORRECT RESPONSE")
                                 .font(formatter.font(fontSize: .large))
                                 .foregroundColor(formatter.color(.secondaryAccent))
-                            MultilineTextField("ENTER A RESPONSE", text: $category.responses[buildVM.editingIndex]) {
+                            MultilineTextField("ENTER A RESPONSE", text: $category.responses[buildVM.editingClueIndex]) {
                                 
                             }
                             .accentColor(formatter.color(.secondaryAccent))
@@ -109,7 +109,7 @@ struct EditClueResponseView: View {
                                     .font(formatter.font(fontSize: .large))
                                 if swapToIndex != -1 {
                                     Button {
-                                        buildVM.swap(currentIndex: buildVM.editingIndex, swapToIndex: swapToIndex, categoryIndex: category.index)
+                                        buildVM.swap(currentIndex: buildVM.editingCategoryIndex, swapToIndex: swapToIndex, categoryIndex: category.index)
                                         swapToIndex = -1
                                     } label: {
                                         Text("GO!")
@@ -132,7 +132,7 @@ struct EditClueResponseView: View {
                         
                         HStack (spacing: formatter.deviceType == .iPad ? nil : 5) {
                             ForEach(0..<category.clues.count, id: \.self) { i in
-                                SwapCellView(editingIndex: $buildVM.editingIndex, preSwapIndex: $swapToIndex, clueIndex: i, amount: buildVM.moneySections[i], clue: category.clues[i], response: category.responses[i])
+                                SwapCellView(editingIndex: $buildVM.editingClueIndex, preSwapIndex: $swapToIndex, clueIndex: i, amount: buildVM.moneySections[i], clue: category.clues[i], response: category.responses[i])
                             }
                         }
                         .frame(height: 120)

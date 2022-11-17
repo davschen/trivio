@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 class ReportViewModel: ObservableObject {
-    @Published var allGames = [Report]()
+    @Published var allGameReports = [Report]()
     @Published var scores: [String:[Int]] = [:]
     @Published var currentReport: Report? = nil
     @Published var currentSet: CustomSet? = nil
@@ -68,12 +68,12 @@ class ReportViewModel: ObservableObject {
             }
             guard let data = snap?.documents else { return }
             DispatchQueue.main.async {
-                self.allGames = data.compactMap { (queryDocSnap) -> Report? in
+                self.allGameReports = data.compactMap { (queryDocSnap) -> Report? in
                     let gameID = queryDocSnap.get("episode_played") as? String ?? "NID"
                     self.addGameName(from: gameID)
                     return try? queryDocSnap.data(as: Report.self)
                 }
-                if let gameID = self.allGames.first?.id {
+                if let gameID = self.allGameReports.first?.id {
                     self.getGameInfo(id: gameID)
                 }
             }

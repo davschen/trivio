@@ -53,7 +53,7 @@ struct GameSettingsHeaderView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     var gameInProgress: Bool {
-        if gamesVM.gamePhase == .trivio && gamesVM.usedAnswers.count == 0 {
+        if gamesVM.gamePhase == .round1 && gamesVM.usedAnswers.count == 0 {
             return false
         } else {
             return true
@@ -61,7 +61,7 @@ struct GameSettingsHeaderView: View {
     }
     
     var gameIsPlayable: Bool {
-        return participantsVM.teams.count > 0 && !gamesVM.selectedEpisode.isEmpty
+        return participantsVM.teams.count > 0
     }
     
     var body: some View {
@@ -103,7 +103,7 @@ struct GameSettingsContestantsView: View {
     @Binding var teamToEdit: Team
     
     var gameInProgress: Bool {
-        if gamesVM.gamePhase == .trivio && gamesVM.usedAnswers.count == 0 {
+        if gamesVM.gamePhase == .round1 && gamesVM.usedAnswers.count == 0 {
             return false
         } else {
             return true
@@ -128,7 +128,7 @@ struct GameSettingsContestantsView: View {
                     Text("Quick Add")
                         .font(formatter.font(fontSize: .mediumLarge))
                         .padding(.horizontal, 10)
-                    ForEach(participantsVM.historicalTeams) { team in
+                    ForEach(participantsVM.savedTeams) { team in
                         HStack {
                             Circle()
                                 .foregroundColor(ColorMap().getColor(color: team.color))
@@ -214,9 +214,9 @@ struct GameSettingsSelectedGameView: View {
                 }
                 Spacer()
             }
-            if !gamesVM.selectedEpisode.isEmpty {
+            if !gamesVM.customSet.title.isEmpty {
                 VStack (alignment: .leading, spacing: 10) {
-                    Text(gamesVM.title)
+                    Text(gamesVM.customSet.title)
                         .font(formatter.font(fontSize: .mediumLarge))
                     Text(gamesVM.queriedUserName.isEmpty ? "Trivio Official" : gamesVM.queriedUserName)
                         .font(formatter.font(.regular))
@@ -320,7 +320,7 @@ struct GameSettingsVoiceSpeedView: View {
             ScrollView (.horizontal, showsIndicators: false) {
                 HStack {
                     GameSettingsSpeedPickerView(speechSpeed: .slow, speedString: "Slow", emphasisColor: emphasisColor)
-                    GameSettingsSpeedPickerView(speechSpeed: .regular, speedString: "Regular", emphasisColor: emphasisColor)
+                    GameSettingsSpeedPickerView(speechSpeed: .medium, speedString: "Regular", emphasisColor: emphasisColor)
                     GameSettingsSpeedPickerView(speechSpeed: .fast, speedString: "Fast", emphasisColor: emphasisColor)
                 }
             }

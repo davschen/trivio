@@ -16,16 +16,16 @@ struct MobileReportsView: View {
     var body: some View {
         ZStack {
             VStack (alignment: .leading, spacing: 10) {
-                if reportVM.allGames.count == 0 {
+                if reportVM.allGameReports.count == 0 {
                     MobileEmptyListView(label: "You haven't played any games yet. Once you do, they will show up here with detailed in-game reports")
                         .padding()
                 } else {
                     ScrollView (.horizontal, showsIndicators: false) {
-                        HStack (spacing: 10) {
+                        HStack {
                             Spacer()
                                 .frame(width: 0)
-                            ForEach(reportVM.allGames, id: \.self) { game in
-                                MobileReportPreviewView(game: game)
+                            ForEach(reportVM.allGameReports, id: \.self) { pastGameReport in
+                                MobileReportPreviewView(pastGameReport: pastGameReport)
                             }
                             Spacer(minLength: 0)
                         }
@@ -38,7 +38,6 @@ struct MobileReportsView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .withBackButton()
     }
 }
 
@@ -47,22 +46,22 @@ struct MobileReportPreviewView: View {
     @EnvironmentObject var reportVM: ReportViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
-    let game: Report
+    let pastGameReport: Report
     
     var body: some View {
-        let gameID = game.id ?? "NID"
+        let gameID = pastGameReport.id ?? "NID"
         VStack (alignment: .leading, spacing: 15) {
             HStack (spacing: 15) {
-                Text("\(reportVM.dateFormatter.string(from: game.date))")
+                Text("\(reportVM.dateFormatter.string(from: pastGameReport.date))")
                     .font(formatter.font(.bold))
                 RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 15)
-                Text("\(reportVM.timeFormatter.string(from: game.date))")
+                Text("\(reportVM.timeFormatter.string(from: pastGameReport.date))")
                     .font(formatter.font(.regular))
             }
             .foregroundColor(formatter.color(.highContrastWhite))
             ScrollView (.horizontal) {
                 HStack (spacing: 15) {
-                    ForEach(game.getNames(), id: \.self) { name in
+                    ForEach(pastGameReport.getNames(), id: \.self) { name in
                         Text(name.uppercased())
                             .font(formatter.font())
                             .foregroundColor(formatter.color(.secondaryAccent))

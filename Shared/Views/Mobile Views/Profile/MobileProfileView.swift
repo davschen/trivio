@@ -92,7 +92,6 @@ struct MobileProfileMenuSelectionView: View {
     var body: some View {
         VStack (spacing: 30) {
             MobileMenuSelectionView(label: "Summary", transitionToView: AnyView(MobileSummaryView().withBackButton()))
-            MobileMenuSelectionView(label: "My Sets", transitionToView: AnyView(MobileMySetsView().withBackButton()))
             MobileMenuSelectionView(label: "My Drafts", transitionToView: AnyView(MobileDraftsView().withBackButton()))
             MobileMenuSelectionView(label: "Past Games", transitionToView: AnyView(MobileReportsView().withBackButton()))
         }

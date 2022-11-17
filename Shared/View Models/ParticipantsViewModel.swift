@@ -13,7 +13,7 @@ import FirebaseAuth
 class ParticipantsViewModel: ObservableObject {
     @Published var isTeams = false
     @Published var teams = [Team]()
-    @Published var historicalTeams = [Team]()
+    @Published var savedTeams = [Team]()
     @Published var wagers = [String]()
     @Published var finalJeopardyAnswers = [String]()
     @Published var questionTicker = 0
@@ -113,11 +113,11 @@ class ParticipantsViewModel: ObservableObject {
                 }
                 guard let data = snap?.documents else { return }
                 DispatchQueue.main.async {
-                    self.historicalTeams = data.compactMap { (queryDocSnap) -> Team? in
+                    self.savedTeams = data.compactMap { (queryDocSnap) -> Team? in
                         return try? queryDocSnap.data(as: Team.self)
                     }
                     var shouldAddSelf = true
-                    for team in self.historicalTeams {
+                    for team in self.savedTeams {
                         if team.id == uid {
                             self.myTeam = team
                             shouldAddSelf = false

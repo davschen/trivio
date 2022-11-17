@@ -12,41 +12,54 @@ struct MobileEditCategoryNameView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     
     @State var offsetValue: CGFloat = 0
+    @State var categoryName = ""
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack (spacing: formatter.shrink(iPadSize: 20)) {
-                Text("CATEGORY NAME")
-                    .font(formatter.font(fontSize: .large))
-                
-                VStack {
-                    MobileCategoryLargeView(categoryName: category.name)
-                    // Category name textfield
-                    MobileCategoryNameTextFieldView(categoryName: $category.name)
-                    
-                    Button(action: {
-                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-                        buildVM.currentDisplay = .grid
-                    }, label: {
-                        Text("Done")
-                            .font(formatter.font())
-                            .padding()
-                            .padding(.horizontal)
-                            .background(formatter.color(.lowContrastWhite))
-                            .clipShape(Capsule())
-                    })
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+        VStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack (spacing: 20) {
+                    VStack {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                                .font(formatter.iconFont(.small))
+                            Text("Category \(category.index + 1)")
+                            Image(systemName: "chevron.right")
+                                .font(formatter.iconFont(.small))
+                            Spacer()
+                        }
+                        // Category name textfield
+                        TextField("Untitled", text: $categoryName)
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .padding(20)
+                            .background(formatter.color(.primaryFG))
+                            .cornerRadius(5)
+                    }
                 }
-                .keyboardAware(heightFactor: 0.5)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding()
+            .background(formatter.color(.primaryFG))
+            .cornerRadius(10)
+            
+            Button(action: {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                buildVM.currentDisplay = .grid
+            }, label: {
+                Text("Done")
+                    .font(formatter.font())
+                    .foregroundColor(formatter.color(.primaryBG))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(formatter.color(.highContrastWhite))
+                    .clipShape(Capsule())
+            })
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .background(formatter.color(.primaryAccent))
-        .cornerRadius(20)
+        .onAppear {
+            categoryName = category.name
+        }
     }
 }
 

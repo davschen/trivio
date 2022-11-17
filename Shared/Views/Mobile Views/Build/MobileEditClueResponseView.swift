@@ -12,7 +12,7 @@ struct MobileEditClueResponseView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     
     @State var swapToIndex = -1
     @State var showingPreview = false
@@ -25,7 +25,7 @@ struct MobileEditClueResponseView: View {
             ZStack {
                 VStack {
                     Text("\(category.name.uppercased())")
-                    Text("$\(buildVM.moneySections[buildVM.editingIndex])")
+                    Text("$\(buildVM.moneySections[buildVM.editingClueIndex])")
                         .foregroundColor(formatter.color(.secondaryAccent))
                 }
                 .font(formatter.font())
@@ -50,8 +50,8 @@ struct MobileEditClueResponseView: View {
             
             if showingPreview {
                 MobileBuildPreviewClueResponseView(categoryName: category.name,
-                                             clue: category.clues[buildVM.editingIndex],
-                                             response: category.responses[buildVM.editingIndex])
+                                             clue: category.clues[buildVM.editingClueIndex],
+                                             response: category.responses[buildVM.editingClueIndex])
             } else {
                 ScrollView (.vertical, showsIndicators: false) {
                     
@@ -60,7 +60,7 @@ struct MobileEditClueResponseView: View {
                         VStack (alignment: .leading, spacing: 5) {
                             Text("CLUE")
                                 .font(formatter.font(fontSize: .mediumLarge))
-                            MobileMultilineTextField("ENTER A CLUE", text: $category.clues[buildVM.editingIndex]) {
+                            MobileMultilineTextField("ENTER A CLUE", text: $category.clues[buildVM.editingClueIndex]) {
                                 
                             }
                             .accentColor(formatter.color(.secondaryAccent))
@@ -71,7 +71,7 @@ struct MobileEditClueResponseView: View {
                             Text("CORRECT RESPONSE")
                                 .font(formatter.font(fontSize: .mediumLarge))
                                 .foregroundColor(formatter.color(.secondaryAccent))
-                            MobileMultilineTextField("ENTER A RESPONSE", text: $category.responses[buildVM.editingIndex]) {
+                            MobileMultilineTextField("ENTER A RESPONSE", text: $category.responses[buildVM.editingClueIndex]) {
                                 
                             }
                             .accentColor(formatter.color(.secondaryAccent))
@@ -117,7 +117,7 @@ struct MobileEditClueResponseView: View {
                                 if swapToIndex != -1 {
                                     Button {
                                         formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                        buildVM.swap(currentIndex: buildVM.editingIndex, swapToIndex: swapToIndex, categoryIndex: category.index)
+                                        buildVM.swap(currentIndex: buildVM.editingCategoryIndex, swapToIndex: swapToIndex, categoryIndex: category.index)
                                         swapToIndex = -1
                                     } label: {
                                         Text("GO!")
@@ -142,7 +142,7 @@ struct MobileEditClueResponseView: View {
                         ScrollView (.horizontal, showsIndicators: false) {
                             HStack (spacing: formatter.deviceType == .iPad ? nil : 5) {
                                 ForEach(0..<category.clues.count, id: \.self) { i in
-                                    MobileSwapCellView(editingIndex: $buildVM.editingIndex, preSwapIndex: $swapToIndex, clueIndex: i, amount: buildVM.moneySections[i], clue: category.clues[i], response: category.responses[i])
+                                    Text("Hi I am now defunct")
                                 }
                             }
                             .frame(height: 80)

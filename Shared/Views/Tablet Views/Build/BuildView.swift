@@ -33,13 +33,11 @@ struct BuildView: View {
             BuildHeaderView(showingEdit: $showingEdit, editingName: $editingName, showingSaveDraft: $showingSaveDraft)
             BuildHUDView()
             switch buildVM.currentDisplay {
-            case .clueResponse:
+            case .buildAll:
                 EditClueResponseView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex])
-            case .categoryName:
-                EditCategoryNameView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex])
             case .finalTrivio:
                 FinalTrivioFillView()
-            case .finishingTouches:
+            case .settings:
                 BuildDetailsView()
             case .saveDraft:
                 SaveDraftView()

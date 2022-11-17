@@ -19,7 +19,6 @@ struct MobileSummaryView: View {
     var body: some View {
         SummaryPreviewView()
             .padding(.horizontal)
-            .withBackButton()
     }
     
     struct SummaryPreviewView: View {
@@ -72,10 +71,6 @@ struct MobileSummaryMySetsView: View {
                     .foregroundColor(formatter.color(.highContrastWhite))
                     .padding([.horizontal, .top])
                 })
-                NavigationLink(destination: MobileMySetsView().withBackButton()
-                                .navigationBarTitle("My Sets", displayMode: .inline),
-                               isActive: $selectionViewActive,
-                               label: { EmptyView() }).hidden()
                 NavigationLink(destination: EmptyView()) {
                     EmptyView()
                 }.hidden()
@@ -125,7 +120,7 @@ struct MobileSummaryMySetsView: View {
         formatter.hapticFeedback(style: .light)
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
-        gamesVM.setEpisode(ep: setID)
+        gamesVM.setCustomSetID(ep: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
         previewViewActive = true
@@ -215,12 +210,12 @@ struct MobileSummaryPastGamesView: View {
                 })
             }
             
-            if reportVM.allGames.count > 0 {
+            if reportVM.allGameReports.count > 0 {
                 ScrollView (.horizontal, showsIndicators: false) {
                     HStack (spacing: 15) {
                         Spacer()
                             .frame(width: 0, height: 0)
-                        ForEach(reportVM.allGames, id: \.self) { game in
+                        ForEach(reportVM.allGameReports, id: \.self) { game in
                             MobilePastGamePreviewView(game: game)
                                 .onTapGesture {
                                     formatter.hapticFeedback(style: .light)

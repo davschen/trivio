@@ -12,7 +12,7 @@ struct EditCategoryNameView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     
     @State var offsetValue: CGFloat = 0
     

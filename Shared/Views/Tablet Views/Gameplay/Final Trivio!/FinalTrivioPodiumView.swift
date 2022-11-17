@@ -22,7 +22,7 @@ struct FinalTrivioPodiumView: View {
             
             // Title and rating
             VStack {
-                Text(gamesVM.title)
+                Text(gamesVM.customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
                     .foregroundColor(formatter.color(.primaryFG))
                 RatingView(rating: $rating)
@@ -37,9 +37,9 @@ struct FinalTrivioPodiumView: View {
             
             // Finished button
             Button(action: {
+                guard let customSetID = gamesVM.customSet.id else { return }
                 participantsVM.incrementGameStep()
-                profileVM.markAsPlayed(gameID: gamesVM.selectedEpisode)
-                participantsVM.writeToFirestore(gameID: gamesVM.selectedEpisode, myRating: rating)
+                participantsVM.writeToFirestore(gameID: customSetID, myRating: rating)
                 participantsVM.resetScores()
                 gamesVM.reset()
                 gamesVM.clearAll()

@@ -298,17 +298,6 @@ struct MobileSettingsCustomizePlayerView: View {
             .background(formatter.color(.secondaryFG))
             .accentColor(formatter.color(.secondaryAccent))
             .cornerRadius(5)
-            
-            HStack (spacing: 5) {
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.blue), colorString: "blue", isSettingsPicker: true)
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.purple), colorString: "purple", isSettingsPicker: true)
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.green), colorString: "green", isSettingsPicker: true)
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.yellow), colorString: "yellow", isSettingsPicker: true)
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.orange), colorString: "orange", isSettingsPicker: true)
-                MobileColorPickerView(team: $participantsVM.myTeam, color: formatter.color(.red), colorString: "red", isSettingsPicker: true)
-            }
-            .frame(height: 30)
-            .padding(.top, 10)
         }
     }
 }

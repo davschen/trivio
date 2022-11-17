@@ -67,7 +67,7 @@ extension GamesViewModel {
                 }
                 if let gameID = self.gamePreviews.first?.id {
                     self.getEpisodeData(gameID: gameID)
-                    self.setEpisode(ep: gameID)
+                    self.setCustomSetID(ep: gameID)
                     self.previewViewShowing = true
                 }
             }
@@ -79,34 +79,34 @@ extension GamesViewModel {
         clearAll()
         reset()
         gameDocRef.getDocument { (doc, error) in
-            let j_category_ids = doc?.get("j_category_ids") as? [String] ?? []
-            let dj_category_ids = doc?.get("dj_category_ids") as? [String] ?? []
-            let j_round_len = doc?.get("j_round_len") as? Int ?? 0
-            let dj_round_len = doc?.get("dj_round_len") as? Int ?? 0
-            
+            guard let jeopardySet = try? doc?.data(as: JeopardySet.self) else { return }
             // there are six categories, should be doing stuff for category
-            for id in j_category_ids {
+            for id in jeopardySet.j_category_ids {
                 self.db.collection("categories").document(id).getDocument { (doc, error) in
                     if error != nil {
                         print(error!.localizedDescription)
                         return
                     }
-                    let index = doc?.get("index") as? Int ?? 0
-                    let clues = doc?.get("clues") as? [String] ?? []
+                    
+                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
+                    
                     DispatchQueue.main.async {
-                        if self.jeopardyRoundClues.isEmpty {
-                            let toAdd = (j_round_len - self.jeopardyRoundClues.count)
-                            self.jeopardyRoundClues = [[String]](repeating: [""], count: toAdd)
-                            self.jeopardyRoundResponses = [[String]](repeating: [""], count: toAdd)
-                            self.jeopardyCategories = [String](repeating: "", count: toAdd)
+                        if self.tidyCustomSet.round1Clues.isEmpty {
+                            let toAdd = (jeopardySet.j_round_len - self.tidyCustomSet.round1Clues.count)
+                            self.tidyCustomSet.round1Clues = [[String]](repeating: [""], count: toAdd)
+                            self.tidyCustomSet.round1Responses = [[String]](repeating: [""], count: toAdd)
+                            self.tidyCustomSet.round1Cats = [String](repeating: "", count: toAdd)
                         }
-                        self.jeopardyRoundClues[index] = doc?.get("clues") as? [String] ?? []
-                        self.jeopardyRoundResponses[index] = doc?.get("responses") as? [String] ?? []
-                        self.jeopardyCategories[index] = doc?.get("name") as? String ?? ""
+                        let index = jeopardyCategory.index
+                        let clues = jeopardyCategory.clues
                         
-                        self.clues = self.jeopardyRoundClues
-                        self.responses = self.jeopardyRoundResponses
-                        self.categories = self.jeopardyCategories
+                        self.tidyCustomSet.round1Clues[index] = jeopardyCategory.clues
+                        self.tidyCustomSet.round1Responses[index] = jeopardyCategory.responses
+                        self.tidyCustomSet.round1Cats[index] = jeopardyCategory.name
+                        
+                        self.clues = self.tidyCustomSet.round1Clues
+                        self.responses = self.tidyCustomSet.round1Responses
+                        self.categories = self.tidyCustomSet.round1Cats
                         clues.forEach {
                             self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
                             self.jCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
@@ -115,25 +115,30 @@ extension GamesViewModel {
                 }
             }
             
-            for id in dj_category_ids {
+            for id in jeopardySet.dj_category_ids {
                 self.db.collection("categories").document(id).getDocument { (doc, error) in
                     if error != nil {
                         print(error!.localizedDescription)
                         return
                     }
-                    let index = doc?.get("index") as? Int ?? 0
-                    let clues = doc?.get("clues") as? [String] ?? []
+                    
+                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
+                    
                     DispatchQueue.main.async {
-                        if self.doubleJeopardyRoundClues.isEmpty {
-                            let toAdd = (dj_round_len - self.doubleJeopardyRoundClues.count)
-                            self.doubleJeopardyRoundClues = [[String]](repeating: [""], count: toAdd)
-                            self.doubleJeopardyRoundResponses = [[String]](repeating: [""], count: toAdd)
-                            self.doubleJeopardyCategories = [String](repeating: "", count: toAdd)
+                        if self.tidyCustomSet.round2Clues.isEmpty {
+                            let toAdd = (jeopardySet.dj_round_len - self.tidyCustomSet.round2Clues.count)
+                            self.tidyCustomSet.round2Clues = [[String]](repeating: [""], count: toAdd)
+                            self.tidyCustomSet.round2Responses = [[String]](repeating: [""], count: toAdd)
+                            self.tidyCustomSet.round2Cats = [String](repeating: "", count: toAdd)
                         }
-                        self.doubleJeopardyRoundClues[index] = doc?.get("clues") as? [String] ?? []
-                        self.doubleJeopardyRoundResponses[index] = doc?.get("responses") as? [String] ?? []
-                        self.doubleJeopardyCategories[index] = doc?.get("name") as? String ?? ""
-                        clues.forEach {
+                        let index = jeopardyCategory.index
+                        let clues = jeopardyCategory.clues
+                        
+                        self.tidyCustomSet.round2Clues[index] = jeopardyCategory.clues
+                        self.tidyCustomSet.round2Responses[index] = jeopardyCategory.responses
+                        self.tidyCustomSet.round2Cats[index] = jeopardyCategory.name
+                        
+                        jeopardyCategory.clues.forEach {
                             self.djRoundCompletes += ($0.isEmpty ? 0 : 1)
                             self.djCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
                         }
@@ -177,7 +182,7 @@ extension GamesViewModel {
                 self.fjCategory = doc?.get("fj_category") as? String ?? ""
                 self.fjClue = doc?.get("fj_clue") as? String ?? ""
                 self.fjResponse = doc?.get("fj_response") as? String ?? ""
-                self.title = doc?.get("title") as? String ?? ""
+                self.customSet.title = doc?.get("title") as? String ?? ""
                 let ts = doc?.get("date") as? Timestamp ?? Timestamp() 
                 self.date = ts.dateValue()
                 completion(true)

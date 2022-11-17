@@ -103,7 +103,7 @@ struct MobileSavedPlayersView: View {
                 .font(formatter.font(fontSize: .mediumLarge))
             ScrollView (.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(participantsVM.historicalTeams) { team in
+                    ForEach(participantsVM.savedTeams) { team in
                         HStack {
                             Circle()
                                 .foregroundColor(ColorMap().getColor(color: team.color))

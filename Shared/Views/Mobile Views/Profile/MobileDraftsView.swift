@@ -35,7 +35,6 @@ struct MobileDraftsView: View {
             }
         }
         .padding(.horizontal)
-        .withBackButton()
     }
 }
 

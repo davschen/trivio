@@ -107,7 +107,7 @@ struct CustomSetView: View {
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
         gamesVM.previewViewShowing = true
-        gamesVM.setEpisode(ep: setID)
+        gamesVM.setCustomSetID(ep: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
     }
@@ -130,7 +130,7 @@ struct CustomSetCellView: View {
         return profileVM.beenPlayed(gameID: setID)
     }
     var selected: Bool {
-        return gamesVM.selectedEpisode == setID
+        return gamesVM.customSet.id == setID
     }
     var rating: String {
         if set.rating == 0 {
@@ -196,7 +196,7 @@ struct CustomSetCellView: View {
                         formatter.setAlertSettings(alertAction: {
                             buildVM.deleteSet(setID: setID)
                             gamesVM.deleteSet(setID: setID)
-                            gamesVM.setEpisode(ep: "")
+                            gamesVM.setCustomSetID(ep: "")
                         }, alertTitle: "Are You Sure?", alertSubtitle: "Deleting your set is irreversible. Your set \"\(set.title)\" has been played \(set.plays) times with a rating of \(String(format: "%.01f", round(set.rating * 10) / 10.0)) out of 5.", hasCancel: true, actionLabel: "Delete")
                     }, label: {
                         Text("Delete")
@@ -233,6 +233,6 @@ struct CustomSetCellView: View {
         .cornerRadius(10)
         .background(RoundedRectangle(cornerRadius: 10)
                         .stroke(formatter.color(.highContrastWhite),
-                                lineWidth: gamesVM.selectedEpisode == setID ? 5 : 0))
+                                lineWidth: gamesVM.customSet.id == setID ? 5 : 0))
     }
 }

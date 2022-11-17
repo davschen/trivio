@@ -1,34 +1,32 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "ConfettiSwiftUI",
-        "repositoryURL": "https://github.com/simibac/ConfettiSwiftUI",
-        "state": {
-          "branch": "master",
-          "revision": "7c0b9e92b75ada5d36ec0022d16aa3389b113594",
-          "version": null
-        }
-      },
-      {
-        "package": "MovingNumbersView",
-        "repositoryURL": "https://github.com/aunnnn/MovingNumbersView.git",
-        "state": {
-          "branch": null,
-          "revision": "89dd0f149de0b89831f0bc5f6bc36daddf9a9eeb",
-          "version": "0.1.0"
-        }
-      },
-      {
-        "package": "SwiftUI-Shimmer",
-        "repositoryURL": "https://github.com/markiv/SwiftUI-Shimmer",
-        "state": {
-          "branch": null,
-          "revision": "5b2e81191e77f66e6c6ca497f11a77fe48f7f0fc",
-          "version": "1.0.0"
-        }
+  "pins" : [
+    {
+      "identity" : "confettiswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/simibac/ConfettiSwiftUI",
+      "state" : {
+        "branch" : "master",
+        "revision" : "7c0b9e92b75ada5d36ec0022d16aa3389b113594"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "movingnumbersview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/aunnnn/MovingNumbersView.git",
+      "state" : {
+        "revision" : "89dd0f149de0b89831f0bc5f6bc36daddf9a9eeb",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "swiftui-shimmer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/markiv/SwiftUI-Shimmer",
+      "state" : {
+        "revision" : "5b2e81191e77f66e6c6ca497f11a77fe48f7f0fc",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 2
 }

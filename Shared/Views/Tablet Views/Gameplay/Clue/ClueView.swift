@@ -166,10 +166,10 @@ struct ClueResponseView: View {
             participantsVM.addSolved()
         }
         
-        if gamesVM.doneWithRound() && gamesVM.gamePhase == .doubleTrivio {
-            gamesVM.gamePhase = .finalTrivio
+        if gamesVM.doneWithRound() && gamesVM.gamePhase == .round2 {
+            gamesVM.gamePhase = .finalRound
         } else if gamesVM.doneWithRound() {
-            gamesVM.moveOntoDoubleJeopardy()
+            gamesVM.moveOntoRound2()
             participantsVM.changeDJTeam()
         }
         self.participantsVM.incrementGameStep()

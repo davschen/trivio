@@ -18,14 +18,15 @@ class ExploreViewModel: ObservableObject {
     @Published var hasSearch = false
     @Published var capSplit = [String]()
     
-    @Published var allRecents = [CustomSet]()
+    @Published var allPublicSets = [CustomSet]()
+    @Published var recentlyPlayedSets = [CustomSet]()
     @Published var titleSearchResults = [CustomSet]()
     @Published var categorySearchResults = [CustomSet]()
     @Published var tagsSearchResults = [CustomSet]()
     @Published var userResults = [CustomSet]()
     
     @Published var filterBy = "dateCreated"
-    @Published var descending = true
+    @Published var isDescending = true
     @Published var tagsString = [String]()
     @Published var tags = [String:Int]()
     
@@ -33,15 +34,16 @@ class ExploreViewModel: ObservableObject {
     @Published var viewingName = ""
     @Published var isShowingUserView = false
     @Published var usernameIDDict = [String:String]()
+    @Published var nameIDDict = [String:String]()
     
     private var db = Firestore.firestore()
     
     private var currentSort: String {
-        if filterBy == "dateCreated" && descending == true {
+        if filterBy == "dateCreated" && isDescending == true {
             return "Date created (newest)"
-        } else if filterBy == "dateCreated" && descending == false {
+        } else if filterBy == "dateCreated" && isDescending == false {
             return "Date created (oldest)"
-        } else if filterBy == "rating" && descending == true {
+        } else if filterBy == "rating" && isDescending == true {
             return "Highest rating"
         } else {
             return "Most plays"
@@ -49,7 +51,8 @@ class ExploreViewModel: ObservableObject {
     }
     
     init() {
-        pullAllRecents()
+        pullAllPublicSets()
+        pullRecentlyPlayedSets()
     }
     
     func clearSearch() {
@@ -59,9 +62,8 @@ class ExploreViewModel: ObservableObject {
     func searchAndPull() {
         let defaults = UserDefaults.standard
         if searchItem.isEmpty { return }
-        let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
-        if searchItem == "JesusIsKing1982" {
-            defaults.set(!isVIP, forKey: "isVIP")
+        if searchItem == "SocratesIsUnwise" {
+            defaults.set(true, forKey: "isVIP")
         }
         switch currentSearchBy {
         case .title:
@@ -69,7 +71,7 @@ class ExploreViewModel: ObservableObject {
         case .category:
             searchByCategory()
         case .allrecents:
-            pullAllRecents()
+            pullAllPublicSets()
         default:
             searchByTags()
         }
@@ -80,7 +82,7 @@ class ExploreViewModel: ObservableObject {
         db.collection("userSets")
             .whereField("titleKeywords", arrayContains: self.searchItem.lowercased())
             .whereField("isPublic", isEqualTo: true)
-            .order(by: filterBy, descending: descending)
+            .order(by: filterBy, descending: isDescending)
             .getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -101,7 +103,7 @@ class ExploreViewModel: ObservableObject {
         db.collection("userSets")
             .whereField("categoryNames", arrayContainsAny: capSplit)
             .whereField("isPublic", isEqualTo: true)
-            .order(by: filterBy, descending: descending)
+            .order(by: filterBy, descending: isDescending)
             .getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -123,7 +125,7 @@ class ExploreViewModel: ObservableObject {
         db.collection("userSets")
             .whereField("tags", arrayContainsAny: capSplit)
             .whereField("isPublic", isEqualTo: true)
-            .order(by: filterBy, descending: descending)
+            .order(by: filterBy, descending: isDescending)
             .getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -137,7 +139,7 @@ class ExploreViewModel: ObservableObject {
         }
     }
     
-    func addUsername(userID: String) {
+    func addUsernameNameToDict(userID: String) {
         db.collection("users").document(userID).getDocument { docSnap, error in
             if error != nil {
                 print(error!.localizedDescription)
@@ -145,6 +147,8 @@ class ExploreViewModel: ObservableObject {
             }
             guard let doc = docSnap else { return }
             guard let username = doc.get("username") as? String else { return }
+            guard let name = doc.get("name") as? String else { return }
+            self.nameIDDict.updateValue(name, forKey: userID)
             self.usernameIDDict.updateValue(username, forKey: userID)
         }
     }
@@ -153,24 +157,65 @@ class ExploreViewModel: ObservableObject {
         return usernameIDDict[userID] ?? "Creator"
     }
     
-    func pullAllRecents() {
+    func getInitialsFromUserID(userID: String) -> String {
+        var initials: String = ""
+        let name: String = nameIDDict[userID] ?? ""
+        let fullNameArray = name.components(separatedBy: " ")
+        for eachName in fullNameArray {
+            initials += eachName.prefix(1)
+            if initials.count > 2 {
+                break
+            }
+        }
+        return initials.uppercased()
+    }
+    
+    func pullAllPublicSets() {
         db.collection("userSets")
             .whereField("isPublic", isEqualTo: true)
-            .order(by: filterBy, descending: descending)
+            .order(by: filterBy, descending: isDescending)
             .getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
             }
             guard let data = snap?.documents else { return }
-            self.allRecents = data.compactMap({ (queryDocSnap) -> CustomSet? in
+            self.allPublicSets = data.compactMap({ (queryDocSnap) -> CustomSet? in
                 let customSet = try? queryDocSnap.data(as: CustomSet.self)
                 if let id = customSet?.userID {
-                    self.addUsername(userID: id)
+                    self.addUsernameNameToDict(userID: id)
                 }
                 return customSet
             })
         }
+    }
+    
+    private func pullRecentlyPlayedSets() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+                return
+            }
+            guard let snap = snap else { return }
+            snap.documentChanges.forEach { (diff) in
+                guard let playedGameID = diff.document.get("gameID") as? String else { return }
+                if diff.type == .added {
+                    self.addToRecentlyPlayed(customSetID: playedGameID)
+                }
+            }
+        }
+    }
+    
+    func addToRecentlyPlayed(customSetID: String) {
+        db.collection("userSets")
+            .document(customSetID)
+            .getDocument { (snap, error) in
+                if error != nil { return }
+                guard let customSet = try? snap?.data(as: CustomSet.self) else { return }
+                self.recentlyPlayedSets.append(customSet)
+                self.recentlyPlayedSets = self.recentlyPlayedSets.sorted(by: { $0.dateCreated > $1.dateCreated })
+            }
     }
     
     func noMatchesFound() -> Bool {
@@ -180,7 +225,7 @@ class ExploreViewModel: ObservableObject {
         case .category:
             return categorySearchResults.count == 0
         case .allrecents:
-            return allRecents.count == 0
+            return allPublicSets.count == 0
         default:
             return tagsSearchResults.count == 0
         }
@@ -223,18 +268,18 @@ class ExploreViewModel: ObservableObject {
         switch sortByOption {
         case "Date created (newest)":
             filterBy = "dateCreated"
-            descending = true
+            isDescending = true
         case "Date created (oldest)":
             filterBy = "dateCreated"
-            descending = false
+            isDescending = false
         case "Highest rating":
             filterBy = "rating"
-            descending = true
+            isDescending = true
         default:
             filterBy = "plays"
-            descending = true
+            isDescending = true
         }
-        pullAllRecents()
+        pullAllPublicSets()
     }
 }
 

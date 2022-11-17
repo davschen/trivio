@@ -13,9 +13,9 @@ import FirebaseFirestoreSwift
 class GamesViewModel: ObservableObject {
     @Published var menuChoice: MenuChoice = .explore
     
-    @Published var moneySections = ["200", "400", "600", "800", "1000"]
+    @Published var pointValueArray = ["200", "400", "600", "800", "1000"]
     @Published var gameSetupMode: GameSetupMode = .settings
-    @Published var gamePhase: GamePhase = .trivio
+    @Published var gamePhase: GamePhase = .round1
     @Published var gameplayDisplay: GameplayDisplay = .grid
     
     @Published var gamePreviews = [GamePreview]()
@@ -26,6 +26,9 @@ class GamesViewModel: ObservableObject {
     @Published var clues: [[String]] = []
     @Published var responses: [[String]] = []
     
+    @Published var jeopardySet = JeopardySet()
+    @Published var tidyCustomSet = TidyCustomSet()
+    
     @Published var jRoundLen = 6
     @Published var djRoundLen = 6
     @Published var jeopardyCategories = [String](repeating: "", count: 6)
@@ -33,8 +36,6 @@ class GamesViewModel: ObservableObject {
     @Published var jeopardyDailyDoubles = [Int]()
     @Published var djDailyDoubles1 = [Int]()
     @Published var djDailyDoubles2 = [Int]()
-    @Published var jeopardyRoundClues: [[String]] = []
-    @Published var doubleJeopardyRoundClues: [[String]] = []
     @Published var jeopardyRoundResponses: [[String]] = []
     @Published var doubleJeopardyRoundResponses: [[String]] = []
     @Published var fjCategory = ""
@@ -55,9 +56,7 @@ class GamesViewModel: ObservableObject {
     
     // Following @Published variables will be for custom sets
     @Published var customSet = Empty().customSet
-    @Published var rating: Double = 0.0
     @Published var title = ""
-    @Published var userID = "NID"
     @Published var queriedUserName = ""
     
     // From profile view
@@ -83,8 +82,8 @@ class GamesViewModel: ObservableObject {
         return df
     }
     
-    private var moneySectionsJ = ["200", "400", "600", "800", "1000"]
-    private var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
+    private var round1PointValues = ["200", "400", "600", "800", "1000"]
+    private var round2PointValues = ["400", "800", "1200", "1600", "2000"]
     
     public var db = Firestore.firestore()
     public let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
@@ -106,24 +105,24 @@ class GamesViewModel: ObservableObject {
     
     // for starting a new game
     func reset() {
-        self.gamePhase = .trivio
-        self.clues = jeopardyRoundClues
-        self.responses = jeopardyRoundResponses
+        self.gamePhase = .round1
+        self.clues = tidyCustomSet.round1Clues
+        self.responses = tidyCustomSet.round2Clues
         self.usedAnswers.removeAll()
-        self.moneySections = moneySectionsJ
-        self.categories = jeopardyCategories
+        self.pointValueArray = round1PointValues
+        self.categories = tidyCustomSet.round1Cats
         self.clearCategoryDones()
         self.finalTrivioStage = .notBegun
         self.currentCategoryIndex = 0
     }
     
-    func moveOntoDoubleJeopardy() {
-        self.gamePhase = .doubleTrivio
-        self.usedAnswers = [String]()
-        self.clues = doubleJeopardyRoundClues
-        self.responses = doubleJeopardyRoundResponses
-        self.moneySections = moneySectionsDJ
-        self.categories = doubleJeopardyCategories
+    func moveOntoRound2() {
+        self.gamePhase = .round2
+        self.clues = tidyCustomSet.round2Clues
+        self.responses = tidyCustomSet.round2Responses
+        self.usedAnswers.removeAll()
+        self.pointValueArray = round2PointValues
+        self.categories = tidyCustomSet.round2Cats
         self.clearCategoryDones()
         self.currentCategoryIndex = 0
     }
@@ -133,7 +132,8 @@ class GamesViewModel: ObservableObject {
         self.currentSeason = folder
     }
     
-    func setEpisode(ep: String) {
+    // selectedEpisode is deprecated for all I know
+    func setCustomSetID(ep: String) {
         self.selectedEpisode = ep
     }
     
@@ -151,14 +151,9 @@ class GamesViewModel: ObservableObject {
         self.jeopardyCategories.removeAll()
         self.doubleJeopardyCategories.removeAll()
         self.usedAnswers.removeAll()
-        self.jeopardyRoundClues.removeAll()
-        self.doubleJeopardyRoundClues.removeAll()
-        self.jeopardyRoundResponses.removeAll()
-        self.doubleJeopardyRoundResponses.removeAll()
-        self.gamePhase = .trivio
+        self.tidyCustomSet = TidyCustomSet()
+        self.gamePhase = .round1
         self.gameSetupMode = .settings
-        self.fjClue.removeAll()
-        self.fjResponse.removeAll()
         self.jeopardyDailyDoubles.removeAll()
         self.djDailyDoubles1.removeAll()
         self.djDailyDoubles2.removeAll()
@@ -187,10 +182,10 @@ class GamesViewModel: ObservableObject {
     
     func categoryDone(colIndex: Int) -> Bool {
         var reference = -1
-        if gamePhase == .trivio {
+        if gamePhase == .round1 {
             reference = jCategoryCompletesReference[colIndex]
             return categoryCompletes[colIndex] == reference
-        } else if gamePhase == .doubleTrivio {
+        } else if gamePhase == .round2 {
             reference = djCategoryCompletesReference[colIndex]
             return categoryCompletes[colIndex] == reference
         } else {
@@ -199,9 +194,9 @@ class GamesViewModel: ObservableObject {
     }
     
     func doneWithRound() -> Bool {
-        if gamePhase == .trivio {
+        if gamePhase == .round1 {
             return jRoundCompletes == usedAnswers.count
-        } else if gamePhase == .doubleTrivio {
+        } else if gamePhase == .round2 {
             return djRoundCompletes == usedAnswers.count
         } else {
             return false
@@ -215,7 +210,7 @@ class GamesViewModel: ObservableObject {
     }
     
     func gameInProgress() -> Bool {
-        if gamePhase == .trivio && usedAnswers.count == 0 {
+        if gamePhase == .round1 && usedAnswers.count == 0 {
             return false
         } else {
             return true
@@ -228,7 +223,7 @@ enum GameSetupMode {
 }
 
 enum GamePhase: CaseIterable {
-    case trivio, doubleTrivio, finalTrivio
+    case round1, round2, finalRound
 }
 
 enum GameplayDisplay {

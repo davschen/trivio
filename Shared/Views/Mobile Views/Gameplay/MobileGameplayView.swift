@@ -27,46 +27,78 @@ struct MobileGameplayView: View {
     @State var category = ""
     
     var body: some View {
-        VStack (spacing: 10) {
-            MobileGameplayHeaderView(showInfoView: $showInfoView)
-                .padding(.horizontal)
-            MobilePlayersView()
-                .padding(.horizontal)
+        ZStack {
+            formatter.color(.primaryBG)
+                .edgesIgnoringSafeArea(.all)
+            VStack (spacing: 10) {
+                MobileGameplayHeaderView(showInfoView: $showInfoView)
+                    .padding(.horizontal)
+                MobilePlayersView()
+                    .padding(.horizontal)
+                MobileGameplayGridView(clue: $clue, value: $value, response: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: $isDailyDouble, isTripleStumper: $isTripleStumper, allDone: $allDone, showInfoView: $showInfoView, category: $category)
+            }
+            .padding(.bottom)
+        }
+        .navigationBarTitle("")
+        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden()
+        .animation(.easeInOut)
+    }
+}
+
+struct MobileGameplayGridView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var clue: String
+    @Binding var value: String
+    @Binding var response: String
+    @Binding var amount: Int
+    @Binding var unsolved: Bool
+    @Binding var isDailyDouble: Bool
+    @Binding var isTripleStumper: Bool
+    @Binding var allDone: Bool
+    @Binding var showInfoView: Bool
+    @Binding var category: String
+    
+    var body: some View {
+        ZStack {
             ZStack {
-                ZStack {
-                    if gamesVM.gamePhase == .finalTrivio && gamesVM.finalTrivioStage != .notBegun {
-                        MobileFinalTrivioView()
-                            .padding(.horizontal)
-                    } else {
-                        if gamesVM.gameplayDisplay == .grid {
-                            ScrollViewReader { scrollView in
-                                ScrollView (.horizontal, showsIndicators: false) {
-                                    MobileGameGridView(clue: $clue, value: $value, response: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: $isDailyDouble, isTripleStumper: $isTripleStumper, allDone: $allDone, showInfoView: $showInfoView, category: $category)
-                                }
-                                .onAppear {
-                                    if gamesVM.currentCategoryIndex != 0 {
-                                        scrollView.scrollTo(gamesVM.currentCategoryIndex, anchor: gamesVM.getUnitPoint())
-                                    }
+                if gamesVM.gamePhase == .finalRound && gamesVM.finalTrivioStage != .notBegun {
+                    MobileFinalTrivioView()
+                        .padding(.horizontal)
+                } else {
+                    if gamesVM.gameplayDisplay == .grid {
+                        ScrollViewReader { scrollView in
+                            ScrollView (.horizontal, showsIndicators: false) {
+                                MobileGameGridView(clue: $clue, value: $value, response: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: $isDailyDouble, isTripleStumper: $isTripleStumper, allDone: $allDone, showInfoView: $showInfoView, category: $category)
+                            }
+                            .onAppear {
+                                if gamesVM.currentCategoryIndex != 0 {
+                                    scrollView.scrollTo(gamesVM.currentCategoryIndex, anchor: gamesVM.getUnitPoint())
                                 }
                             }
-                        } else if gamesVM.gameplayDisplay == .clue {
-                            MobileClueView(unsolved: $unsolved, category: category, clue: clue, response: response, amount: amount, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper)
-                                .padding(.horizontal)
                         }
-                        if gamesVM.gamePhase == .finalTrivio && gamesVM.finalTrivioStage == .notBegun {
-                            MobileContinueToFinalTrivioView()
-                        }
+                    } else if gamesVM.gameplayDisplay == .clue {
+                        MobileClueView(unsolved: $unsolved, category: category, clue: clue, response: response, amount: amount, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper)
+                            .padding(.horizontal)
+                    }
+                    if gamesVM.gamePhase == .finalRound && gamesVM.finalTrivioStage == .notBegun {
+                        MobileContinueToFinalTrivioView()
                     }
                 }
-                MobileInfoView(showInfoView: $showInfoView)
-                    .shadow(radius: 20)
             }
+            MobileInfoView(showInfoView: $showInfoView)
+                .shadow(radius: 20)
         }
-        .padding(.bottom)
     }
 }
 
 struct MobileGameplayHeaderView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
@@ -75,9 +107,9 @@ struct MobileGameplayHeaderView: View {
     
     var headerString: String {
         switch gamesVM.gamePhase {
-        case .trivio:
+        case .round1:
             return "Trivio! Round"
-        case .doubleTrivio:
+        case .round2:
             return "Double Trivio! Round"
         default:
             return "Final Trivio! Round"
@@ -89,7 +121,7 @@ struct MobileGameplayHeaderView: View {
     }
     
     var cluesInRound: Int {
-        return gamesVM.gamePhase == .trivio ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
+        return gamesVM.gamePhase == .round1 ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
     }
     
     var body: some View {
@@ -97,10 +129,11 @@ struct MobileGameplayHeaderView: View {
             HStack {
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    presentationMode.wrappedValue.dismiss()
                     gamesVM.gameSetupMode = .settings
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                 }
                 
                 Text("\(headerString)")
@@ -114,12 +147,12 @@ struct MobileGameplayHeaderView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     showInfoView.toggle()
                 } label: {
-                    Image(systemName: "gear")
+                    Image(systemName: "info.circle.fill")
                         .font(.system(size: 20, weight: .bold))
                 }
             }
             // Progress bar
-            if gamesVM.gamePhase == .trivio || gamesVM.gamePhase == .doubleTrivio {
+            if gamesVM.gamePhase == .round1 || gamesVM.gamePhase == .round2 {
                 GeometryReader { geometry in
                     VStack (alignment: .leading, spacing: 2) {
                         Spacer()
@@ -135,7 +168,11 @@ struct MobileGameplayHeaderView: View {
                             Text("Progress: \(progressCount) of \(cluesInRound) clues completed")
                             Spacer()
                             Button {
-                                gamesVM.gamePhase = gamesVM.gamePhase.next()
+                                if gamesVM.gamePhase == .round1 {
+                                    gamesVM.moveOntoRound2()
+                                } else {
+                                    gamesVM.gamePhase = gamesVM.gamePhase.next()
+                                }
                             } label: {
                                 Text("Skip round")
                                     .font(formatter.font(.boldItalic, fontSize: .small))

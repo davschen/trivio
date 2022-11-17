@@ -25,7 +25,7 @@ struct TeamBuildView: View {
                 .edgesIgnoringSafeArea(.all)
                 .opacity(showsBuild ? 0.6 : 0)
                 .onTapGesture {
-                    if participantsVM.historicalTeams.contains(team) {
+                    if participantsVM.savedTeams.contains(team) {
                         participantsVM.editTeamInDB(teamIndex: team.index)
                     }
                     formatter.resignKeyboard()
@@ -73,7 +73,7 @@ struct TeamBuildView: View {
                     if let uid = profileVM.myUID {
                         if team.id != uid {
                             Button {
-                                if !participantsVM.historicalTeams.contains(team) {
+                                if !participantsVM.savedTeams.contains(team) {
                                     participantsVM.writeTeamToFirestore(team: team)
                                 } else {
                                     formatter.setAlertSettings(alertAction: {
@@ -82,10 +82,10 @@ struct TeamBuildView: View {
                                 }
                             } label: {
                                 HStack {
-                                    Image(systemName: participantsVM.historicalTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
+                                    Image(systemName: participantsVM.savedTeams.contains(team) ? "square.and.arrow.down.fill" : "square.and.arrow.down")
                                         .font(.system(size: 20, weight: .bold))
                                         .offset(y: -3)
-                                    Text(participantsVM.historicalTeams.contains(team) ? "Unsave" : "Save")
+                                    Text(participantsVM.savedTeams.contains(team) ? "Unsave" : "Save")
                                         .font(formatter.font())
                                 }
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -11,7 +11,7 @@ import SwiftUI
 struct BuildCategoryView: View {
     @EnvironmentObject var buildVM: BuildViewModel
     @Binding var categoryIndex: Int
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     @State var index: Int
     @State var isHeld = -1
     
@@ -34,7 +34,7 @@ struct BuildCategoryView: View {
                         return
                     }
                     
-                    buildVM.currentDisplay = .categoryName
+                    buildVM.currentDisplay = .buildAll
                     
                     if buildVM.buildStage == .dtRound {
                         buildVM.djCategories[index].setIndex(index: index)

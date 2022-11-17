@@ -47,7 +47,7 @@ struct InfoView: View {
                 .background(formatter.color(.secondaryFG))
                 ScrollView (.vertical, showsIndicators: false) {
                     VStack (alignment: .leading) {
-                        Text("\(gamesVM.title)")
+                        Text("\(gamesVM.customSet.title)")
                             .font(formatter.font(fontSize: .large))
                         Text("Created by \(isCustom ? gamesVM.queriedUserName : "Trivio Official") on \(gamesVM.dateFormatter.string(from: isCustom ? customSet.dateCreated : gamesVM.date))")
                             .font(formatter.font(.regular))

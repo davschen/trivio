@@ -15,7 +15,6 @@ struct MobileBuildView: View {
     @EnvironmentObject var searchVM: SearchViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
-    @State var showingEdit = false
     @State var editingName = false
     @State var showingSaveDraft = false
     @State var categoryIndex = 0
@@ -24,48 +23,75 @@ struct MobileBuildView: View {
         return buildVM.buildStage == .dtRound || buildVM.buildStage == .dtRoundDD
     }
     
-    var isShowingGrid: Bool {
-        return !showingEdit && !editingName && !showingSaveDraft
-    }
-    
     var body: some View {
         VStack (alignment: .leading) {
-            MobileBuildHeaderView(showingEdit: $showingEdit, editingName: $editingName, showingSaveDraft: $showingSaveDraft)
-            MobileBuildHUDView()
-                .padding(.horizontal)
-            MobileBuildTickerView()
-                .padding(.horizontal)
+            if buildVM.currentDisplay != .buildAll {
+                MobileBuildHUDView()
+            }
             switch buildVM.currentDisplay {
-            case .clueResponse:
-                MobileEditClueResponseView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex])
+            case .settings:
+                Text("")
+                MobileBuildDetailsView()
                     .padding(.horizontal)
-            case .categoryName:
-                MobileEditCategoryNameView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex])
-                    .padding(.horizontal)
+            case .buildAll:
+                MobileBuildAllView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryIndex: $categoryIndex)
             case .finalTrivio:
                 MobileFinalTrivioFillView()
-                    .padding(.horizontal)
-            case .finishingTouches:
-                MobileBuildDetailsView()
                     .padding(.horizontal)
             case .saveDraft:
                 MobileSaveDraftView()
                     .padding(.horizontal)
             default:
-                MobileBuildGridView(showingEdit: $showingEdit, categoryIndex: $categoryIndex)
+                MobileBuildGridView(categoryIndex: $categoryIndex)
             }
-            Spacer(minLength: 0)
+            if buildVM.currentDisplay != .buildAll {
+                MobileBuildFooterView()
+                    .padding(.horizontal)
+            }
         }
-        .padding(.vertical)
+        .withBackButton()
+        .withBackground()
+        .navigationTitle(buildVM.setName.isEmpty ? "Build set" : buildVM.setName)
+        .navigationBarTitleDisplayMode(.inline)
+        .ignoresSafeArea(edges: .bottom)
+        .toolbar {
+            ToolbarItem {
+                Button(action: {
+                    if buildVM.isEditing && !buildVM.isEditingDraft {
+                        formatter.setAlertSettings(alertAction: {
+                            formatter.hapticFeedback(style: .soft, intensity: .strong)
+                            buildVM.saveDraft()
+                        }, alertTitle: "Save and Leave?", alertSubtitle: "Choose whether you want to leave or stay after saving.", hasCancel: true, actionLabel: "Stay", hasSecondaryAction: true, secondaryAction: {
+                            buildVM.saveDraft()
+                            buildVM.showingBuildView.toggle()
+                        }, secondaryActionLabel: "Leave")
+                    } else {
+                        buildVM.currentDisplay = .saveDraft
+                    }
+                }) {
+                    ZStack {
+                        Text("Save")
+                    }
+                    .font(formatter.font(fontSize: .regular))
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .padding(.horizontal).padding(.vertical, 5)
+                    .background(formatter.color(.highContrastWhite))
+                    .clipShape(Capsule())
+                }
+                .opacity(buildVM.setName.isEmpty ? 0 : 1)
+            }
+        }
     }
 }
 
 struct MobileBuildGridView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
-    
-    @Binding var showingEdit: Bool
+
     @Binding var categoryIndex: Int
+    
+    @State var isShowingPreview = false
+    @State var showsDuplexExplanation = false
     
     var isDJ: Bool {
         return buildVM.buildStage == .dtRound || buildVM.buildStage == .dtRoundDD
@@ -73,11 +99,40 @@ struct MobileBuildGridView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
-            Text(buildVM.stepStringHandler())
-                .font(formatter.font(fontSize: .mediumLarge))
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+            if buildVM.buildStage == .trivioRound || buildVM.buildStage == .dtRound {
+                MobileBuildGridEntryView(isShowingPreview: $isShowingPreview)
+                    .frame(height: 20)
+            } else if buildVM.buildStage == .trivioRoundDD || buildVM.buildStage == .dtRoundDD {
+                VStack (alignment: .leading) {
+                    HStack {
+                        Text("Duplex of the Day")
+                        Button {
+                            showsDuplexExplanation.toggle()
+                        } label: {
+                            Image(systemName: showsDuplexExplanation ? "questionmark.circle.fill" : "questionmark.circle")
+                                .font(formatter.iconFont(.small))
+                        }
+                        Spacer()
+                        Button {
+                            buildVM.randomDDs()
+                        } label: {
+                            Text("Random")
+                                .font(formatter.font(fontSize: .small))
+                                .padding(5)
+                                .frame(width: 70)
+                                .background(formatter.color(.green))
+                                .clipShape(Capsule())
+                        }
+
+                    }
+                    .frame(height: 20)
+                    if showsDuplexExplanation {
+                        Text("Pick \(buildVM.buildStage == .trivioRoundDD ? "a" : "two") clue\(buildVM.buildStage == .trivioRoundDD ? "" : "s") to serve as your duplex of the day.")
+                            .font(formatter.font(.regularItalic, fontSize: .small))
+                    }
+                }
                 .padding(.horizontal)
+            }
             ScrollViewReader { scrollView in
                 ScrollView (.horizontal, showsIndicators: false) {
                     HStack (spacing: 5) {
@@ -86,9 +141,12 @@ struct MobileBuildGridView: View {
                         ForEach(0..<(isDJ ? self.buildVM.djCategories.count : self.buildVM.jCategories.count), id: \.self) { i in
                             let toShow = isDJ ? buildVM.djCategoriesShowing : buildVM.jCategoriesShowing
                             if i <= (toShow.count - 1) && toShow[i] {
-                                MobileBuildCategoryView(categoryIndex: $categoryIndex,
-                                                  category: (isDJ ? $buildVM.djCategories[i] : $buildVM.jCategories[i]),
-                                                  index: i).id(i)
+                                MobileBuildCategoryView(
+                                    categoryIndex: $categoryIndex,
+                                    category: (isDJ ? $buildVM.djCategories[i] : $buildVM.jCategories[i]),
+                                    isShowingPreview: $isShowingPreview,
+                                    index: i
+                                ).id(i)
                             }
                         }
                         Spacer()
@@ -102,6 +160,54 @@ struct MobileBuildGridView: View {
                 }
             }
         }
+    }
+}
+
+struct MobileBuildGridEntryView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var buildVM: BuildViewModel
+    
+    @Binding var isShowingPreview: Bool
+    
+    var isDJ: Bool {
+        return buildVM.buildStage == .dtRound || buildVM.buildStage == .dtRoundDD
+    }
+    
+    var body: some View {
+        HStack (spacing: 2) {
+            Text("Categories (\(isDJ ? buildVM.djRoundLen : buildVM.jRoundLen))")
+                .font(formatter.font(fontSize: .medium))
+            Button {
+                buildVM.subtractCategory()
+            } label: {
+                Image(systemName: "minus.circle.fill")
+                    .font(formatter.iconFont(.small))
+                    .opacity(isDJ ? (buildVM.djRoundLen == 3 ? 0.4 : 1) : (buildVM.jRoundLen == 3 ? 0.4 : 1))
+            }
+            Button {
+                buildVM.addCategory()
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(formatter.iconFont(.small))
+                    .opacity(isDJ ? (buildVM.djRoundLen == 6 ? 0.4 : 1) : (buildVM.jRoundLen == 6 ? 0.4 : 1))
+            }
+            Spacer()
+            Text("Preview")
+                .font(formatter.font(fontSize: .medium))
+                .padding(.trailing, 3)
+            ZStack(alignment: (isShowingPreview ? .trailing : .leading)) {
+                Capsule()
+                    .frame(width: 30, height: 15)
+                    .foregroundColor(formatter.color(isShowingPreview ? .secondaryAccent : .primaryFG))
+                Circle()
+                    .frame(width: 15, height: 15)
+            }
+            .onTapGesture {
+                isShowingPreview.toggle()
+            }
+            .animation(Animation.easeIn(duration: 0.05))
+        }
+        .padding(.horizontal).padding(.top, 7)
     }
 }
 

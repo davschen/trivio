@@ -12,9 +12,9 @@ struct MobileBuildCellView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var isHeld: Int
+    @Binding var isShowingPreview: Bool
     @Binding var categoryIndex: Int
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     @Binding var index: Int
     
     var i: Int
@@ -28,32 +28,43 @@ struct MobileBuildCellView: View {
     
     var body: some View {
         ZStack {
-            if isHeld == i {
-                MobileBuildCellHeldView()
+            if isShowingPreview {
+                VStack (spacing: 5) {
+                    Text(clue.uppercased())
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                    Text(response.uppercased())
+                        .foregroundColor(formatter.color(.secondaryAccent))
+                        .lineLimit(1)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .font(formatter.fontFloat(.bold, sizeFloat: 10.0))
             } else {
                 ZStack {
-                    Text("$\(amount)")
-                        .font(formatter.font(.extraBold, fontSize: .large))
+                    Text("\(amount)")
+                        .font(formatter.fontFloat(.bold, sizeFloat: 45.0))
                         .minimumScaleFactor(0.5)
                         .foregroundColor(formatter.color(.secondaryAccent).opacity((clue.isEmpty || response.isEmpty) ? 0.5 : 1))
                         .multilineTextAlignment(.center)
                     if (buildVM.buildStage == .trivioRound) || (buildVM.buildStage == .dtRound) {
                         Image(systemName: (clue.isEmpty || response.isEmpty) ? "plus.circle.fill" : "pencil.circle.fill")
-                            .font(formatter.iconFont())
+                            .font(formatter.iconFont(.small))
                             .opacity(category.name.isEmpty ? 0 : 0.5)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
                             .padding(5)
                     }
                 }
+                .id(amount)
             }
         }
-        .frame(width: 150)
+        .frame(width: 165)
         .frame(maxHeight: .infinity)
         .background(RoundedRectangle(cornerRadius: 10).stroke(
             (buildVM.buildStage == .trivioRound || buildVM.buildStage == .dtRound) ? formatter.color(.primaryAccent) : formatter.color(.highContrastWhite),
-            lineWidth: buildVM.isDailyDouble(i: category.index, j: i) ? 10 : 0
+            lineWidth: buildVM.isDailyDouble(i: category.index, j: i) ? 5 : 0
         ))
-        .background(formatter.color((clue.isEmpty || response.isEmpty) ? .primaryFG : .primaryAccent))
+        .background(formatter.color((clue.isEmpty || response.isEmpty) ? .secondaryFG : .primaryAccent).opacity((clue.isEmpty || response.isEmpty) ? 0.4 : 1))
         .cornerRadius(10)
         .onTapGesture {
             if (buildVM.buildStage == .trivioRoundDD
@@ -64,22 +75,22 @@ struct MobileBuildCellView: View {
                 }
             } else if !category.name.isEmpty {
                 formatter.hapticFeedback(style: .rigid)
-                buildVM.currentDisplay = .clueResponse
+                buildVM.currentDisplay = .buildAll
                 buildVM.setEditingIndex(index: i)
                 buildVM.editingCategoryIndex = index
                 categoryIndex = index
             }
         }
-        .onLongPressGesture(minimumDuration: 1, pressing: { inProgress in
-            if (!clue.isEmpty || !response.isEmpty) {
-                formatter.hapticFeedback(style: .medium)
-                buildVM.setPreviews(clue: clue, response: response)
-                isHeld = inProgress ? i : -1
-            }
-        }) {
-            formatter.hapticFeedback(style: .medium, intensity: .weak)
-            isHeld = -1
-        }
+//        .onLongPressGesture(minimumDuration: 1, pressing: { inProgress in
+//            if (!clue.isEmpty || !response.isEmpty) {
+//                formatter.hapticFeedback(style: .medium)
+//                buildVM.setPreviews(clue: clue, response: response)
+//                isHeld = inProgress ? i : -1
+//            }
+//        }) {
+//            formatter.hapticFeedback(style: .medium, intensity: .weak)
+//            isHeld = -1
+//        }
     }
 }
 

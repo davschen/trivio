@@ -33,7 +33,7 @@ struct GameplayView: View {
             PlayersView()
             ZStack {
                 ZStack {
-                    if gamesVM.gamePhase == .finalTrivio && gamesVM.finalTrivioStage != .notBegun {
+                    if gamesVM.gamePhase == .finalRound && gamesVM.finalTrivioStage != .notBegun {
                         FinalTrivioView()
                     } else {
                         if gamesVM.gameplayDisplay == .grid {
@@ -41,7 +41,7 @@ struct GameplayView: View {
                         } else if gamesVM.gameplayDisplay == .clue {
                             ClueView(unsolved: $unsolved, category: category, clue: clue, response: response, amount: amount, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper)
                         }
-                        if gamesVM.gamePhase == .finalTrivio && gamesVM.finalTrivioStage == .notBegun {
+                        if gamesVM.gamePhase == .finalRound && gamesVM.finalTrivioStage == .notBegun {
                             ContinueToFinalTrivioView()
                         }
                     }
@@ -63,9 +63,9 @@ struct GameplayHeaderView: View {
     
     var headerString: String {
         switch gamesVM.gamePhase {
-        case .trivio:
+        case .round1:
             return "Trivio! Round"
-        case .doubleTrivio:
+        case .round2:
             return "Double Trivio! Round"
         default:
             return "Final Trivio! Round"
@@ -77,7 +77,7 @@ struct GameplayHeaderView: View {
     }
     
     var cluesInRound: Int {
-        return gamesVM.gamePhase == .trivio ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
+        return gamesVM.gamePhase == .round1 ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
     }
     
     var body: some View {
@@ -93,7 +93,7 @@ struct GameplayHeaderView: View {
                 .font(formatter.font(fontSize: .extraLarge))
             
             // Progress bar
-            if gamesVM.gamePhase == .trivio || gamesVM.gamePhase == .doubleTrivio {
+            if gamesVM.gamePhase == .round1 || gamesVM.gamePhase == .round2 {
                 GeometryReader { geometry in
                     VStack (alignment: .leading, spacing: 2) {
                         Spacer()

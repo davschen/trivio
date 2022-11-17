@@ -19,13 +19,13 @@ struct ReportsView: View {
                 Text("Past Games")
                     .font(formatter.font(fontSize: .extraLarge))
                     .foregroundColor(formatter.color(.highContrastWhite))
-                if reportVM.allGames.count == 0 {
+                if reportVM.allGameReports.count == 0 {
                     EmptyListView(label: "You haven't played any games yet. Once you do, they will show up here with detailed in-game reports")
                         .padding(.vertical, 30)
                 } else {
                     ScrollView (.horizontal, showsIndicators: false) {
                         HStack (spacing: 15) {
-                            ForEach(reportVM.allGames, id: \.self) { game in
+                            ForEach(reportVM.allGameReports, id: \.self) { game in
                                 ReportPreviewView(game: game)
                             }
                         }

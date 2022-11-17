@@ -10,11 +10,12 @@ import Firebase
 import FirebaseFirestoreSwift
 
 class BuildViewModel: ObservableObject {
-    @Published var buildStage: BuildStage = .trivioRound
-    @Published var currentDisplay: CurrentDisplay = .grid
+    @Published var buildStage: BuildStage = .details
+    @Published var buildPhaseType: BuildPhaseType = .rounds1and2
+    @Published var currentDisplay: CurrentDisplay = .settings
     @Published var isEditing = false
     @Published var isEditingDraft = false
-    
+
     @Published var moneySections = ["", "", "", "", ""]
     @Published var jeopardyDailyDoubles = [Int]()
     @Published var djDailyDoubles1 = [Int]()
@@ -23,19 +24,23 @@ class BuildViewModel: ObservableObject {
     @Published var fjClue = ""
     @Published var fjResponse = ""
     
+    @Published var isPreviewDisplayModern = true
+    @Published var mostAdvancedStage: BuildStage = .details
     @Published var gameID = ""
     @Published var isPublic = true
     @Published var tags = [String]()
     @Published var tag = ""
     @Published var setName = ""
+    @Published var setDescription = ""
+    @Published var hasTwoRounds = false
     @Published var jRoundLen = 0
     @Published var djRoundLen = 0
-    @Published var categories = [Category]()
-    @Published var jCategories = [Category]()
-    @Published var djCategories = [Category]()
+    @Published var categories = [CustomSetCategory]()
+    @Published var jCategories = [CustomSetCategory]()
+    @Published var djCategories = [CustomSetCategory]()
     @Published var isRandomDD = false
     
-    @Published var editingIndex = 0
+    @Published var editingClueIndex = 0
     @Published var choosingDailyDoubles = false
     @Published var jCategoriesShowing = [Bool]()
     @Published var djCategoriesShowing = [Bool]()
@@ -73,7 +78,7 @@ class BuildViewModel: ObservableObject {
         self.tags.removeAll()
         
         self.isRandomDD = false
-        self.editingIndex = 0
+        self.editingClueIndex = 0
         self.jCategoriesShowing.removeAll()
         self.djCategoriesShowing.removeAll()
         self.gameID = UUID().uuidString
@@ -81,6 +86,7 @@ class BuildViewModel: ObservableObject {
         self.fillBlanks()
         
         self.buildStage = .trivioRound
+        self.mostAdvancedStage = .details
         self.currentDisplay = .grid
     }
     
@@ -206,7 +212,7 @@ class BuildViewModel: ObservableObject {
                 
                 self.categories = self.jCategories
                 self.isRandomDD = true
-                self.editingIndex = 0
+                self.editingClueIndex = 0
                 self.jCategoriesShowing = [Bool](repeating: true, count: 6)
                 self.djCategoriesShowing = [Bool](repeating: true, count: 6)
             }
@@ -250,7 +256,7 @@ class BuildViewModel: ObservableObject {
         }
         gameID = UUID().uuidString
         moneySections = moneySectionsJ
-        buildStage = .trivioRound
+        buildStage = .details
     }
     
     func start() {
@@ -262,16 +268,16 @@ class BuildViewModel: ObservableObject {
     
     func getCategoriesWithIDs(isDJ: Bool, ids: [String]) {
         if isDJ {
-            self.djCategories = [Category](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
+            self.djCategories = [CustomSetCategory](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
         } else {
-            self.jCategories = [Category](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
+            self.jCategories = [CustomSetCategory](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
         }
         for i in 0..<ids.count {
             let id = ids[i]
             db.collection("userCategories").document(id).getDocument { (doc, error) in
                 if error != nil { return }
                 guard let doc = doc else { return }
-                guard let category = try? doc.data(as: Category.self) else { return }
+                guard let category = try? doc.data(as: CustomSetCategory.self) else { return }
                 DispatchQueue.main.async {
                     if isDJ {
                         self.djCategories[category.index] = category
@@ -283,33 +289,49 @@ class BuildViewModel: ObservableObject {
         }
     }
     
-    func addCategory() {
-        if buildStage == .trivioRound {
-            if self.jRoundLen == 6 { return }
-            self.jRoundLen += 1
-            jCategoriesShowing[jRoundLen - 1] = true
-            if jCategories.count <= jRoundLen {
-                self.jCategories.append(Empty().category(index: jRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
-            }
-        } else if buildStage == .dtRound {
-            if self.djRoundLen == 6 { return }
-            self.djRoundLen += 1
-            djCategoriesShowing[djRoundLen - 1] = true
-            if djCategories.count <= djRoundLen {
-                self.jCategories.append(Empty().category(index: djRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
-            }
+    func addRound1() {
+        if self.jRoundLen == 6 { return }
+        self.jRoundLen += 1
+        jCategoriesShowing[jRoundLen - 1] = true
+        if jCategories.count <= jRoundLen {
+            self.jCategories.append(Empty().category(index: jRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
         }
     }
     
-    func subtractCategory(index: Int, last: Bool) {
+    func addRound2() {
+        if self.djRoundLen == 6 { return }
+        self.djRoundLen += 1
+        djCategoriesShowing[djRoundLen - 1] = true
+        if djCategories.count <= djRoundLen {
+            self.jCategories.append(Empty().category(index: djRoundLen - 1, emptyStrings: emptyStrings, gameID: gameID))
+        }
+    }
+    
+    func addCategory() {
         if buildStage == .trivioRound {
-            if self.jRoundLen == 3 { return }
-            self.jRoundLen -= 1
-            jCategoriesShowing[jRoundLen] = false
+            addRound1()
         } else if buildStage == .dtRound {
-            if self.djRoundLen == 3 { return }
-            self.djRoundLen -= 1
-            djCategoriesShowing[djRoundLen] = false
+            addRound2()
+        }
+    }
+    
+    func subtractRound1() {
+        if self.jRoundLen == 3 { return }
+        self.jRoundLen -= 1
+        jCategoriesShowing[jRoundLen] = false
+    }
+    
+    func subtractRound2() {
+        if self.djRoundLen == 3 { return }
+        self.djRoundLen -= 1
+        djCategoriesShowing[djRoundLen] = false
+    }
+    
+    func subtractCategory() {
+        if buildStage == .trivioRound {
+            subtractRound1()
+        } else if buildStage == .dtRound {
+            subtractRound2()
         }
     }
     
@@ -347,11 +369,12 @@ class BuildViewModel: ObservableObject {
     
     func randomDDs() {
         if buildStage == .trivioRoundDD {
+            jeopardyDailyDoubles.removeAll()
             while self.jeopardyDailyDoubles.isEmpty {
                 let randCol = Int.random(in: 0..<jRoundLen)
                 let randRow = Int.random(in: 0..<5)
 
-                if !self.jCategories[randCol].clues[randRow].isEmpty {
+                if !(self.jCategories[randCol].clues[randRow].isEmpty && self.jCategories[randCol].responses[randRow].isEmpty) {
                     self.jeopardyDailyDoubles = [randCol, randRow]
                 }
             }
@@ -417,7 +440,7 @@ class BuildViewModel: ObservableObject {
     }
     
     func setEditingIndex(index: Int) {
-        self.editingIndex = index
+        self.editingClueIndex = index
     }
     
     func stepStringHandler() -> String {
@@ -475,6 +498,9 @@ class BuildViewModel: ObservableObject {
     
     func back() {
         switch buildStage {
+        case .trivioRound:
+            buildStage = .details
+            currentDisplay = .settings
         case .trivioRoundDD:
             buildStage = .trivioRound
             currentDisplay = .grid
@@ -486,7 +512,11 @@ class BuildViewModel: ObservableObject {
             buildStage = .dtRound
             currentDisplay = .grid
         case .finalTrivio:
-            buildStage = .dtRoundDD
+            if hasTwoRounds {
+                buildStage = .dtRoundDD
+            } else {
+                buildStage = .trivioRoundDD
+            }
             currentDisplay = .grid
         default:
             buildStage = .finalTrivio
@@ -494,32 +524,49 @@ class BuildViewModel: ObservableObject {
         }
     }
     
+    func rectifyNextProhibited(nextIsPermitted: Bool) {
+//        mostAdvancedStage = nextIsPermitted ? buildStage : mostAdvancedStage
+    }
+    
     func nextPermitted() -> Bool {
+        var nextIsPermitted = false
         switch buildStage {
+        case .details:
+            nextIsPermitted = !tags.isEmpty && !setName.isEmpty
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         case .trivioRound:
             var numFilled = 0
             for category in jCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
-            return numFilled >= jRoundLen
+            nextIsPermitted = numFilled >= jRoundLen
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         case .dtRound:
             var numFilled = 0
             for category in djCategories {
                 numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
             }
-            return numFilled >= djRoundLen
+            nextIsPermitted = numFilled >= djRoundLen
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         case .trivioRoundDD:
-            return !jeopardyDailyDoubles.isEmpty
+            nextIsPermitted = !jeopardyDailyDoubles.isEmpty
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         case .dtRoundDD:
-            return (!djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty)
-        case .details:
-            return tags.count >= 2 && !setName.isEmpty
+            nextIsPermitted = (!djDailyDoubles1.isEmpty && !djDailyDoubles2.isEmpty)
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         default:
-            return !fjCategory.isEmpty && !fjClue.isEmpty && !fjResponse.isEmpty
+            nextIsPermitted = !fjCategory.isEmpty && !fjClue.isEmpty && !fjResponse.isEmpty
+            rectifyNextProhibited(nextIsPermitted: nextIsPermitted)
+            return nextIsPermitted
         }
     }
     
-    func categoryEmpty(category: Category) -> Bool {
+    func categoryEmpty(category: CustomSetCategory) -> Bool {
         for i in 0..<category.clues.count {
             let clue = category.clues[i]
             let response = category.responses[i]
@@ -539,15 +586,32 @@ class BuildViewModel: ObservableObject {
         return true
     }
     
+    public func changePointValues(isAdvancing: Bool) {
+        moneySections = isAdvancing ? moneySectionsDJ : moneySectionsJ
+    }
+    
     func nextButtonHandler() {
+        let buildStageIndexDict = MobileBuildStageIndexDict()
+        let buildStageIndex = buildStageIndexDict.getIndex(from: buildStage)
+        let mostAdvancedStageIndex = buildStageIndexDict.getIndex(from: mostAdvancedStage)
+        
         switch buildStage {
+        case .details:
+            buildStage = .trivioRound
+            currentDisplay = .grid
+            editingCategoryIndex = 0
         case .trivioRound:
             buildStage = .trivioRoundDD
             currentDisplay = .grid
             editingCategoryIndex = 0
         case .trivioRoundDD:
-            buildStage = .dtRound
-            moneySections = moneySectionsDJ
+            if hasTwoRounds {
+                buildStage = .dtRound
+                changePointValues(isAdvancing: true)
+            } else {
+                buildStage = .finalTrivio
+                currentDisplay = .finalTrivio
+            }
         case .dtRound:
             buildStage = .dtRoundDD
             isRandomDD = false
@@ -556,9 +620,6 @@ class BuildViewModel: ObservableObject {
         case .dtRoundDD:
             buildStage = .finalTrivio
             currentDisplay = .finalTrivio
-        case .finalTrivio:
-            buildStage = .details
-            currentDisplay = .finishingTouches
         default:
             writeToFirestore() { (success) -> Void in
                 self.processPending = true
@@ -569,6 +630,9 @@ class BuildViewModel: ObservableObject {
                     self.clearAll()
                 }
             }
+        }
+        if mostAdvancedStageIndex <= buildStageIndex {
+            mostAdvancedStage = buildStage
         }
     }
     
@@ -683,65 +747,34 @@ class BuildViewModel: ObservableObject {
     }
 }
 
-struct Category: Decodable, Hashable, Encodable {
-    @DocumentID var id: String?
-    var name: String
-    var index: Int
-    var clues: [String]
-    var responses: [String]
-    var gameID: String
-    // stored as [<index>, <URL>]
-    var imageURLs: [Int:String]
-    var audioURLs: [Int:String]
+struct MobileBuildStageIndexDict {
+    var dict: [BuildStage:Int] = [
+        .details: 0,
+        .trivioRound: 1,
+        .trivioRoundDD: 2,
+        .dtRound: 3,
+        .dtRoundDD: 4,
+        .finalTrivio: 5
+    ]
     
-    mutating func setIndex(index: Int) {
-        self.index = index
-    }
-}
-
-struct CustomSet: Decodable, Hashable, Identifiable, Encodable {
-    @DocumentID var id: String?
-    var jCategoryIDs: [String]
-    var djCategoryIDs: [String]
-    var categoryNames: [String]
-    var title: String
-    var titleKeywords: [String]
-    var fjCategory: String
-    var fjClue: String
-    var fjResponse: String
-    var dateCreated: Date
-    var jeopardyDailyDoubles: [Int]
-    var djDailyDoubles1: [Int]
-    var djDailyDoubles2: [Int]
-    var userID: String
-    var isPublic: Bool
-    var tags: [String]
-    var plays: Int
-    var rating: Double
-    var numRatings: Int
-    var numclues: Int
-    var averageScore: Double
-    var jRoundLen: Int
-    var djRoundLen: Int
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+    func getIndex(from buildStage: BuildStage) -> Int {
+        return dict[buildStage] ?? 0
     }
 }
 
 struct Empty {
     var customSet = CustomSet(id: "", jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
     var game = Game(id: "", date: Date(), dj_category_ids: [], dj_dds_1: [], dj_dds_2: [], dj_round_len: 0, fj_category: "", fj_clue: "", fj_response: "", game_id: "", group_index: 0, j_category_ids: [], j_round_len: 0, title: "", type: "", userID: "")
-    var team = Team(id: "", index: 0, name: "", members: [], score: 0, color: "blue")
-    func category(index: Int, emptyStrings: [String], gameID: String) -> Category {
-        return Category(id: UUID().uuidString, name: "", index: index, clues: emptyStrings, responses: emptyStrings, gameID: gameID, imageURLs: [:], audioURLs: [:])
+    var team = Team(id: UUID().uuidString, index: 0, name: "", members: [], score: 0, color: "blue")
+    func category(index: Int, emptyStrings: [String], gameID: String) -> CustomSetCategory {
+        return CustomSetCategory(id: UUID().uuidString, name: "", index: index, clues: emptyStrings, responses: emptyStrings, gameID: gameID, imageURLs: [:], audioURLs: [:])
     }
 }
 
 enum BuildStage {
-    case trivioRound, trivioRoundDD, dtRound, dtRoundDD, finalTrivio, details
+    case details, trivioRound, trivioRoundDD, dtRound, dtRoundDD, finalTrivio
 }
 
 enum CurrentDisplay {
-    case grid, categoryName, clueResponse, finalTrivio, finishingTouches, saveDraft
+    case grid, buildAll, finalTrivio, settings, saveDraft
 }

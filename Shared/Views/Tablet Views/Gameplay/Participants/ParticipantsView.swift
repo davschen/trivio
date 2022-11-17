@@ -99,7 +99,7 @@ struct SavedPlayersView: View {
                 Text("Saved Players")
                     .font(formatter.font(fontSize: .mediumLarge))
                     .padding(.horizontal, 15)
-                ForEach(participantsVM.historicalTeams) { team in
+                ForEach(participantsVM.savedTeams) { team in
                     HStack {
                         Circle()
                             .foregroundColor(ColorMap().getColor(color: team.color))

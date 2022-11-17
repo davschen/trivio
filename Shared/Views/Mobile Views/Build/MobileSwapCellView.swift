@@ -12,56 +12,42 @@ struct MobileSwapCellView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
-    @Binding var editingIndex: Int
+    @Binding var category: CustomSetCategory
     @Binding var preSwapIndex: Int
     
-    @State var currentHeldIndex = -1
     @State var clueIndex: Int
+    @State var currentHeldIndex = -1
     
-    var amount: String
-    var clue: String
-    var response: String
+    var clue: String {
+        return category.clues[clueIndex]
+    }
+    
+    var response: String {
+        return category.responses[clueIndex]
+    }
+    
+    var amount: String {
+        return buildVM.moneySections[clueIndex]
+    }
     
     var body: some View {
-        ZStack {
-            if currentHeldIndex == clueIndex {
-                if !clue.isEmpty || !response.isEmpty {
-                    BuildCellHeldView()
-                } else {
-                    Text("EMPTY TILE")
-                        .font(formatter.font(.boldItalic))
-                        .foregroundColor(.white.opacity(0.75))
+        Text(amount)
+            .font(formatter.font(fontSize: .mediumLarge))
+            .foregroundColor(formatter.color(.secondaryAccent).opacity((clue.isEmpty || response.isEmpty) ? 0.5 : 1))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(formatter.color(buildVM.editingClueIndex == clueIndex ? .secondaryFG : .primaryFG))
+            .cornerRadius(5)
+            .padding(1.5)
+            .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: preSwapIndex == clueIndex ? 2 : 0))
+            .onTapGesture {
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                formatter.resignKeyboard()
+                if preSwapIndex == clueIndex {
+                    preSwapIndex = -1
+                } else if clueIndex != buildVM.editingClueIndex {
+                    preSwapIndex = clueIndex
                 }
-            } else {
-                Text("$\(amount)")
-                    .font(formatter.font(.extraBold, fontSize: .semiLarge))
-                    .foregroundColor(formatter.color(.secondaryAccent).opacity((clue.isEmpty || response.isEmpty) ? 0.5 : 1))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(5)
-        .background(RoundedRectangle(cornerRadius: 10).stroke(formatter.color(.highContrastWhite), lineWidth: preSwapIndex == clueIndex ? 10 : 0))
-        .background(formatter.color(editingIndex == clueIndex ? .secondaryFG : .lowContrastWhite))
-        .cornerRadius(10)
-        .frame(width: 110)
-        .onTapGesture {
-            formatter.hapticFeedback(style: .rigid, intensity: .weak)
-            formatter.resignKeyboard()
-            if preSwapIndex == clueIndex {
-                preSwapIndex = -1
-            } else if clueIndex != editingIndex {
-                preSwapIndex = clueIndex
-            }
-        }
-        .onLongPressGesture(minimumDuration: 1, pressing: { inProgress in
-            buildVM.setPreviews(clue: clue, response: response)
-            currentHeldIndex = inProgress ? clueIndex : -1
-        }) {
-            currentHeldIndex = -1
-        }
     }
 }
 

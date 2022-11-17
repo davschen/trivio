@@ -66,6 +66,10 @@ class MasterHandler: ObservableObject {
         self.showingAlert = false
     }
     
+    func dismissKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
     func padding(size: CGFloat = 15) -> CGFloat {
         if deviceType == .iPhone {
             if size == 15 {

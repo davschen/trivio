@@ -13,13 +13,9 @@ extension MasterHandler {
         Button(action: {
             dismiss()
         }) {
-            HStack {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 15, weight: .bold))
-                Text("Back")
-                    .font(font())
-            }
-            .foregroundColor(color(.highContrastWhite))
+            Image(systemName: "chevron.left")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(color(.highContrastWhite))
         }
     }
 }

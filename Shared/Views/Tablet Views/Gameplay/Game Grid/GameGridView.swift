@@ -51,7 +51,7 @@ struct GameGridView: View {
             HStack (spacing: 7) {
                 ForEach(0..<gamesVM.categories.count, id: \.self) { i in
                     VStack (spacing: 7) {
-                        ForEach(0..<gamesVM.moneySections.count, id: \.self) { j in
+                        ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { j in
                             let clueCounts: Int = gamesVM.clues[i].count
                             let responsesCounts: Int = gamesVM.responses[i].count
                             let gridClue: String = clueCounts - 1 >= j ? gamesVM.clues[i][j] : ""
@@ -84,9 +84,9 @@ struct GameGridView: View {
             updateTripleStumper(i: i, j: j)
             clue = gridClue
             response = gridResponse
-            amount = Int(gamesVM.moneySections[j]) ?? 0
+            amount = Int(gamesVM.pointValueArray[j]) ?? 0
             category = gamesVM.categories[i]
-            value = gamesVM.moneySections[j]
+            value = gamesVM.pointValueArray[j]
             
             participantsVM.setDefaultIndex()
             gamesVM.gameplayDisplay = .clue
@@ -99,18 +99,18 @@ struct GameGridView: View {
     
     func updateDailyDouble(i: Int, j: Int) {
         let toCheck: [Int] = [j, i]
-        if gamesVM.gamePhase == .trivio {
+        if gamesVM.gamePhase == .round1 {
             isDailyDouble = toCheck == gamesVM.jeopardyDailyDoubles
-        } else if gamesVM.gamePhase == .doubleTrivio {
+        } else if gamesVM.gamePhase == .round2 {
             isDailyDouble = (toCheck == gamesVM.djDailyDoubles1 || toCheck == gamesVM.djDailyDoubles2)
         }
     }
     
     func updateTripleStumper(i: Int, j: Int) {
         let toCheck: [Int] = [i, j]
-        if gamesVM.gamePhase == .trivio {
+        if gamesVM.gamePhase == .round1 {
             isTripleStumper = gamesVM.jTripleStumpers.contains(toCheck)
-        } else if gamesVM.gamePhase == .doubleTrivio {
+        } else if gamesVM.gamePhase == .round2 {
             isTripleStumper = gamesVM.djTripleStumpers.contains(toCheck)
         }
     }
@@ -125,7 +125,7 @@ struct GameCellView: View {
     var body: some View {
         ZStack {
             formatter.color(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty ? .primaryFG : .primaryAccent)
-            Text("$\(gamesVM.moneySections[j])")
+            Text("$\(gamesVM.pointValueArray[j])")
                 .font(formatter.font(.extraBold, fontSize: .large))
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .shadow(color: Color.black.opacity(0.2), radius: 5)

@@ -65,7 +65,7 @@ struct CategoryCountIncrementView: View {
             
             HStack (spacing: 7) {
                 Button(action: {
-                    buildVM.subtractCategory(index: 0, last: true)
+                    buildVM.subtractCategory()
                 }, label: {
                     Image(systemName: "minus")
                         .font(.system(size: 15, weight: .bold))

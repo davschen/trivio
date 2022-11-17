@@ -174,7 +174,7 @@ struct MobileSeasonsListView: View {
                     formatter.hapticFeedback(style: .medium, intensity: .strong)
                     gamesVM.getEpisodes(seasonID: seasonID)
                     gamesVM.setSeason(folder: season)
-                    gamesVM.setEpisode(ep: "")
+                    gamesVM.setCustomSetID(ep: "")
                     gamesVM.clearAll()
                     gamesVM.previewViewShowing = false
                 }
@@ -197,7 +197,8 @@ struct MobileJeopardyGamesView: View {
         if (showingGames ? !searchVM.games.isEmpty : !gamesVM.selectedSeason.isEmpty) {
             GeometryReader { geometry in
                 VStack (alignment: .leading, spacing: 15) {
-                    MobileGamePreviewView(searchQuery: searchVM.capSplit)
+                    MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
+                    MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
                     VStack (alignment: .leading, spacing: 0) {
                         ScrollView (.vertical) {
                             VStack {
@@ -217,13 +218,13 @@ struct MobileJeopardyGamesView: View {
                                         .padding(.vertical, 5)
                                         .frame(maxWidth: .infinity)
                                         .shadow(color: Color.black.opacity(0.2), radius: 10)
-                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
+                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.customSet.id == gamePreviewID ? 1 : 0))
                                         .cornerRadius(5)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             formatter.hapticFeedback(style: .medium, intensity: .strong)
                                             gamesVM.getEpisodeData(gameID: gamePreviewID)
-                                            gamesVM.setEpisode(ep: gamePreviewID)
+                                            gamesVM.setCustomSetID(ep: gamePreviewID)
                                             gamesVM.previewViewShowing = true
                                             participantsVM.resetScores()
                                         }
@@ -261,12 +262,12 @@ struct MobileJeopardyGamesView: View {
                                         .foregroundColor(formatter.color(beenPlayed(gameID: gamePreviewID) ? .lowContrastWhite : .highContrastWhite))
                                         .lineLimit(1)
                                         .padding(10)
-                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.selectedEpisode == gamePreviewID ? 1 : 0))
+                                        .background(formatter.color(.primaryAccent).opacity(gamesVM.customSet.id == gamePreviewID ? 1 : 0))
                                         .cornerRadius(5)
                                         .contentShape(Rectangle())
                                         .onTapGesture {
                                             formatter.hapticFeedback(style: .medium, intensity: .strong)
-                                            gamesVM.setEpisode(ep: gamePreviewID)
+                                            gamesVM.setCustomSetID(ep: gamePreviewID)
                                             gamesVM.previewViewShowing = true
                                             gamesVM.getEpisodeData(gameID: gamePreviewID)
                                             participantsVM.resetScores()

@@ -128,12 +128,12 @@ struct SummaryView: View {
                             .padding([.horizontal, .top], 20)
                         })
                         
-                        if reportVM.allGames.count > 0 {
+                        if reportVM.allGameReports.count > 0 {
                             ScrollView (.horizontal, showsIndicators: false) {
                                 HStack (spacing: 20) {
                                     Spacer()
                                         .frame(width: 0, height: 0)
-                                    ForEach(reportVM.allGames, id: \.self) { game in
+                                    ForEach(reportVM.allGameReports, id: \.self) { game in
                                         PastGamePreviewView(game: game)
                                     }
                                     Spacer()
@@ -157,7 +157,7 @@ struct SummaryView: View {
             guard let setID = set.id else { return }
             gamesVM.getCustomData(setID: setID)
             gamesVM.previewViewShowing = true
-            gamesVM.setEpisode(ep: setID)
+            gamesVM.setCustomSetID(ep: setID)
             gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
             participantsVM.resetScores()
             profileVM.menuSelectedItem = "My Sets"

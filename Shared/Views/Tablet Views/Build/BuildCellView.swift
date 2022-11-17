@@ -14,7 +14,7 @@ struct BuildCellView: View {
     
     @Binding var isHeld: Int
     @Binding var categoryIndex: Int
-    @Binding var category: Category
+    @Binding var category: CustomSetCategory
     @Binding var index: Int
     
     var i: Int
@@ -60,7 +60,7 @@ struct BuildCellView: View {
                 && (!category.clues[i].isEmpty && !category.responses[i].isEmpty) {
                 buildVM.addDailyDouble(i: category.index, j: i)
             } else if !category.name.isEmpty {
-                buildVM.currentDisplay = .clueResponse
+                buildVM.currentDisplay = .buildAll
                 buildVM.setEditingIndex(index: i)
                 categoryIndex = index
             }

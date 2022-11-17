@@ -11,7 +11,7 @@ import Firebase
 import FirebaseFirestoreSwift
 
 class ProfileViewModel: ObservableObject {
-    @Published var playedGames = [String]()
+    @Published var playedGameIDs = [String]()
     @Published var menuSelectedItem = "Summary"
     @Published var username = "" 
     @Published var name = ""
@@ -25,11 +25,11 @@ class ProfileViewModel: ObservableObject {
     public var myUID = Auth.auth().currentUser?.uid
     
     init() {
-        getPlayedGames()
+        getPlayedGameIDs()
         getUserInfo()
     }
     
-    func getPlayedGames() {
+    private func getPlayedGameIDs() {
         guard let uid = myUID else { return }
         db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
             if error != nil {
@@ -38,11 +38,11 @@ class ProfileViewModel: ObservableObject {
             }
             guard let snap = snap else { return }
             snap.documentChanges.forEach { (diff) in
-                guard let playedGame = diff.document.get("gameID") as? String else { return }
+                guard let playedGameID = diff.document.get("gameID") as? String else { return }
                 if diff.type == .added {
-                    self.playedGames.append(playedGame)
+                    self.playedGameIDs.append(playedGameID)
                 } else if diff.type == .removed {
-                    self.playedGames = self.playedGames.filter { $0 != playedGame }
+                    self.playedGameIDs = self.playedGameIDs.filter { $0 != playedGameID }
                 }
             }
         }
@@ -50,7 +50,7 @@ class ProfileViewModel: ObservableObject {
     
     func markAsPlayed(gameID: String) {
         let playedRef = db.collection("users").document(Auth.auth().currentUser?.uid ?? "NID").collection("played")
-        if !playedGames.contains(gameID) {
+        if !playedGameIDs.contains(gameID) {
             playedRef.addDocument(data: [
                 "gameID" : gameID
             ])
@@ -58,7 +58,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func beenPlayed(gameID: String) -> Bool {
-        return playedGames.contains(gameID)
+        return playedGameIDs.contains(gameID)
     }
     
     func categoryInSearch(categoryName: String, searchQuery: [String]) -> Bool {
@@ -129,7 +129,7 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
-    func getUserInfo() {
+    private func getUserInfo() {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
         db.collection("users").document(myUID).getDocument { (docSnap, error) in
             if error != nil { return }
