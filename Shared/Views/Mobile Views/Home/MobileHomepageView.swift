@@ -129,26 +129,45 @@ struct MobileExploreBuildPromptButtonView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     
+    @State var isPresentingBuildView = false
+    
     var body: some View {
         ZStack {
-            Button {
-                buildVM.showingBuildView.toggle()
-            } label: {
-                HStack {
-                    Image(systemName: "hammer.fill")
-                        .font(.system(size: 10, weight: .bold))
-                    Text("Build a Set!")
+            VStack {
+                if !buildVM.currCustomSet.title.isEmpty {
+                    Button {
+                        isPresentingBuildView.toggle()
+                    } label: {
+                        HStack {
+                            Image(systemName: "hammer.fill")
+                                .font(.system(size: 10, weight: .bold))
+                            Text("Resume \(buildVM.currCustomSet.title)")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(formatter.color(.secondaryAccent))
+                        .cornerRadius(10)
+                        .padding(.horizontal, 15)
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(formatter.color(.primaryAccent))
-                .cornerRadius(10)
-                .padding(.horizontal, 15)
+                Button {
+                    buildVM.start()
+                } label: {
+                    HStack {
+                        Image(systemName: "hammer.fill")
+                            .font(.system(size: 10, weight: .bold))
+                        Text("Build a Set!")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(formatter.color(.primaryAccent))
+                    .cornerRadius(10)
+                    .padding(.horizontal, 15)
+                }
             }
-            NavigationLink (isActive: $buildVM.showingBuildView) {
+            NavigationLink (isActive: $isPresentingBuildView) {
                 MobileBuildView()
             } label: { EmptyView() }
-                .isDetailLink(false)
                 .hidden()
             NavigationLink(destination: EmptyView()) {
                 EmptyView()

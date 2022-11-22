@@ -139,7 +139,7 @@ extension GamesViewModel {
             }
             
             DispatchQueue.main.async {
-                self.getUserName(userID: customSet.creatorUserID)
+                self.getUserName(userID: customSet.userID)
                 self.customSet = customSet
             }
             group.leave()

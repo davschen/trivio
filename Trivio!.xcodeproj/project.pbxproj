@@ -82,10 +82,6 @@
 		8B88EACF26AD1B74001C5C2C /* MobileGameplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EACD26AD1B74001C5C2C /* MobileGameplayView.swift */; };
 		8B88EAD126AD1BA6001C5C2C /* MobilePlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD026AD1BA6001C5C2C /* MobilePlayersView.swift */; };
 		8B88EAD226AD1BA6001C5C2C /* MobilePlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD026AD1BA6001C5C2C /* MobilePlayersView.swift */; };
-		8B88EAD426AD1BD6001C5C2C /* MobileParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD326AD1BD6001C5C2C /* MobileParticipantsView.swift */; };
-		8B88EAD526AD1BD6001C5C2C /* MobileParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD326AD1BD6001C5C2C /* MobileParticipantsView.swift */; };
-		8B88EAD726AD1C16001C5C2C /* MobileTeamBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD626AD1C16001C5C2C /* MobileTeamBuildView.swift */; };
-		8B88EAD826AD1C16001C5C2C /* MobileTeamBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD626AD1C16001C5C2C /* MobileTeamBuildView.swift */; };
 		8B88EADA26AD1C3C001C5C2C /* MobileGameGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD926AD1C3C001C5C2C /* MobileGameGridView.swift */; };
 		8B88EADB26AD1C3C001C5C2C /* MobileGameGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAD926AD1C3C001C5C2C /* MobileGameGridView.swift */; };
 		8B88EADD26AD1EEF001C5C2C /* MobileInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EADC26AD1EEF001C5C2C /* MobileInfoView.swift */; };
@@ -106,14 +102,10 @@
 		8B88EAF326AD202C001C5C2C /* MobileFinalTrivioPodiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAF126AD202C001C5C2C /* MobileFinalTrivioPodiumView.swift */; };
 		8B88EAF526AD2078001C5C2C /* MobileProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAF426AD2078001C5C2C /* MobileProfileView.swift */; };
 		8B88EAF626AD2078001C5C2C /* MobileProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAF426AD2078001C5C2C /* MobileProfileView.swift */; };
-		8B88EAF826AD209E001C5C2C /* MobileSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAF726AD209E001C5C2C /* MobileSummaryView.swift */; };
-		8B88EAF926AD209E001C5C2C /* MobileSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAF726AD209E001C5C2C /* MobileSummaryView.swift */; };
 		8B88EAFB26AD20BC001C5C2C /* MobileCustomSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAFA26AD20BC001C5C2C /* MobileCustomSetsView.swift */; };
 		8B88EAFC26AD20BC001C5C2C /* MobileCustomSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAFA26AD20BC001C5C2C /* MobileCustomSetsView.swift */; };
 		8B88EAFE26AD20E2001C5C2C /* MobileDraftsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAFD26AD20E2001C5C2C /* MobileDraftsView.swift */; };
 		8B88EAFF26AD20E2001C5C2C /* MobileDraftsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EAFD26AD20E2001C5C2C /* MobileDraftsView.swift */; };
-		8B88EB0126AD2106001C5C2C /* MobileReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0026AD2106001C5C2C /* MobileReportsView.swift */; };
-		8B88EB0226AD2106001C5C2C /* MobileReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0026AD2106001C5C2C /* MobileReportsView.swift */; };
 		8B88EB0426AD2137001C5C2C /* MobileBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0326AD2137001C5C2C /* MobileBuildView.swift */; };
 		8B88EB0526AD2137001C5C2C /* MobileBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0326AD2137001C5C2C /* MobileBuildView.swift */; };
 		8B88EB0A26AD2192001C5C2C /* MobileBuildCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0926AD2192001C5C2C /* MobileBuildCategoryView.swift */; };
@@ -138,8 +130,6 @@
 		8B88EB2626AD2285001C5C2C /* MobileCategoryLargeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2426AD2285001C5C2C /* MobileCategoryLargeView.swift */; };
 		8B88EB2826AD22A0001C5C2C /* MobileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2726AD22A0001C5C2C /* MobileSettingsView.swift */; };
 		8B88EB2926AD22A0001C5C2C /* MobileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2726AD22A0001C5C2C /* MobileSettingsView.swift */; };
-		8B88EB2B26AD27CB001C5C2C /* MobileSetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2A26AD27CB001C5C2C /* MobileSetPreviewView.swift */; };
-		8B88EB2C26AD27CC001C5C2C /* MobileSetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2A26AD27CB001C5C2C /* MobileSetPreviewView.swift */; };
 		8B88EB2E26AE213E001C5C2C /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2D26AE213D001C5C2C /* Navigation.swift */; };
 		8B88EB2F26AE213F001C5C2C /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2D26AE213D001C5C2C /* Navigation.swift */; };
 		8B9B0695265C9B4500758036 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B0694265C9B4500758036 /* ProfileViewModel.swift */; };
@@ -172,6 +162,10 @@
 		8BA62B9A292701B70010835A /* SortDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62B99292701B70010835A /* SortDictionary.swift */; };
 		8BA62B9C292701D70010835A /* SpeakerUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62B9B292701D70010835A /* SpeakerUtils.swift */; };
 		8BA62B9E292702090010835A /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62B9D292702090010835A /* Persistence.swift */; };
+		8BA62BA1292704A60010835A /* BuildViewModel+Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62BA0292704A60010835A /* BuildViewModel+Database.swift */; };
+		8BA62BA32927061E0010835A /* BuildViewModel+Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62BA22927061E0010835A /* BuildViewModel+Categories.swift */; };
+		8BA62BA5292720000010835A /* BuildViewModel+FlowControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62BA4292720000010835A /* BuildViewModel+FlowControl.swift */; };
+		8BA62BA729284D620010835A /* MobileMyCustomSetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA62BA629284D620010835A /* MobileMyCustomSetsView.swift */; };
 		8BC53852265B5DFF0099D05B /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53851265B5DFF0099D05B /* Tests_iOS.swift */; };
 		8BC5385D265B5DFF0099D05B /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC5385C265B5DFF0099D05B /* Tests_macOS.swift */; };
 		8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC53836265B5DFA0099D05B /* Trivio_App.swift */; };
@@ -328,8 +322,6 @@
 		8B88EACA26AD1B2A001C5C2C /* MobileGameSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileGameSettingsView.swift; sourceTree = "<group>"; };
 		8B88EACD26AD1B74001C5C2C /* MobileGameplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileGameplayView.swift; sourceTree = "<group>"; };
 		8B88EAD026AD1BA6001C5C2C /* MobilePlayersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobilePlayersView.swift; sourceTree = "<group>"; };
-		8B88EAD326AD1BD6001C5C2C /* MobileParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileParticipantsView.swift; sourceTree = "<group>"; };
-		8B88EAD626AD1C16001C5C2C /* MobileTeamBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileTeamBuildView.swift; sourceTree = "<group>"; };
 		8B88EAD926AD1C3C001C5C2C /* MobileGameGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileGameGridView.swift; sourceTree = "<group>"; };
 		8B88EADC26AD1EEF001C5C2C /* MobileInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileInfoView.swift; sourceTree = "<group>"; };
 		8B88EADF26AD1F12001C5C2C /* MobileClueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileClueView.swift; sourceTree = "<group>"; };
@@ -340,10 +332,8 @@
 		8B88EAEE26AD2009001C5C2C /* MobileFinalTrivioRevealResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileFinalTrivioRevealResponseView.swift; sourceTree = "<group>"; };
 		8B88EAF126AD202C001C5C2C /* MobileFinalTrivioPodiumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileFinalTrivioPodiumView.swift; sourceTree = "<group>"; };
 		8B88EAF426AD2078001C5C2C /* MobileProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileProfileView.swift; sourceTree = "<group>"; };
-		8B88EAF726AD209E001C5C2C /* MobileSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSummaryView.swift; sourceTree = "<group>"; };
 		8B88EAFA26AD20BC001C5C2C /* MobileCustomSetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCustomSetsView.swift; sourceTree = "<group>"; };
 		8B88EAFD26AD20E2001C5C2C /* MobileDraftsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileDraftsView.swift; sourceTree = "<group>"; };
-		8B88EB0026AD2106001C5C2C /* MobileReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileReportsView.swift; sourceTree = "<group>"; };
 		8B88EB0326AD2137001C5C2C /* MobileBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildView.swift; sourceTree = "<group>"; };
 		8B88EB0926AD2192001C5C2C /* MobileBuildCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildCategoryView.swift; sourceTree = "<group>"; };
 		8B88EB0C26AD21A5001C5C2C /* MobileBuildCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildCellView.swift; sourceTree = "<group>"; };
@@ -356,7 +346,6 @@
 		8B88EB2126AD226D001C5C2C /* MobileSaveDraftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSaveDraftView.swift; sourceTree = "<group>"; };
 		8B88EB2426AD2285001C5C2C /* MobileCategoryLargeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileCategoryLargeView.swift; sourceTree = "<group>"; };
 		8B88EB2726AD22A0001C5C2C /* MobileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSettingsView.swift; sourceTree = "<group>"; };
-		8B88EB2A26AD27CB001C5C2C /* MobileSetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSetPreviewView.swift; sourceTree = "<group>"; };
 		8B88EB2D26AE213D001C5C2C /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		8B9B0694265C9B4500758036 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8B9B0697265CA2C700758036 /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
@@ -380,6 +369,10 @@
 		8BA62B99292701B70010835A /* SortDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortDictionary.swift; sourceTree = "<group>"; };
 		8BA62B9B292701D70010835A /* SpeakerUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakerUtils.swift; sourceTree = "<group>"; };
 		8BA62B9D292702090010835A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		8BA62BA0292704A60010835A /* BuildViewModel+Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BuildViewModel+Database.swift"; sourceTree = "<group>"; };
+		8BA62BA22927061E0010835A /* BuildViewModel+Categories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BuildViewModel+Categories.swift"; sourceTree = "<group>"; };
+		8BA62BA4292720000010835A /* BuildViewModel+FlowControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BuildViewModel+FlowControl.swift"; sourceTree = "<group>"; };
+		8BA62BA629284D620010835A /* MobileMyCustomSetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileMyCustomSetsView.swift; sourceTree = "<group>"; };
 		8BC53836265B5DFA0099D05B /* Trivio_App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trivio_App.swift; sourceTree = "<group>"; };
 		8BC53837265B5DFA0099D05B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		8BC53838265B5DFF0099D05B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -607,7 +600,6 @@
 				8B88EAA726AD189C001C5C2C /* Gameplay */,
 				8B88EAA626AD1898001C5C2C /* Profile */,
 				8B88EAA526AD1893001C5C2C /* Build */,
-				8B88EAA426AD1884001C5C2C /* Settings */,
 			);
 			path = "Mobile Views";
 			sourceTree = "<group>";
@@ -636,14 +628,6 @@
 			path = General;
 			sourceTree = "<group>";
 		};
-		8B88EAA426AD1884001C5C2C /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				8B88EB2726AD22A0001C5C2C /* MobileSettingsView.swift */,
-			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
 		8B88EAA526AD1893001C5C2C /* Build */ = {
 			isa = PBXGroup;
 			children = (
@@ -668,10 +652,9 @@
 			isa = PBXGroup;
 			children = (
 				8B88EAF426AD2078001C5C2C /* MobileProfileView.swift */,
-				8B88EAF726AD209E001C5C2C /* MobileSummaryView.swift */,
-				8B88EAFA26AD20BC001C5C2C /* MobileCustomSetsView.swift */,
+				8BA62BA629284D620010835A /* MobileMyCustomSetsView.swift */,
 				8B88EAFD26AD20E2001C5C2C /* MobileDraftsView.swift */,
-				8B88EB0026AD2106001C5C2C /* MobileReportsView.swift */,
+				8B88EB2726AD22A0001C5C2C /* MobileSettingsView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -683,7 +666,6 @@
 				8BA3BAC1290BB12E0086451B /* MobileTrivioLivePreviewView.swift */,
 				8B88EACD26AD1B74001C5C2C /* MobileGameplayView.swift */,
 				8B88EAD026AD1BA6001C5C2C /* MobilePlayersView.swift */,
-				8B88EAC326AD1ADD001C5C2C /* Participants */,
 				8B88EAC626AD1AF1001C5C2C /* Game Grid */,
 				8B88EAC526AD1AED001C5C2C /* Clue */,
 				8B88EAC426AD1AE7001C5C2C /* Final Trivio! */,
@@ -695,8 +677,8 @@
 			isa = PBXGroup;
 			children = (
 				8B88EAB726AD19F9001C5C2C /* MobileHomepageView.swift */,
+				8B88EAFA26AD20BC001C5C2C /* MobileCustomSetsView.swift */,
 				8B88EAC026AD1ABB001C5C2C /* MobileUserView.swift */,
-				8B88EB2A26AD27CB001C5C2C /* MobileSetPreviewView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -717,15 +699,6 @@
 				8B88EAB126AD1972001C5C2C /* MobileSignInView.swift */,
 			);
 			path = Auth;
-			sourceTree = "<group>";
-		};
-		8B88EAC326AD1ADD001C5C2C /* Participants */ = {
-			isa = PBXGroup;
-			children = (
-				8B88EAD326AD1BD6001C5C2C /* MobileParticipantsView.swift */,
-				8B88EAD626AD1C16001C5C2C /* MobileTeamBuildView.swift */,
-			);
-			path = Participants;
 			sourceTree = "<group>";
 		};
 		8B88EAC426AD1AE7001C5C2C /* Final Trivio! */ = {
@@ -756,6 +729,17 @@
 				8B88EADC26AD1EEF001C5C2C /* MobileInfoView.swift */,
 			);
 			path = "Game Grid";
+			sourceTree = "<group>";
+		};
+		8BA62B9F292704630010835A /* Build View Model */ = {
+			isa = PBXGroup;
+			children = (
+				8BFC126026A1591F00D3E513 /* BuildViewModel.swift */,
+				8BA62BA0292704A60010835A /* BuildViewModel+Database.swift */,
+				8BA62BA22927061E0010835A /* BuildViewModel+Categories.swift */,
+				8BA62BA4292720000010835A /* BuildViewModel+FlowControl.swift */,
+			);
+			path = "Build View Model";
 			sourceTree = "<group>";
 		};
 		8BC53830265B5DFA0099D05B = {
@@ -842,8 +826,8 @@
 		8BC53874265B5EEB0099D05B /* View Models */ = {
 			isa = PBXGroup;
 			children = (
+				8BA62B9F292704630010835A /* Build View Model */,
 				8BFC127026A15AB500D3E513 /* Games View Model */,
-				8BFC126026A1591F00D3E513 /* BuildViewModel.swift */,
 				8BFC125E26A1591F00D3E513 /* ExploreViewModel.swift */,
 				8BFC126326A1592000D3E513 /* ParticipantsViewModel.swift */,
 				8BFC125F26A1591F00D3E513 /* ReportViewModel.swift */,
@@ -1263,7 +1247,6 @@
 			files = (
 				8BEAE4FD2698F7EB00BF932C /* PlayersView.swift in Sources */,
 				8BEAE4F12697A7A600BF932C /* BuildView.swift in Sources */,
-				8B88EB2B26AD27CB001C5C2C /* MobileSetPreviewView.swift in Sources */,
 				8BEDCBDF26A3C6EF00E89359 /* FinalTrivioMakeWagerView.swift in Sources */,
 				8B88EA9926AD1437001C5C2C /* MasterHandler+Haptic.swift in Sources */,
 				8B88EAB826AD19F9001C5C2C /* MobileHomepageView.swift in Sources */,
@@ -1273,7 +1256,6 @@
 				8B88EB1026AD21BF001C5C2C /* MobileBuildHUDView.swift in Sources */,
 				8BA62B982927019C0010835A /* NumberFormatter.swift in Sources */,
 				8BFC126626A15A0A00D3E513 /* ParticipantsViewModel.swift in Sources */,
-				8B88EB0126AD2106001C5C2C /* MobileReportsView.swift in Sources */,
 				8B88EAE326AD1F76001C5C2C /* MobileDuplexWagerView.swift in Sources */,
 				8B88EAB526AD19BB001C5C2C /* MobileSearchView.swift in Sources */,
 				8BEAE4EA2697A78700BF932C /* ClueView.swift in Sources */,
@@ -1286,6 +1268,7 @@
 				8B88EB1626AD2205001C5C2C /* MobileSwapCellView.swift in Sources */,
 				8B88EAF526AD2078001C5C2C /* MobileProfileView.swift in Sources */,
 				8B88EAE926AD1FC1001C5C2C /* MobileFinalTrivioUserFlowView.swift in Sources */,
+				8BA62BA1292704A60010835A /* BuildViewModel+Database.swift in Sources */,
 				8BA62B96292701760010835A /* MultilineTextField.swift in Sources */,
 				8B88EB0426AD2137001C5C2C /* MobileBuildView.swift in Sources */,
 				8B88EB2226AD226D001C5C2C /* MobileSaveDraftView.swift in Sources */,
@@ -1295,7 +1278,6 @@
 				8B0EFC3027EC1478000BD2DF /* DailyTrivioPreviewView.swift in Sources */,
 				8BEAE4DC2697A74000BF932C /* SignInView.swift in Sources */,
 				8BEAE4E62697A77300BF932C /* ParticipantsView.swift in Sources */,
-				8B88EAD726AD1C16001C5C2C /* MobileTeamBuildView.swift in Sources */,
 				8BEAE4EF2697A7A100BF932C /* SearchView.swift in Sources */,
 				8BA62B92292701200010835A /* FlexibleView.swift in Sources */,
 				8B88EA8B26A9F392001C5C2C /* SaveDraftView.swift in Sources */,
@@ -1319,6 +1301,7 @@
 				8B88EA6826A8AEEF001C5C2C /* GameView.swift in Sources */,
 				8B88EB2E26AE213E001C5C2C /* Navigation.swift in Sources */,
 				8B88EA6C26A91CFA001C5C2C /* UserView.swift in Sources */,
+				8BA62BA5292720000010835A /* BuildViewModel+FlowControl.swift in Sources */,
 				8BA62B88292570FF0010835A /* PaddedTextField.swift in Sources */,
 				8B88EACB26AD1B2A001C5C2C /* MobileGameSettingsView.swift in Sources */,
 				8B88EA7C26A9F2AA001C5C2C /* EditClueResponseView.swift in Sources */,
@@ -1347,6 +1330,7 @@
 				8BA3BAC5290CBD050086451B /* Build.swift in Sources */,
 				8B9B0695265C9B4500758036 /* ProfileViewModel.swift in Sources */,
 				8BEAE4DE2697A75100BF932C /* ExploreView.swift in Sources */,
+				8BA62BA32927061E0010835A /* BuildViewModel+Categories.swift in Sources */,
 				8B88EAE026AD1F12001C5C2C /* MobileClueView.swift in Sources */,
 				8BA62B94292701550010835A /* KeyboardAdapt.swift in Sources */,
 				8BA62B8C29262B1A0010835A /* AppStoreManager.swift in Sources */,
@@ -1359,15 +1343,14 @@
 				8B0EFC2E27EBC320000BD2DF /* MobileDTFinishedView.swift in Sources */,
 				8BEAE4EB2697A79800BF932C /* FinalTrivioView.swift in Sources */,
 				8B88EA8826A9F373001C5C2C /* BuildDetailsView.swift in Sources */,
-				8B88EAD426AD1BD6001C5C2C /* MobileParticipantsView.swift in Sources */,
 				8B88EA7326A9F204001C5C2C /* BuildCategoryView.swift in Sources */,
 				8B88EA7926A9F290001C5C2C /* BuildHUDView.swift in Sources */,
 				8BA62B9E292702090010835A /* Persistence.swift in Sources */,
 				8BFC126526A15A0A00D3E513 /* ExploreViewModel.swift in Sources */,
 				8B88EAE626AD1F96001C5C2C /* MobileFinalTrivioView.swift in Sources */,
 				8B0EFC3527EC67C8000BD2DF /* DailyTrivioSet.swift in Sources */,
-				8B88EAF826AD209E001C5C2C /* MobileSummaryView.swift in Sources */,
 				8BA62B9A292701B70010835A /* SortDictionary.swift in Sources */,
+				8BA62BA729284D620010835A /* MobileMyCustomSetsView.swift in Sources */,
 				8BEAE4E42697A76E00BF932C /* GameplayView.swift in Sources */,
 				8B88EACE26AD1B74001C5C2C /* MobileGameplayView.swift in Sources */,
 				8B88EA6F26A9E7E7001C5C2C /* InfoView.swift in Sources */,
@@ -1414,7 +1397,6 @@
 				8BA3BACC290CE6B30086451B /* MobileBuildAllView.swift in Sources */,
 				8B88EB1126AD21BF001C5C2C /* MobileBuildHUDView.swift in Sources */,
 				8B88EAFC26AD20BC001C5C2C /* MobileCustomSetsView.swift in Sources */,
-				8B88EAD826AD1C16001C5C2C /* MobileTeamBuildView.swift in Sources */,
 				8BFC126D26A15A0B00D3E513 /* GamesViewModel.swift in Sources */,
 				8B88EA8626A9F341001C5C2C /* FinalTrivioFillView.swift in Sources */,
 				8B88EACC26AD1B2A001C5C2C /* MobileGameSettingsView.swift in Sources */,
@@ -1432,7 +1414,6 @@
 				8B88EAAD26AD18E9001C5C2C /* MobileContentView.swift in Sources */,
 				8BEAE4BC269673FF00BF932C /* Font.swift in Sources */,
 				8B88EA7726A9F230001C5C2C /* BuildCellView.swift in Sources */,
-				8B88EAF926AD209E001C5C2C /* MobileSummaryView.swift in Sources */,
 				8B88EADE26AD1EEF001C5C2C /* MobileInfoView.swift in Sources */,
 				8BC53862265B5DFF0099D05B /* ContentView.swift in Sources */,
 				8B9B0696265C9B4500758036 /* ProfileViewModel.swift in Sources */,
@@ -1443,7 +1424,6 @@
 				8B88EAB626AD19BB001C5C2C /* MobileSearchView.swift in Sources */,
 				8B88EB2F26AE213F001C5C2C /* Navigation.swift in Sources */,
 				8BEAE4DD2697A74700BF932C /* SignInView.swift in Sources */,
-				8B88EB2C26AD27CC001C5C2C /* MobileSetPreviewView.swift in Sources */,
 				8B88EAF026AD2009001C5C2C /* MobileFinalTrivioRevealResponseView.swift in Sources */,
 				8BEAE4E52697A76E00BF932C /* GameplayView.swift in Sources */,
 				8B88EB1426AD21EC001C5C2C /* MobileEditClueResponseView.swift in Sources */,
@@ -1455,7 +1435,6 @@
 				8B88EACF26AD1B74001C5C2C /* MobileGameplayView.swift in Sources */,
 				8B88EAB926AD19F9001C5C2C /* MobileHomepageView.swift in Sources */,
 				8BFC126C26A15A0B00D3E513 /* ParticipantsViewModel.swift in Sources */,
-				8B88EAD526AD1BD6001C5C2C /* MobileParticipantsView.swift in Sources */,
 				8B88EAF326AD202C001C5C2C /* MobileFinalTrivioPodiumView.swift in Sources */,
 				8B88EA8326A9F2FA001C5C2C /* EditCategoryNameView.swift in Sources */,
 				8B88EA7A26A9F290001C5C2C /* BuildHUDView.swift in Sources */,
@@ -1470,7 +1449,6 @@
 				8B88EABC26AD1A30001C5C2C /* MobileGamePickerView.swift in Sources */,
 				8BFC126A26A15A0B00D3E513 /* ReportViewModel.swift in Sources */,
 				8B9B06A0265FFC8800758036 /* AlertView.swift in Sources */,
-				8B88EB0226AD2106001C5C2C /* MobileReportsView.swift in Sources */,
 				8B88EAEA26AD1FC1001C5C2C /* MobileFinalTrivioUserFlowView.swift in Sources */,
 				8BEAE4F02697A7A200BF932C /* SearchView.swift in Sources */,
 				8BEAE4DF2697A75100BF932C /* ExploreView.swift in Sources */,

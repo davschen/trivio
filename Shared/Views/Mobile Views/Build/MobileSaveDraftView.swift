@@ -41,7 +41,6 @@ struct MobileSaveDraftView: View {
                         if !buildVM.currCustomSet.title.isEmpty {
                             formatter.hapticFeedback(style: .soft, intensity: .strong)
                             buildVM.currentDisplay = .grid
-                            buildVM.saveDraft()
                         }
                     }, label: {
                         HStack {

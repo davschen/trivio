@@ -71,7 +71,7 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
     var roundOneDaily: [Int]
     var roundTwoDaily1: [Int]
     var roundTwoDaily2: [Int]
-    var creatorUserID: String
+    var userID: String
     var tags: [String]
     var plays: Int
     var rating: Double
@@ -103,7 +103,7 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
         self.roundOneDaily = customSet.jeopardyDailyDoubles
         self.roundTwoDaily1 = customSet.djDailyDoubles1
         self.roundTwoDaily2 = customSet.djDailyDoubles2
-        self.creatorUserID = customSet.userID
+        self.userID = customSet.userID
         self.tags = customSet.tags
         self.plays = customSet.plays
         self.rating = customSet.rating
@@ -111,14 +111,14 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
         self.numClues = customSet.numclues
         self.round1Len = customSet.jRoundLen
         self.round2Len = customSet.djRoundLen
+        self.isPublic = customSet.isPublic
         self.hasTwoRounds = true
         self.isDraft = false
-        self.isPublic = false
     }
 }
 
 extension CustomSetCherry {
-    init(id: String? = nil, round1CatIDs: [String] = [], round2CatIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], description: String = "", finalCat: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), dateLastModified: Date = Date(), roundOneDaily: [Int] = [], roundTwoDaily1: [Int] = [], roundTwoDaily2: [Int] = [], creatorUserID: String = "", tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numClues: Int = 0, round1Len: Int = 6, round2Len: Int = 6, hasTwoRounds: Bool = false, isDraft: Bool = true, isPublic: Bool = true) {
+    init(id: String? = UUID().uuidString, round1CatIDs: [String] = [], round2CatIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], description: String = "", finalCat: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), dateLastModified: Date = Date(), roundOneDaily: [Int] = [], roundTwoDaily1: [Int] = [], roundTwoDaily2: [Int] = [], userID: String = "", tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numClues: Int = 0, round1Len: Int = 6, round2Len: Int = 6, hasTwoRounds: Bool = false, isDraft: Bool = true, isPublic: Bool = true) {
         self.id = id
         self.round1CatIDs = round1CatIDs
         self.round2CatIDs = round2CatIDs
@@ -134,7 +134,7 @@ extension CustomSetCherry {
         self.roundOneDaily = roundOneDaily
         self.roundTwoDaily1 = roundTwoDaily1
         self.roundTwoDaily2 = roundTwoDaily2
-        self.creatorUserID = creatorUserID
+        self.userID = userID
         self.tags = tags
         self.plays = plays
         self.rating = rating

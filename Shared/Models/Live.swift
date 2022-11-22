@@ -17,6 +17,7 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
     var roundOneDaily, roundTwoDaily1, roundTwoDaily2: [Int]
     var round1CategoryNames, round2CategoryNames: [String]
     var round1Clues, round1Responses, round2Clues, round2Responses : [Int:[String]]
+    var dateInitiated: Date
     
     init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetCherry, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
         self.hostUsername = hostUsername
@@ -44,6 +45,7 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
         self.round1Len = customSet.round1Len
         self.round2Len = customSet.round2Len
         self.hasTwoRounds = customSet.hasTwoRounds
+        self.dateInitiated = Date()
     }
 }
 
@@ -74,5 +76,6 @@ extension LiveGameCustomSet {
         self.round1Len = round1Len
         self.round2Len = round2Len
         self.hasTwoRounds = hasTwoRounds
+        self.dateInitiated = Date()
     }
 }

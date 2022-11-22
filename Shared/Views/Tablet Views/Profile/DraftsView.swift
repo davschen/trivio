@@ -46,7 +46,7 @@ struct DraftCellView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
-    var draft: CustomSet
+    var draft: CustomSetCherry
     var setID: String {
         return draft.id ?? "NID"
     }
@@ -63,7 +63,7 @@ struct DraftCellView: View {
                 Spacer()
             }
             HStack {
-                Text("\(draft.numclues) clues")
+                Text("\(draft.numClues) clues")
                 RoundedRectangle(cornerRadius: 2).frame(width: 1, height: 10)
                 Text("\(gamesVM.dateFormatter.string(from: draft.dateCreated))")
             }
@@ -71,8 +71,7 @@ struct DraftCellView: View {
             .foregroundColor(formatter.color(.highContrastWhite))
             HStack {
                 Button(action: {
-                    buildVM.edit(isDraft: true, gameID: setID)
-                    buildVM.isEditingDraft = true
+                    buildVM.edit(customSet: draft)
                 }, label: {
                     Text("Edit")
                         .foregroundColor(formatter.color(.highContrastWhite))
@@ -103,8 +102,7 @@ struct DraftCellView: View {
         .background(formatter.color(.secondaryFG))
         .cornerRadius(10)
         .onTapGesture {
-            buildVM.edit(isDraft: true, gameID: setID)
-            buildVM.isEditingDraft = true
+            buildVM.edit(customSet: draft)
         }
     }
 }

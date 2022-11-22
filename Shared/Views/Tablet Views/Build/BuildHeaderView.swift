@@ -27,7 +27,7 @@ struct BuildHeaderView: View {
                         .font(.system(size: 30, weight: .bold))
                 })
             }
-            Text("\(buildVM.isEditing ? "Edit" : "Build")")
+            Text("Build")
                 .font(formatter.font(fontSize: .extraLarge))
             
             BuildTickerView()
@@ -38,11 +38,7 @@ struct BuildHeaderView: View {
             HStack {
                 if buildVM.currentDisplay == .grid {
                     Button(action: {
-                        buildVM.writeToFirestore { (success) in
-                            if success {
-                                buildVM.showingBuildView.toggle()
-                            }
-                        }
+                        buildVM.writeToFirestore()
                     }) {
                         ZStack {
                             if buildVM.processPending {
@@ -90,11 +86,7 @@ struct BuildHeaderView: View {
         actionLabel: "Leave without saving",
         hasSecondaryAction: true,
         secondaryAction: {
-            buildVM.writeToFirestore { (success) in
-                if success {
-//                    buildVM.showingBuildView.toggle()
-                }
-            }
+            buildVM.writeToFirestore()
         },
         secondaryActionLabel: "Save")
     }

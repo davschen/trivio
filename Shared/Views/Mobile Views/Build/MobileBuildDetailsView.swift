@@ -19,10 +19,6 @@ struct MobileBuildDetailsView: View {
     @State var setDescription = ""
     @State var tagString = ""
     
-    init() {
-        UIScrollView.appearance().keyboardDismissMode = .onDrag
-    }
-    
     var body: some View {
         ScrollView (.vertical, showsIndicators: false) {
             VStack (alignment: .leading, spacing: 20) {
@@ -44,7 +40,10 @@ struct MobileBuildDetailsView: View {
                                 .font(formatter.font(.boldItalic, fontSize: .mediumLarge))
                         }
                         TextField("", text: $setTitle, onEditingChanged: { newTitle in
-                            buildVM.currCustomSet.title = setTitle
+                            if buildVM.currCustomSet.title != setTitle {
+                                buildVM.incrementDirtyBit()
+                                buildVM.currCustomSet.title = setTitle
+                            }
                         })
                         .accentColor(formatter.color(.secondaryAccent))
                         .font(formatter.font(fontSize: .mediumLarge))
@@ -53,10 +52,6 @@ struct MobileBuildDetailsView: View {
                     .padding(.horizontal)
                     .background(formatter.color(.primaryFG))
                     .cornerRadius(5)
-                    .onAppear {
-                        setTitle = buildVM.currCustomSet.title
-                        setDescription = buildVM.currCustomSet.description
-                    }
                 }
                 VStack (alignment: .leading, spacing: 5) {
                     Text("(Optional) Add a description for your set")
@@ -69,7 +64,10 @@ struct MobileBuildDetailsView: View {
                                     .foregroundColor(formatter.color(.lowContrastWhite))
                             }
                             MobileMultilineTextField("", text: $setDescription) {
-                                buildVM.currCustomSet.description = setDescription
+                                if buildVM.currCustomSet.description != setDescription {
+                                    buildVM.incrementDirtyBit()
+                                    buildVM.currCustomSet.description = setDescription
+                                }
                             }
                             .accentColor(formatter.color(.highContrastWhite))
                             .offset(x: -5)
@@ -170,7 +168,10 @@ struct MobileBuildDetailsView: View {
                             .background(formatter.color(!buildVM.currCustomSet.hasTwoRounds ? .primaryAccent : .primaryFG))
                             .cornerRadius(5)
                             .onTapGesture {
-                                buildVM.currCustomSet.hasTwoRounds = false
+                                if buildVM.currCustomSet.hasTwoRounds {
+                                    buildVM.currCustomSet.hasTwoRounds = false
+                                    buildVM.incrementDirtyBit()
+                                }
                             }
                         Text("2")
                             .frame(maxWidth: .infinity)
@@ -178,7 +179,10 @@ struct MobileBuildDetailsView: View {
                             .background(formatter.color(buildVM.currCustomSet.hasTwoRounds ? .primaryAccent : .primaryFG))
                             .cornerRadius(5)
                             .onTapGesture {
-                                buildVM.currCustomSet.hasTwoRounds = true
+                                if !buildVM.currCustomSet.hasTwoRounds {
+                                    buildVM.currCustomSet.hasTwoRounds = true
+                                    buildVM.incrementDirtyBit()
+                                }
                             }
                     }
                     .font(formatter.font(fontSize: .mediumLarge))
@@ -193,14 +197,14 @@ struct MobileBuildDetailsView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
                             Button {
-                                buildVM.subtractRound1()
+                                buildVM.subtractCategoryRound1()
                             } label: {
                                 Image(systemName: "minus.circle.fill")
                                     .font(formatter.iconFont(.medium))
                                     .opacity(buildVM.currCustomSet.round1Len == 3 ? 0.4 : 1)
                             }
                             Button {
-                                buildVM.addRound1()
+                                buildVM.addCategoryRound1()
                             } label: {
                                 Image(systemName: "plus.circle.fill")
                                     .font(formatter.iconFont(.medium))
@@ -221,14 +225,14 @@ struct MobileBuildDetailsView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 Spacer()
                                 Button {
-                                    buildVM.subtractRound2()
+                                    buildVM.subtractCategoryRound2()
                                 } label: {
                                     Image(systemName: "minus.circle.fill")
                                         .font(formatter.iconFont(.medium))
                                         .opacity(buildVM.currCustomSet.round2Len == 3 ? 0.4 : 1)
                                 }
                                 Button {
-                                    buildVM.addRound2()
+                                    buildVM.addCategoryRound2()
                                 } label: {
                                     Image(systemName: "plus.circle.fill")
                                         .font(formatter.iconFont(.medium))
@@ -252,6 +256,7 @@ struct MobileBuildDetailsView: View {
                     }
                     .animation(.easeInOut(duration: 0.1), value: UUID().uuidString)
                     .onTapGesture {
+                        buildVM.incrementDirtyBit()
                         buildVM.currCustomSet.isPublic.toggle()
                     }
                     
@@ -260,8 +265,15 @@ struct MobileBuildDetailsView: View {
                 }
                 Text("Tip: Each category is considered complete when it has one or more clues. So, if you’re stuck on a category, just finish one clue and move on. You can always come back to it later, or you can leave it empty!")
                     .font(formatter.font(.regularItalic, fontSize: .regular))
+                    .padding(.bottom, 45)
             }
             .keyboardAware()
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                setTitle = buildVM.currCustomSet.title
+                setDescription = buildVM.currCustomSet.description
+            }
         }
     }
 }

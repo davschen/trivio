@@ -110,6 +110,7 @@ struct MobileBuildAllCategoryView: View {
                             formatter.resignKeyboard()
                             category.name.isEmpty ? buildVM.setEditingIndex(index: 0) : ()
                             category.name = categoryName
+                            buildVM.incrementDirtyBit()
                         } label: {
                             Text("Done")
                                 .font(formatter.font())
@@ -174,6 +175,7 @@ struct MobileBuildAllHeaderView: View {
         HStack (spacing: 8) {
             Button {
                 buildVM.currentDisplay = .grid
+                buildVM.determineMostAdvancedStage()
             } label: {
                 HStack {
                     Image(systemName: "arrow.left")
@@ -268,6 +270,12 @@ struct MobileBuildAllCluePickerView: View {
             }
         }
         .frame(width: 70)
+        .onChange(of: category.clues) { _ in
+            buildVM.incrementDirtyBit()
+        }
+        .onChange(of: category.responses) { _ in
+            buildVM.incrementDirtyBit()
+        }
     }
 }
 

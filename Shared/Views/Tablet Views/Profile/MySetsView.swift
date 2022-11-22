@@ -180,8 +180,7 @@ struct CustomSetCellView: View {
             if isMine {
                 HStack {
                     Button(action: {
-                        buildVM.edit(gameID: setID)
-                        buildVM.isEditingDraft = false
+                        buildVM.edit(customSet: set)
                     }, label: {
                         Text("Edit")
                             .foregroundColor(formatter.color(.highContrastWhite))
@@ -209,13 +208,13 @@ struct CustomSetCellView: View {
             } else if !exploreVM.isShowingUserView {
                 Button(action: {
                     exploreVM.isShowingUserView.toggle()
-                    exploreVM.pullAllFromUser(withID: set.creatorUserID)
+                    exploreVM.pullAllFromUser(withID: set.userID)
                     gamesVM.previewViewShowing = false
                 }, label: {
                     HStack {
                         Image(systemName: "person.circle")
                             .font(.system(size: 15, weight: .bold))
-                        Text("\(exploreVM.getUsernameFromUserID(userID: set.creatorUserID))'s Profile")
+                        Text("\(exploreVM.getUsernameFromUserID(userID: set.userID))'s Profile")
                             .font(formatter.font(fontSize: .medium))
                     }
                     .foregroundColor(formatter.color(.highContrastWhite))

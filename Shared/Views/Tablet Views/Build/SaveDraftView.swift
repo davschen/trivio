@@ -40,7 +40,6 @@ struct SaveDraftView: View {
                     Button(action: {
                         if !buildVM.currCustomSet.title.isEmpty {
                             buildVM.currentDisplay = .grid
-                            buildVM.saveDraft()
                         }
                     }, label: {
                         HStack {

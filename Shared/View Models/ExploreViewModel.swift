@@ -30,8 +30,10 @@ class ExploreViewModel: ObservableObject {
     @Published var tagsString = [String]()
     @Published var tags = [String:Int]()
     
-    @Published var viewingUsername = ""
-    @Published var viewingName = ""
+    @Published var selectedUserUsername = ""
+    @Published var selectedUserName = ""
+    @Published var selectedUserTagsDict = [String:Bool]()
+    
     @Published var isShowingUserView = false
     @Published var usernameIDDict = [String:String]()
     @Published var nameIDDict = [String:String]()
@@ -187,7 +189,7 @@ class ExploreViewModel: ObservableObject {
                 }
                 if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
                     // Custom set for version 3.0
-                    self.addUsernameNameToDict(userID: customSetCherry.creatorUserID)
+                    self.addUsernameNameToDict(userID: customSetCherry.userID)
                     return customSetCherry
                 } else {
                     // default
@@ -250,6 +252,8 @@ class ExploreViewModel: ObservableObject {
     // for user view
     func pullAllFromUser(withID userID: String) {
         userResults.removeAll()
+        selectedUserTagsDict.removeAll()
+        
         db.collection("userSets")
             .whereField("userID", isEqualTo: userID)
             .whereField("isPublic", isEqualTo: true)
@@ -268,22 +272,34 @@ class ExploreViewModel: ObservableObject {
                     }
                     if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
                         // Custom set for version 3.0
+                        for tag in customSetCherry.tags {
+                            self.selectedUserTagsDict[tag] = true
+                        }
+                        print("ExploreViewModel :: selectedUserTagsDict")
                         return customSetCherry
                     } else {
                         // default
+                        for tag in (customSet ?? Empty().customSet).tags {
+                            self.selectedUserTagsDict[tag] = true
+                        }
                         return CustomSetCherry(customSet: customSet ?? Empty().customSet)
                     }
                 })
             }
+        
         db.collection("users").document(userID).getDocument { (docSnap, error) in
             if error != nil {
                 print(error!.localizedDescription)
                 return
             }
             guard let doc = docSnap else { return }
-            self.viewingUsername = doc.get("username") as? String ?? ""
-            self.viewingName = doc.get("name") as? String ?? ""
+            self.selectedUserUsername = doc.get("username") as? String ?? ""
+            self.selectedUserName = doc.get("name") as? String ?? ""
         }
+    }
+    
+    func toggleSelectedUserTagsDict(item: String) {
+        self.selectedUserTagsDict[item]?.toggle()
     }
     
     func getCurrentSort() -> String {

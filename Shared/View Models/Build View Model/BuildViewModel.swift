@@ -39,12 +39,11 @@ class BuildViewModel: ObservableObject {
     @Published var showingBuildView = false
     
     public var editingCategoryIndex = 0
-    
-    private var moneySectionsJ = ["200", "400", "600", "800", "1000"]
-    private var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
-    private var db = Firestore.firestore()
-    private var emptyStrings = ["", "", "", "", ""]
-    private var myUID = Auth.auth().currentUser?.uid ?? "no_one"
+    public var moneySectionsJ = ["200", "400", "600", "800", "1000"]
+    public var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
+    public var emptyStrings = ["", "", "", "", ""]
+    public var myUID = Auth.auth().currentUser?.uid ?? "noUID"
+    public var db = Firestore.firestore()
     
     init() {
         self.fillBlanks()
@@ -60,116 +59,12 @@ class BuildViewModel: ObservableObject {
         self.editingClueIndex = 0
         self.round1CatsShowing.removeAll()
         self.round2CatsShowing.removeAll()
-        self.gameID = UUID().uuidString
         self.moneySections = moneySectionsDJ
         self.fillBlanks()
         
-        self.buildStage = .trivioRound
+        self.buildStage = .details
         self.mostAdvancedStage = .details
-        self.currentDisplay = .grid
-    }
-    
-    func writeToFirestore(completion: @escaping (Bool) -> Void) {
-        let docRef = db.collection(self.currCustomSet.isDraft ? "drafts" : "userSets").document(gameID)
-        currCustomSet.dateLastModified = Date()
-        docRef.getDocument { (doc, error) in
-            if error != nil { return }
-            DispatchQueue.main.async {
-                try? docRef.setData(from: self.currCustomSet)
-                self.writeCategories()
-                self.updateTagsDB()
-                self.dirtyBit = 0
-                if !self.currCustomSet.isDraft {
-                    self.db.collection("drafts").document(self.gameID).delete()
-                }
-            }
-        }
-    }
-    
-    func writeCategories() {
-        for i in 0..<self.currCustomSet.round1Len {
-            let category = jCategories[i]
-            guard let id = category.id else { return }
-            let docRef = db.collection("userCategories").document(id)
-            try? docRef.setData(from: category)
-        }
-        for i in 0..<self.currCustomSet.round2Len {
-            let category = djCategories[i]
-            guard let id = category.id else { return }
-            let docRef = db.collection("userCategories").document(id)
-            try? docRef.setData(from: category)
-        }
-    }
-    
-    func updateTagsDB(tags: [String] = []) {
-        let myDocRef = db.collection("users").document(myUID)
-        myDocRef.getDocument { (docSnap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let doc = docSnap else { return }
-            var dbTags = doc.get("tags") as? [String:Int] ?? [:]
-            let tagsToAdd = self.currCustomSet.tags.isEmpty ? self.currCustomSet.tags : tags
-            for tag in tagsToAdd {
-                let upperTag = tag.uppercased()
-                if dbTags.keys.contains(upperTag) {
-                    dbTags[upperTag]! += 1
-                } else {
-                    dbTags.updateValue(1, forKey: upperTag)
-                }
-            }
-            myDocRef.setData([
-                "tags" : dbTags
-            ], merge: true)
-        }
-    }
-    
-    func edit(gameID: String) {
-        self.showingBuildView.toggle()
-        self.gameID = gameID
-        self.jCategories.removeAll()
-        self.djCategories.removeAll()
-        let docRef = db.collection(currCustomSet.isDraft ? "drafts" : "userSets").document(gameID)
-        docRef.getDocument { (doc, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let doc = doc else { return }
-            let customSet: CustomSetCherry
-            if let customSetOG = try? doc.data(as: CustomSet.self) {
-                customSet = CustomSetCherry(customSet: customSetOG)
-            } else if let customSetCherry = try? doc.data(as: CustomSetCherry.self) {
-                customSet = customSetCherry
-            } else {
-                return
-            }
-            DispatchQueue.main.async {
-                self.currCustomSet = customSet
-                self.getCategoriesWithIDs(isDJ: false, ids: customSet.round1CatIDs)
-                self.getCategoriesWithIDs(isDJ: true, ids: customSet.round2CatIDs)
-                
-                self.categories = self.jCategories
-                self.isRandomDD = true
-                self.editingClueIndex = 0
-                self.round1CatsShowing = [Bool](repeating: true, count: 6)
-                self.round2CatsShowing = [Bool](repeating: true, count: 6)
-            }
-        }
-    }
-    
-    func saveDraft(isExiting: Bool = false) {
-        writeToFirestore() { (success) in
-            self.processPending = true
-            if success {
-                self.processPending = false
-                self.buildStage = .trivioRound
-                if isExiting {
-                    self.showingBuildView.toggle()
-                }
-            }
-        }
+        self.currentDisplay = .settings
     }
     
     func getCategoryIDs(isDJ: Bool) -> [String] {
@@ -192,83 +87,24 @@ class BuildViewModel: ObservableObject {
             self.djCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: gameID))
             round2CatsShowing.append(true)
         }
+        
         gameID = UUID().uuidString
+        currCustomSet.id = gameID
         moneySections = moneySectionsJ
         buildStage = .details
+    }
+    
+    func incrementDirtyBit() {
+        dirtyBit += 1
+    }
+    
+    func resetDirtyBit() {
+        dirtyBit = 0
     }
     
     func start() {
         clearAll()
         showingBuildView.toggle()
-    }
-    
-    func getCategoriesWithIDs(isDJ: Bool, ids: [String]) {
-        if isDJ {
-            self.djCategories = [CustomSetCategory](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
-        } else {
-            self.jCategories = [CustomSetCategory](repeating: Empty().category(index: 0, emptyStrings: emptyStrings, gameID: gameID), count: ids.count)
-        }
-        for i in 0..<ids.count {
-            let id = ids[i]
-            db.collection("userCategories").document(id).getDocument { (doc, error) in
-                if error != nil { return }
-                guard let doc = doc else { return }
-                guard let category = try? doc.data(as: CustomSetCategory.self) else { return }
-                DispatchQueue.main.async {
-                    if isDJ {
-                        self.djCategories[category.index] = category
-                    } else {
-                        self.jCategories[category.index] = category
-                    }
-                }
-            }
-        }
-    }
-    
-    func addCategoryRound1() {
-        if self.currCustomSet.round1Len == 6 { return }
-        self.currCustomSet.round1Len += 1
-        round1CatsShowing[currCustomSet.round1Len - 1] = true
-        if jCategories.count <= currCustomSet.round1Len {
-            self.jCategories.append(Empty().category(index: currCustomSet.round1Len - 1, emptyStrings: emptyStrings, gameID: gameID))
-        }
-    }
-    
-    func addCategoryRound2() {
-        if self.currCustomSet.round2Len == 6 { return }
-        self.currCustomSet.round2Len += 1
-        round2CatsShowing[currCustomSet.round2Len - 1] = true
-        if djCategories.count <= currCustomSet.round2Len {
-            self.jCategories.append(Empty().category(index: currCustomSet.round2Len - 1, emptyStrings: emptyStrings, gameID: gameID))
-        }
-    }
-    
-    func addCategory() {
-        if buildStage == .trivioRound {
-            addCategoryRound1()
-        } else if buildStage == .dtRound {
-            addCategoryRound2()
-        }
-    }
-    
-    func subtractCategoryRound1() {
-        if currCustomSet.round1Len == 3 { return }
-        currCustomSet.round1Len -= 1
-        round1CatsShowing[currCustomSet.round1Len] = false
-    }
-    
-    func subtractCategoryRound2() {
-        if currCustomSet.round2Len == 3 { return }
-        currCustomSet.round2Len -= 1
-        round2CatsShowing[currCustomSet.round2Len] = false
-    }
-    
-    func subtractCategory() {
-        if buildStage == .trivioRound {
-            subtractCategoryRound1()
-        } else if buildStage == .dtRound {
-            subtractCategoryRound2()
-        }
     }
     
     func getNumClues() -> Int {
@@ -432,102 +268,6 @@ class BuildViewModel: ObservableObject {
         return backString
     }
     
-    func back() {
-        switch buildStage {
-        case .trivioRound:
-            buildStage = .details
-            currentDisplay = .settings
-        case .trivioRoundDD:
-            buildStage = .trivioRound
-            currentDisplay = .grid
-        case .dtRound:
-            moneySections = moneySectionsJ
-            buildStage = .trivioRoundDD
-            currentDisplay = .grid
-        case .dtRoundDD:
-            buildStage = .dtRound
-            currentDisplay = .grid
-        case .finalTrivio:
-            if currCustomSet.hasTwoRounds {
-                buildStage = .dtRoundDD
-            } else {
-                buildStage = .trivioRoundDD
-            }
-            currentDisplay = .grid
-        default:
-            buildStage = .finalTrivio
-            currentDisplay = .finalTrivio
-        }
-    }
-    
-    func rectifyNextProhibited() {
-        // Can't get this to work, but it's supposed to reconsider mostAdvancedStage
-//        mostAdvancedStage = buildStage
-    }
-    
-    func checkForSetIsComplete() -> Bool {
-        var round1FilledCount = 0
-        var round2FilledCount = 0
-        for category in jCategories {
-            round1FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
-        }
-        for category in djCategories {
-            round2FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
-        }
-        
-        let detailsCheck = !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
-        let trivioRoundCheck = round1FilledCount >= currCustomSet.round1Len
-        let dtRoundCheck = round2FilledCount >= currCustomSet.round2Len
-        let roundOneDailyCheck = !currCustomSet.roundOneDaily.isEmpty
-        let roundTwoDailyCheck = !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
-        let finalCheck = !currCustomSet.finalCat.isEmpty && !currCustomSet.finalClue.isEmpty && !currCustomSet.finalResponse.isEmpty
-        
-        return detailsCheck && trivioRoundCheck && dtRoundCheck && roundOneDailyCheck && roundTwoDailyCheck && finalCheck
-    }
-    
-    func nextPermitted() -> Bool {
-        switch buildStage {
-        case .details:
-            if currCustomSet.tags.isEmpty || currCustomSet.title.isEmpty {
-                rectifyNextProhibited()
-            }
-            return !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
-        case .trivioRound:
-            var numFilled = 0
-            for category in jCategories {
-                numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
-            }
-            if numFilled < currCustomSet.round1Len {
-                rectifyNextProhibited()
-            }
-            return numFilled >= currCustomSet.round1Len
-        case .dtRound:
-            var numFilled = 0
-            for category in djCategories {
-                numFilled += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
-            }
-            if numFilled < currCustomSet.round2Len {
-                rectifyNextProhibited()
-            }
-            return numFilled >= currCustomSet.round2Len
-        case .trivioRoundDD:
-            if currCustomSet.roundOneDaily.isEmpty {
-                rectifyNextProhibited()
-            }
-            return !currCustomSet.roundOneDaily.isEmpty
-        case .dtRoundDD:
-            if (currCustomSet.roundTwoDaily1.isEmpty  || currCustomSet.roundTwoDaily2.isEmpty) {
-                rectifyNextProhibited()
-            }
-            return (!currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty)
-        default:
-            if currCustomSet.finalCat.isEmpty || currCustomSet.finalClue.isEmpty || currCustomSet.finalResponse.isEmpty {
-                rectifyNextProhibited()
-            }
-            return checkForSetIsComplete()
-        }
-    }
-    
     func categoryEmpty(category: CustomSetCategory) -> Bool {
         for i in 0..<category.clues.count {
             let clue = category.clues[i]
@@ -585,15 +325,8 @@ class BuildViewModel: ObservableObject {
             buildStage = .finalTrivio
             currentDisplay = .finalTrivio
         default:
-            writeToFirestore() { (success) -> Void in
-                self.processPending = true
-                if success {
-                    self.processPending = false
-                    self.buildStage = .trivioRound
-                    self.showingBuildView.toggle()
-                    self.clearAll()
-                }
-            }
+            writeToFirestore()
+            showingBuildView.toggle()
         }
         if mostAdvancedStageIndex <= buildStageIndex {
             mostAdvancedStage = buildStage
@@ -614,6 +347,7 @@ class BuildViewModel: ObservableObject {
                     currCustomSet.roundTwoDaily2 = [i, j]
                 }
             }
+            determineMostAdvancedStage()
         default:
             currCustomSet.roundOneDaily = [i, j]
         }
@@ -629,14 +363,18 @@ class BuildViewModel: ObservableObject {
     }
     
     func addTag() {
-        if !currCustomSet.tags.contains(tag) {
-            currCustomSet.tags.append(contentsOf: tag.split(separator: " ").compactMap { String($0) })
+        tag.split(separator: " ").forEach { tag in
+            if !currCustomSet.tags.contains(String(tag)) {
+                currCustomSet.tags.append(String(tag))
+                incrementDirtyBit()
+            }
         }
         self.tag.removeAll()
     }
     
     func removeTag(tag: String) {
         currCustomSet.tags = currCustomSet.tags.filter { $0 != tag }
+        incrementDirtyBit()
     }
     
     func deleteSet(isDraft: Bool = false, setID: String) {
@@ -721,13 +459,22 @@ struct MobileBuildStageIndexDict {
         .finalTrivio: 5
     ]
     
+    var reverseDict: [Int:BuildStage] = [
+        1 : .details,
+        2 : .trivioRound,
+        3 : .trivioRoundDD,
+        4 : .dtRound,
+        5 : .dtRoundDD,
+        6 : .finalTrivio
+    ]
+    
     func getIndex(from buildStage: BuildStage) -> Int {
         return dict[buildStage] ?? 0
     }
 }
 
 struct Empty {
-    var customSet = CustomSet(id: "", jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
+    var customSet = CustomSet(id: UUID().uuidString, jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
     
     var game = Game(id: "", date: Date(), dj_category_ids: [], dj_dds_1: [], dj_dds_2: [], dj_round_len: 0, fj_category: "", fj_clue: "", fj_response: "", game_id: "", group_index: 0, j_category_ids: [], j_round_len: 0, title: "", type: "", userID: "")
     var team = Team(id: UUID().uuidString, index: 0, name: "", members: [], score: 0, color: "blue")

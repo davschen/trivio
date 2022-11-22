@@ -9,127 +9,104 @@ import Foundation
 import SwiftUI
 
 struct MobileProfileView: View {
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @State var isShowingMyCustomSetsView = true
+    @State var isShowingDraftsView = true
     
     var body: some View {
-        ZStack {
-            if buildVM.showingBuildView {
-                MobileBuildView()
-                    .transition(.move(edge: .bottom))
-                    .withBackground()
-            } else if profileVM.showingSettingsView {
-                MobileSettingsView()
-                    .transition(.move(edge: .bottom))
-                    .withBackground()
-            } else {
-                NavigationView() {
-                    MobileProfileMainView()
-                        .withHeader("Profile")
+        ScrollView (showsIndicators: false) {
+            VStack (alignment: .leading, spacing: 15) {
+                MobileAccountInfoView()
+                Spacer(minLength: 10)
+                VStack (spacing: 20) {
+                    VStack (alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("My sets")
+                            Spacer()
+                            Button {
+                                isShowingMyCustomSetsView.toggle()
+                            } label: {
+                                Text(isShowingMyCustomSetsView ? "Hide" : "Show")
+                                    .foregroundColor(formatter.color(.secondaryAccent))
+                            }
+                        }
+                        .padding(.horizontal)
+                        if isShowingMyCustomSetsView {
+                            MobileMyCustomSetsView(customSets: $gamesVM.customSets)
+                        }
+                    }
+                    VStack (alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("My drafts")
+                            Spacer()
+                            Button {
+                                isShowingDraftsView.toggle()
+                            } label: {
+                                Text(isShowingDraftsView ? "Hide" : "Show")
+                                    .foregroundColor(formatter.color(.secondaryAccent))
+                            }
+                        }
+                        .padding(.horizontal)
+                        if isShowingDraftsView {
+                            MobileDraftsView()
+                        }
+                    }
                 }
-                .navigationViewStyle(StackNavigationViewStyle())
             }
+            .padding(.vertical)
+            .padding(.bottom, 25)
         }
-    }
-}
-
-struct MobileProfileMainView: View {
-
-    var body: some View {
-        VStack {
-            MobileAccountInfoView()
-            ScrollView (.vertical, showsIndicators: false) {
-                MobileProfileMenuSelectionView()
-            }
-            MobileProfileBottomButtonsView()
-        }
-        .padding([.horizontal, .bottom])
+        .withBackground()
+        .withBackButton()
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
 struct MobileAccountInfoView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
     var body: some View {
-        VStack (alignment: .leading) {
-            VStack (alignment: .leading) {
-                Text("\(profileVM.name)")
-                    .font(formatter.font(.bold, fontSize: .large))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                Text("@\(profileVM.username)")
-                    .font(formatter.font(.regular, fontSize: .medium))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom)
-            
-            Button(action: {
-                formatter.hapticFeedback(style: .light)
-                profileVM.showingSettingsView.toggle()
-                profileVM.settingsMenuSelectedItem = "Account"
-            }, label: {
-                Text("Edit Info")
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .font(formatter.font(.bold, fontSize: .medium))
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(formatter.color(.primaryAccent))
-                    .cornerRadius(5)
-            })
-        }
-        .padding()
-        .background(formatter.color(.primaryFG))
-        .cornerRadius(10)
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct MobileProfileMenuSelectionView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var profileVM: ProfileViewModel
-    
-    var body: some View {
-        VStack (spacing: 30) {
-            MobileMenuSelectionView(label: "Summary", transitionToView: AnyView(MobileSummaryView().withBackButton()))
-            MobileMenuSelectionView(label: "My Drafts", transitionToView: AnyView(MobileDraftsView().withBackButton()))
-            MobileMenuSelectionView(label: "Past Games", transitionToView: AnyView(MobileReportsView().withBackButton()))
-        }
-        .padding()
-    }
-}
-
-struct MobileMenuSelectionView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var profileVM: ProfileViewModel
-    
-    @State var selectionViewActive = false
-    
-    let label: String
-    let transitionToView: AnyView
-    
-    var body: some View {
-        ZStack {
-            Button {
-                formatter.hapticFeedback(style: .light)
-                selectionViewActive.toggle()
-            } label: {
-                HStack {
-                    Text(label)
-                        .font(formatter.font(fontSize: .mediumLarge))
-                        .foregroundColor(formatter.color(.highContrastWhite))
-                    Spacer()
+        Button {
+            profileVM.showingSettingsView.toggle()
+            profileVM.settingsMenuSelectedItem = "Account"
+        } label: {
+            ZStack {
+                HStack (spacing: 5) {
+                    Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
+                        .font(formatter.font(.boldItalic, fontSize: .regular))
+                        .frame(width: 45, height: 45)
+                        .background(formatter.color(.primaryAccent))
+                        .clipShape(Circle())
+                        .overlay(
+                                Circle()
+                                    .stroke(formatter.color(.highContrastWhite), lineWidth: 3)
+                            )
+                    VStack (alignment: .leading, spacing: 5) {
+                        Text("\(profileVM.name)")
+                            .font(formatter.font(.bold, fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                        Text("@\(profileVM.username)")
+                            .font(formatter.font(.regular, fontSize: .medium))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 10)
+                    
+                    Spacer(minLength: 0)
+                    
                     Image(systemName: "chevron.right")
-                        .font(formatter.iconFont())
+                        .font(formatter.iconFont(.small))
                 }
+                .padding(.horizontal)
+                
+                NavigationLink(destination: MobileSettingsView(),
+                               isActive: $profileVM.showingSettingsView,
+                               label: { EmptyView() }).hidden()
             }
-            NavigationLink(destination: transitionToView
-                            .navigationBarTitle(label, displayMode: .inline),
-                           isActive: $selectionViewActive,
-                           label: { EmptyView() }).hidden()
-            NavigationLink(destination: EmptyView()) {
-                EmptyView()
-            }.hidden()
         }
     }
 }
@@ -189,10 +166,14 @@ struct MobileEmptyListView: View {
                 .font(formatter.font(.regularItalic))
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: 145)
         .padding()
-        .background(formatter.color(.primaryFG))
         .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(formatter.color(.lowContrastWhite), lineWidth: 2)
+        )
     }
 }
 

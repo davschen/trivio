@@ -23,6 +23,10 @@ struct MobileBuildView: View {
         return buildVM.buildStage == .dtRound || buildVM.buildStage == .dtRoundDD
     }
     
+    init() {
+        UIScrollView.appearance().keyboardDismissMode = .onDrag
+    }
+    
     var body: some View {
         VStack (alignment: .leading) {
             if buildVM.currentDisplay != .buildAll {
@@ -57,18 +61,19 @@ struct MobileBuildView: View {
         .toolbar {
             ToolbarItem {
                 Button(action: {
-                    buildVM.saveDraft()
+                    buildVM.writeToFirestore()  
                 }) {
                     ZStack {
-                        Text("Save")
+                        Text(buildVM.dirtyBit == 0 ? "Saved" : "Save")
                     }
                     .font(formatter.font(fontSize: .regular))
                     .foregroundColor(formatter.color(.primaryFG))
                     .padding(.horizontal).padding(.vertical, 5)
-                    .background(formatter.color(.highContrastWhite))
+                    .background(formatter.color(buildVM.dirtyBit == 0 ? .lowContrastWhite : .highContrastWhite))
                     .clipShape(Capsule())
                 }
                 .opacity(buildVM.currCustomSet.title.isEmpty ? 0 : 1)
+                .disabled(buildVM.dirtyBit == 0)
             }
         }
     }

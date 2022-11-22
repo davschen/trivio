@@ -16,7 +16,7 @@ class ProfileViewModel: ObservableObject {
     @Published var username = "" 
     @Published var name = ""
     @Published var usernameValid = false
-    @Published var drafts = [CustomSet]()
+    @Published var drafts = [CustomSetCherry]()
     @Published var searchItem = ""
     @Published var showingSettingsView = false
     @Published var settingsMenuSelectedItem = "Game Settings"
@@ -153,11 +153,18 @@ class ProfileViewModel: ObservableObject {
             .whereField("userID", isEqualTo: myUID)
             .order(by: "dateCreated", descending: true)
             .addSnapshotListener { snap, error in
-            if error != nil { return }
-            guard let data = snap?.documents else { return }
-            self.drafts = data.compactMap({ (queryDocSnap) -> CustomSet? in
-                return try? queryDocSnap.data(as: CustomSet.self)
-            })
+                if error != nil { return }
+                guard let data = snap?.documents else { return }
+                self.drafts = data.compactMap { (queryDocSnap) -> CustomSetCherry? in
+                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
+                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
+                        // Custom set for version 3.0
+                        return customSetCherry
+                    } else {
+                        // default
+                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                    }
+                }
         }
     }
     
@@ -212,6 +219,30 @@ class ProfileViewModel: ObservableObject {
     
     func updatePhoneNumber(newPhoneNumber: String) {
         
+    }
+    
+    func accountInformationError(usernameTaken: Bool) -> Bool {
+        return !nameError().isEmpty || !usernameError(usernameTaken: usernameTaken).isEmpty
+    }
+    
+    func usernameError(usernameTaken: Bool) -> String {
+        if usernameTaken {
+            return "That username is already taken"
+        } else if self.username.isEmpty {
+            return "Your username cannot be empty"
+        } else if !self.checkForbiddenChars().isEmpty {
+            return "Your username cannot contain a " + self.checkForbiddenChars()
+        } else {
+            return ""
+        }
+    }
+    
+    func nameError() -> String {
+        if self.name.isEmpty {
+            return "Your name cannot be empty"
+        } else {
+            return ""
+        }
     }
     
     func logOut() {

@@ -49,6 +49,7 @@ struct MobileCustomSetCellView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var setPreviewActive = false
+    @State var userViewActive = false
     
     var isInUserView = false
     var customSet: CustomSetCherry
@@ -67,20 +68,32 @@ struct MobileCustomSetCellView: View {
             VStack (alignment: .leading, spacing: 7) {
                 Text(customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
-                Text("2 rounds, \(customSet.numClues) clues")
+                Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     .font(formatter.font(.regular))
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
                     .font(formatter.font(.regular))
                     .foregroundColor(formatter.color(.lowContrastWhite))
                     .padding(.bottom, 5)
-                HStack {
-                    Text("\(exploreVM.getInitialsFromUserID(userID: customSet.creatorUserID))")
-                        .font(formatter.font(.boldItalic, fontSize: .small))
-                        .frame(width: 35, height: 35)
-                        .background(formatter.color(.primaryAccent))
-                        .clipShape(Circle())
+                HStack (spacing: 10) {
+                    ZStack {
+                        Button {
+                            exploreVM.pullAllFromUser(withID: customSet.userID)
+                            userViewActive.toggle()
+                        } label: {
+                            Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
+                                .font(formatter.font(.boldItalic, fontSize: .small))
+                                .frame(width: 35, height: 35)
+                                .background(formatter.color(.primaryAccent))
+                                .clipShape(Circle())
+                        }
+
+                        NavigationLink(destination: MobileUserView()
+                            .navigationBarTitle("Profile", displayMode: .inline),
+                                       isActive: $userViewActive,
+                                       label: { EmptyView() }).hidden()
+                    }
                     VStack (alignment: .leading, spacing: 2) {
-                        Text("\(exploreVM.getUsernameFromUserID(userID: customSet.creatorUserID))")
+                        Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
                             .font(formatter.font(.regular))
                         HStack {
                             Text("\(customSet.plays) plays")
@@ -117,44 +130,6 @@ struct MobileCustomSetCellView: View {
         gamesVM.getCustomData(setID: setID)
         gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
-    }
-}
-
-struct MobileUserProfileButtonView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var exploreVM: ExploreViewModel
-    
-    @Binding var userViewActive: Bool
-    
-    var set: CustomSetCherry
-    
-    var body: some View {
-        ZStack {
-            NavigationLink(destination: MobileUserView()
-                            .navigationBarTitle("Profile", displayMode: .inline),
-                           isActive: $userViewActive,
-                           label: {}).hidden()
-            NavigationLink(destination: EmptyView()) {
-                EmptyView()
-            }.hidden()
-            Button(action: {
-                formatter.hapticFeedback(style: .light)
-                exploreVM.pullAllFromUser(withID: set.creatorUserID)
-                userViewActive.toggle()
-            }, label: {
-                HStack {
-                    Image(systemName: "person.circle")
-                        .font(.system(size: 15, weight: .bold))
-                    Text("\(exploreVM.getUsernameFromUserID(userID: set.creatorUserID))'s Profile")
-                        .font(formatter.font(fontSize: .medium))
-                }
-                .foregroundColor(formatter.color(.highContrastWhite))
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(formatter.color(.primaryAccent))
-                .cornerRadius(5)
-            })
-        }
     }
 }
 

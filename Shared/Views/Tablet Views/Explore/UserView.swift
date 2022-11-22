@@ -31,9 +31,9 @@ struct UserView: View {
                     .font(formatter.font())
                 }
                 VStack (alignment: .leading, spacing: 5) {
-                    Text(exploreVM.viewingUsername)
+                    Text(exploreVM.selectedUserUsername)
                         .font(formatter.font(fontSize: .large))
-                    Text(exploreVM.viewingName)
+                    Text(exploreVM.selectedUserName)
                         .font(formatter.font(fontSize: .semiLarge))
                         .foregroundColor(formatter.color(.mediumContrastWhite))
                 }

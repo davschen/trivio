@@ -75,7 +75,7 @@ struct MobileGameSettingsHeaderView: View {
         VStack (alignment: .leading, spacing: 5) {
             Text("\(gamesVM.customSet.title)")
                 .font(formatter.font(fontSize: .large))
-            Text("Created by \(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.creatorUserID)) on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
+            Text("Created by \(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.userID)) on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
                 .font(formatter.font(.regular, fontSize: .regular))
             // TODO: Space for an optional description
         }
@@ -127,6 +127,7 @@ struct MobileGameSettingsContestantsView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     participantsVM.teamToEdit = Empty().team
                     participantsVM.teamToEdit.index = participantsVM.savedTeams.count
+                    editingName.removeAll()
                     
                     participantsVM.savedTeams.append(participantsVM.teamToEdit)
                     editingID = participantsVM.teamToEdit.id
@@ -212,6 +213,15 @@ struct MobileContestantsCellView: View {
             Button {
                 if editingID == team.id {
                     // "Done"
+                    if editingName.isEmpty && team.name.isEmpty {
+                        // The nevermind case
+                        if let lastIndex = participantsVM.savedTeams.indices.last {
+                            participantsVM.savedTeams.remove(at: lastIndex)
+                            editingID = nil
+                            participantsVM.teamToEdit = Empty().team
+                        }
+                        return
+                    }
                     participantsVM.teamToEdit.id = editingID!
                     participantsVM.teamToEdit.name = editingName
                     participantsVM.teamToEdit.color = editingColor
@@ -255,9 +265,10 @@ struct MobileEditContestantsCellView: View {
             HStack (alignment: .bottom) {
                 VStack (alignment: .leading, spacing: 2) {
                     Text("Name")
-                        .font(formatter.font(.bold, fontSize: .micro))
+                        .font(formatter.font(.bold, fontSize: .small))
                     TextField("Aa", text: $editingName)
                         .font(formatter.font(.regular, fontSize: .medium))
+                        .frame(height: 25)
                     Rectangle()
                         .frame(maxWidth: .infinity)
                         .frame(height: 2)
@@ -266,7 +277,7 @@ struct MobileEditContestantsCellView: View {
                 
                 VStack (alignment: .leading, spacing: 2) {
                     Text("Color")
-                        .font(formatter.font(.bold, fontSize: .micro))
+                        .font(formatter.font(.bold, fontSize: .small))
                     HStack (spacing: 2) {
                         MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.blue), colorString: "blue")
                         MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.purple), colorString: "purple")
@@ -276,24 +287,55 @@ struct MobileEditContestantsCellView: View {
                         MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.red), colorString: "red")
                     }
                 }
-                .frame(width: 150)
+                .frame(width: 190)
                 
                 Button {
+                    if team.name.isEmpty {
+                        editingID = nil
+                        participantsVM.teamToEdit = Empty().team
+                        if let lastIndex = participantsVM.savedTeams.indices.last {
+                            participantsVM.savedTeams.remove(at: lastIndex)
+                        }
+                        return
+                    }
                     formatter.setAlertSettings(alertAction: {
                         formatter.hapticFeedback(style: .soft)
                         participantsVM.removeTeamFromFirestore(id: team.id)
                     }, alertTitle: "Delete \(team.name)?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                 } label: {
                     Image(systemName: "trash")
-                        .font(.system(size: 10))
-                        .frame(width: 30, height: 30)
+                        .font(.system(size: 20))
                         .foregroundColor(formatter.color(.red))
-                        .background(formatter.color(.primaryFG))
-                        .cornerRadius(2)
                 }
             }
             .padding(.horizontal)
         }
+    }
+}
+
+struct MobileColorPickerView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    
+    @Binding var teamColor: String
+    
+    @State var color: Color
+    @State var colorString: String
+    
+    var isSettingsPicker = false
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 2)
+                .foregroundColor(color)
+                .frame(maxWidth: .infinity)
+                .opacity(teamColor == colorString ? 1 : 0.2)
+                .onTapGesture {
+                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                    teamColor = colorString
+                }
+        }
+        .frame(height: 30)
     }
 }
 
@@ -516,7 +558,7 @@ struct MobileGameSettingsGenderView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Reading Voice")
+                Text("Narration Gender")
                 Spacer()
                 HStack (spacing: 5) {
                     Text("\(selectedGender == .male ? "Male" : "Female")")
@@ -637,11 +679,9 @@ struct MobileGameSettingsFooterView: View {
                     .clipShape(Capsule())
             })
             Button(action: {
-                if gameIsPlayable {
-                    isPresentingTrivioLiveView.toggle()
-                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
-                }
+                isPresentingTrivioLiveView.toggle()
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
             }, label: {
                 Text("Host this game live!")
                     .font(formatter.font(.boldItalic, fontSize: .regular))
@@ -649,7 +689,6 @@ struct MobileGameSettingsFooterView: View {
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(formatter.color(.primaryAccent))
-                    .opacity(gameIsPlayable ? 1 : 0.5)
                     .clipShape(Capsule())
             })
         }
