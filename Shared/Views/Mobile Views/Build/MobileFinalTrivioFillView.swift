@@ -9,9 +9,8 @@ import Foundation
 import SwiftUI
 
 struct MobileFinalTrivioFillView: View {
-    @EnvironmentObject var buildVM: BuildViewModel
-    
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var buildVM: BuildViewModel
     
     @State var categoryName = ""
     @State var finalClue = ""

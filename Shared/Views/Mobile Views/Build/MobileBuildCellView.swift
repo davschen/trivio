@@ -81,16 +81,6 @@ struct MobileBuildCellView: View {
                 categoryIndex = index
             }
         }
-//        .onLongPressGesture(minimumDuration: 1, pressing: { inProgress in
-//            if (!clue.isEmpty || !response.isEmpty) {
-//                formatter.hapticFeedback(style: .medium)
-//                buildVM.setPreviews(clue: clue, response: response)
-//                isHeld = inProgress ? i : -1
-//            }
-//        }) {
-//            formatter.hapticFeedback(style: .medium, intensity: .weak)
-//            isHeld = -1
-//        }
     }
 }
 

@@ -13,11 +13,9 @@ struct MobileUserView: View {
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
-    @State var showingTags = [String]()
-    
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack {
+            VStack (spacing: 15) {
                 VStack (alignment: .leading, spacing: 5) {
                     Text("\(exploreVM.selectedUserName)")
                         .font(formatter.font(.bold, fontSize: .mediumLarge))
@@ -28,52 +26,19 @@ struct MobileUserView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-                .padding(.bottom, 10)
-                
-                FlexibleView(data: exploreVM.selectedUserTagsDict.keys, spacing: 3, alignment: .leading) { item in
-                    HStack (spacing: 0) {
-                        Text("#")
-                        Text(verbatim: item)
-                    }
-                    .foregroundColor(formatter.color(unwrappedUserTagBool(item: item) ? .primaryFG : .highContrastWhite))
-                    .font(formatter.font(.boldItalic, fontSize: .small))
-                    .padding(6)
-                    .background(formatter.color(unwrappedUserTagBool(item: item) ? .highContrastWhite : .secondaryFG))
-                    .clipShape(Capsule())
-                    .padding(.vertical, 2)
-                    .onTapGesture {
-                        exploreVM.toggleSelectedUserTagsDict(item: item)
-                        if unwrappedUserTagBool(item: item) {
-                            showingTags.append(item)
-                        } else {
-                            showingTags = showingTags.filter { $0 != item }
-                        }
-                    }
-                }
-                .padding(.leading)
+                .padding(.bottom, 5)
                 
                 VStack (alignment: .leading, spacing: 3) {
                     ForEach(exploreVM.userResults, id: \.self) { customSet in
-                        if showingTags.contains(where: customSet.tags.contains) {
-                            MobileUserCustomSetCellView(customSet: customSet)
-                        }
+                        MobileUserCustomSetCellView(customSet: customSet)
                     }
                 }
             }
             .padding(.bottom, 25)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                    showingTags = exploreVM.selectedUserTagsDict.keys.compactMap { $0 }
-                }
-            }
         }
         .withBackButton()
         .withBackground()
         .edgesIgnoringSafeArea(.bottom)
-    }
-    
-    func unwrappedUserTagBool(item: String) -> Bool {
-        return exploreVM.selectedUserTagsDict[item] ?? false
     }
 }
 
