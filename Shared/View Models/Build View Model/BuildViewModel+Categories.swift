@@ -9,21 +9,23 @@ import Foundation
 
 extension BuildViewModel {
     func addCategoryRound1() {
+        guard let currSetID = currCustomSet.id else { return }
         if self.currCustomSet.round1Len == 6 { return }
         self.currCustomSet.round1Len += 1
         round1CatsShowing[currCustomSet.round1Len - 1] = true
         if jCategories.count <= currCustomSet.round1Len {
-            self.jCategories.append(Empty().category(index: currCustomSet.round1Len - 1, emptyStrings: emptyStrings, gameID: gameID))
+            self.jCategories.append(Empty().category(index: currCustomSet.round1Len - 1, emptyStrings: emptyStrings, gameID: currSetID))
         }
         incrementDirtyBit()
     }
     
     func addCategoryRound2() {
+        guard let currSetID = currCustomSet.id else { return }
         if self.currCustomSet.round2Len == 6 { return }
         self.currCustomSet.round2Len += 1
         round2CatsShowing[currCustomSet.round2Len - 1] = true
         if djCategories.count <= currCustomSet.round2Len {
-            self.jCategories.append(Empty().category(index: currCustomSet.round2Len - 1, emptyStrings: emptyStrings, gameID: gameID))
+            self.djCategories.append(Empty().category(index: currCustomSet.round2Len - 1, emptyStrings: emptyStrings, gameID: currSetID))
         }
         incrementDirtyBit()
     }
@@ -34,6 +36,7 @@ extension BuildViewModel {
         } else if buildStage == .dtRound {
             addCategoryRound2()
         }
+        determineMostAdvancedStage()
     }
     
     func subtractCategoryRound1() {

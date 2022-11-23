@@ -107,6 +107,8 @@ extension GamesViewModel {
                 }
             }
             
+            if !customSet.hasTwoRounds { return }
+            
             for id in customSet.round2CatIDs {
                 self.db.collection("userCategories").document(id).getDocument { (doc, err) in
                     if err != nil {

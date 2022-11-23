@@ -118,12 +118,12 @@ struct ClueResponseView: View {
                             .onTapGesture {
                                 let teamIndex = participantsVM.selectedTeam.index
                                 let wager = Int(self.ddCorrect ? -self.wager : self.wager)
-                                self.participantsVM.editScore(index: teamIndex, amount: wager)
+                                self.participantsVM.editScore(index: teamIndex, pointValueInt: wager)
                                 self.ddCorrect.toggle()
                             }
                         }
                     } else {
-                        CorrectSelectorView(teamCorrect: $teamCorrect, amount: self.amount)
+                        CorrectSelectorView(teamCorrect: $teamCorrect, pointValueInt: self.amount)
                     }
                     Text("  \(self.showResponse ? "Hide" : "Show") Response  ")
                         .font(formatter.font(fontSize: .mediumLarge))
@@ -160,7 +160,7 @@ struct ClueResponseView: View {
         showResponse = false
         if self.ddCorrect && self.participantsVM.teams.count > 0 {
             let teamIndex = participantsVM.selectedTeam.index
-            participantsVM.editScore(index: teamIndex, amount: Int(self.wager))
+            participantsVM.editScore(index: teamIndex, pointValueInt: Int(self.wager))
         }
         if !teamCorrect.id.isEmpty {
             participantsVM.addSolved()
@@ -203,7 +203,7 @@ struct CorrectSelectorView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @Binding var teamCorrect: Team
     
-    var amount: Int
+    var pointValueInt: Int
     
     var body: some View {
         ScrollView (.horizontal, showsIndicators: false) {
@@ -214,11 +214,11 @@ struct CorrectSelectorView: View {
                         Button(action: {
                             if team == teamCorrect {
                                 teamCorrect = Team(index: 0, name: "", members: [], score: 0, color: "")
-                                self.participantsVM.editScore(index: team.index, amount: -amount)
+                                self.participantsVM.editScore(index: team.index, pointValueInt: -pointValueInt)
                             }
                             self.participantsVM.toSubtracts[team.index].toggle()
-                            let amount = self.participantsVM.toSubtracts[team.index] ? -self.amount : self.amount
-                            self.participantsVM.editScore(index: team.index, amount: amount)
+                            let pointValueInt = self.participantsVM.toSubtracts[team.index] ? -self.pointValueInt : self.pointValueInt
+                            self.participantsVM.editScore(index: team.index, pointValueInt: pointValueInt)
                         }, label: {
                             Image(systemName: "xmark")
                                 .font(.system(size: 25, weight: .bold))
@@ -254,18 +254,18 @@ struct CorrectSelectorView: View {
     
     func markCorrect(teamIndex: Int) {
         let team = participantsVM.teams[teamIndex]
-        participantsVM.resetToLastIncrement(amount: amount)
+        participantsVM.resetToLastIncrement(pointValueInt: pointValueInt)
         // if the contestant is marked wrong, unmark them wrong
         if participantsVM.toSubtracts[team.index] {
             participantsVM.toSubtracts[team.index].toggle()
-            participantsVM.editScore(index: team.index, amount: amount)
+            participantsVM.editScore(index: team.index, pointValueInt: pointValueInt)
         }
         if team == teamCorrect {
             // reset teamCorrect
             self.teamCorrect = Team(index: 0, name: "", members: [], score: 0, color: "")
             participantsVM.setSelectedTeam(index: participantsVM.defaultIndex)
         } else {
-            participantsVM.editScore(index: team.index, amount: amount)
+            participantsVM.editScore(index: team.index, pointValueInt: pointValueInt)
             self.teamCorrect = team
             participantsVM.setSelectedTeam(index: team.index)
         }

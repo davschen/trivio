@@ -192,7 +192,7 @@ struct CustomSetCellView: View {
                     })
                     Button(action: {
                         formatter.setAlertSettings(alertAction: {
-                            buildVM.deleteSet(setID: setID)
+                            buildVM.deleteSet(customSet: set)
                             gamesVM.deleteSet(setID: setID)
                         }, alertTitle: "Are You Sure?", alertSubtitle: "Deleting your set is irreversible. Your set \"\(set.title)\" has been played \(set.plays) times with a rating of \(String(format: "%.01f", round(set.rating * 10) / 10.0)) out of 5.", hasCancel: true, actionLabel: "Delete")
                     }, label: {

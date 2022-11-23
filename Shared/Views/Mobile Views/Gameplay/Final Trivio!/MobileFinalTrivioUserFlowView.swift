@@ -49,37 +49,53 @@ struct MobileFinalTrivioUserFlowView: View {
     
     var body: some View {
         VStack {
-            Text(gamesVM.fjCategory.uppercased())
-                .font(formatter.font(.bold, fontSize: .mediumLarge))
-                .padding()
-                .frame(height: 120)
-                .frame(maxWidth: .infinity)
-                .background(formatter.color(.primaryAccent))
-                .cornerRadius(10)
-            VStack {
-                ScrollView (.vertical, showsIndicators: false) {
-                    VStack {
-                        VStack {
-                            HStack {
-                                Text(headingLabelText)
-                                    .font(formatter.font(.bold, fontSize: .medium))
-                                Spacer()
-                                Button(action: {
-                                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                    isShowingInstructions.toggle()
-                                }, label: {
-                                    Image(systemName: isShowingInstructions ? "questionmark.circle.fill" : "questionmark.circle")
-                                        .font(formatter.iconFont(.small))
-                                })
-                            }
-                            // Instructions (only shown if isShowingInstructions is true)
-                            if isShowingInstructions {
-                                Text(guidanceLabelText)
-                                    .font(formatter.font(.regularItalic, fontSize: .small))
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            Spacer(minLength: 20)
-                            
+            ScrollView (.vertical, showsIndicators: false) {
+                VStack {
+                    VStack (alignment: gamesVM.finalTrivioStage == .makeWager ? .center : .leading, spacing: 5) {
+                        if gamesVM.finalTrivioStage == .makeWager {
+                            Text(gamesVM.customSet.finalCat.uppercased())
+                                .font(formatter.font(.bold, fontSize: .mediumLarge))
+                        } else {
+                            Text(gamesVM.customSet.finalCat.uppercased())
+                                .font(formatter.font(.bold, fontSize: .medium))
+                            Text(gamesVM.customSet.finalClue)
+                                .font(formatter.font(.regular, fontSize: .regular))
+                                .lineSpacing(3)
+                            Text(gamesVM.customSet.finalResponse)
+                                .font(formatter.font(.regular, fontSize: .regular))
+                                .foregroundColor(formatter.color(gamesVM.finalTrivioStage == .revealResponse ? .secondaryAccent : .primaryAccent))
+                        }
+                    }
+                    .padding()
+                    .frame(height: 150)
+                    .frame(maxWidth: .infinity)
+                    .background(formatter.color(.primaryAccent))
+                    .cornerRadius(10)
+                    .padding(10)
+                    
+                    VStack (spacing: 5) {
+                        HStack {
+                            Text(headingLabelText)
+                                .font(formatter.font(.bold, fontSize: .medium))
+                            Spacer()
+                            Button(action: {
+                                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                                isShowingInstructions.toggle()
+                            }, label: {
+                                Image(systemName: isShowingInstructions ? "questionmark.circle.fill" : "questionmark.circle")
+                                    .font(formatter.iconFont(.small))
+                            })
+                        }
+                        // Instructions (only shown if isShowingInstructions is true)
+                        if isShowingInstructions {
+                            Text(guidanceLabelText)
+                                .font(formatter.font(.regularItalic, fontSize: .small))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        Spacer(minLength: 20)
+                        
+                        VStack (spacing: 15) {
                             // Each player's textbox for entering wagers
                             ForEach(participantsVM.teams, id: \.self) { team in
                                 switch gamesVM.finalTrivioStage {
@@ -88,110 +104,36 @@ struct MobileFinalTrivioUserFlowView: View {
                                 case .submitAnswer:
                                     MobileSubmitAnswerView(teamIndex: team.index)
                                 default:
-                                    MobileMakeWagerView(teamIndex: team.index)
+                                    MobileRevealGradeView(teamIndex: team.index)
                                 }
                             }
                         }
                     }
-                    .padding()
+                    .padding(10)
                 }
-                // Continue button
-                Button(action: {
-                    if participantsVM.wagersValid() {
-                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-                        gamesVM.finalTrivioFinishedAction()
-                    }
-                }, label: {
-                    Text("Continue")
-                        .foregroundColor(formatter.color(.primaryFG))
-                        .font(formatter.font(fontSize: .regular))
-                        .padding(.vertical, 20)
-                        .frame(maxWidth: .infinity)
-                        .background(formatter.color(.highContrastWhite))
-                        .clipShape(Capsule())
-                        .contentShape(Capsule())
-                        .padding([.horizontal, .bottom])
-                        .opacity(participantsVM.wagersValid() ? 1 : 0.4)
-                })
             }
+            .resignKeyboardOnDragGesture()
             .background(formatter.color(.primaryFG))
             .cornerRadius(10)
-        }
-    }
-}
-
-struct MobileMakeWagerView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    
-    @State var hidden = false
-    
-    let teamIndex: Int
-    
-    var team: Team {
-        return participantsVM.teams[teamIndex]
-    }
-    
-    var wagerMade: Bool {
-        let wager = participantsVM.wagers[teamIndex]
-        return !wager.isEmpty && (Int(wager) != nil) && (Int(wager)! >= 0)
-    }
-    
-    var body: some View {
-        VStack (alignment: .leading, spacing: 5) {
-            HStack (spacing: 5) {
-                Circle()
-                    .frame(width: 6, height: 6)
-                    .foregroundColor(ColorMap().getColor(color: team.color))
-                Text(team.name)
-                    .font(formatter.font(fontSize: .medium))
-            }
-            HStack {
-                if hidden {
-                    Text(wagerMade ? "Wager made" : "Make your wager")
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.3)
-                        .font(formatter.font(.boldItalic, fontSize: .mediumLarge))
-                } else {
-                    SecureField("Enter your wager", text: $participantsVM.wagers[teamIndex])
-                        .keyboardType(.numberPad)
-                }
-                Spacer()
-                Button(action: {
-                    formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    hidden.toggle()
-                }, label: {
-                    Text("\(hidden ? "Edit" : "Done")")
-                        .foregroundColor(formatter.color(.secondaryAccent))
-                })
-            }
-            .font(formatter.font(fontSize: .medium))
-            .padding(20)
-            .frame(maxWidth: .infinity)
-            .background(formatter.color(hidden ? .primaryAccent : .secondaryFG))
-            .cornerRadius(5)
-            .contentShape(Rectangle())
             
-            if !invalidWagerString(teamIndex: teamIndex).isEmpty {
-                Text(invalidWagerString(teamIndex: teamIndex))
-                    .font(formatter.font(.regularItalic))
-                    .foregroundColor(formatter.color(.secondaryAccent))
-                    .multilineTextAlignment(.leading)
-            }
+            // Continue button
+            Button(action: {
+                if participantsVM.wagersValid() {
+                    formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    gamesVM.finalTrivioFinishedAction()
+                }
+            }, label: {
+                Text("Continue")
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .font(formatter.font(fontSize: .regular))
+                    .padding(.vertical, 20)
+                    .frame(maxWidth: .infinity)
+                    .background(formatter.color(.highContrastWhite))
+                    .clipShape(Capsule())
+                    .contentShape(Capsule())
+                    .padding(.horizontal, 10)
+                    .opacity(participantsVM.wagersValid() ? 1 : 0.4)
+            })
         }
-    }
-    
-    func invalidWagerString(teamIndex: Int) -> String {
-        if participantsVM.wagers[teamIndex].isEmpty {
-            return ""
-        }
-        if Int(participantsVM.wagers[teamIndex]) == nil {
-            return "You must enter a number"
-        } else if Int(participantsVM.wagers[teamIndex])! > participantsVM.teams[teamIndex].score {
-            return "Your wager cannot be higher than your score"
-        } else if Int(participantsVM.wagers[teamIndex])! < 0 {
-            return "Your wager cannot be negative. Nice try though."
-        }
-        return ""
     }
 }

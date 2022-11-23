@@ -12,17 +12,17 @@ struct MobileHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var appStoreManager: AppStoreManager
     
+    @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
+    
+    @State var profileViewActive = false
+    @State var allPublicSetsViewActive = false
+    @State var allRecentSetsViewActive = false
     
     var body: some View {
         NavigationView() {
-            // ZStack is for background color purposes only
-            ZStack {
-                formatter.color(.primaryBG)
-                    .edgesIgnoringSafeArea(.all)
+            ZStack (alignment: .top) {
                 // VStack for Trivio! Header
                 VStack {
                     MobileHomepageHeaderView()
@@ -32,8 +32,8 @@ struct MobileHomepageView: View {
                             // Was a Search bar that used :searchAndPull from exploreVM
                             MobileSetHorizontalScrollView(customSets: $gamesVM.customSets,
                                                           labelText: "My sets",
-                                                          promptText: "More") {
-                                print("More my sets")
+                                                          promptText: "View all") {
+                                profileViewActive.toggle()
                             }
                             MobileExploreBuildPromptButtonView()
                             Spacer()
@@ -41,20 +41,43 @@ struct MobileHomepageView: View {
                             MobileSetHorizontalScrollView(customSets: $exploreVM.recentlyPlayedSets,
                                                           labelText: "Recently played",
                                                           promptText: "View all") {
-                                print("See all recents")
+                                allRecentSetsViewActive.toggle()
                             }
                             Spacer()
                                 .frame(height: 5)
                             MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSets,
                                                           labelText: "Public sets",
                                                           promptText: "View all") {
-                                print("See all publics")
+                                exploreVM.pullAllPublicSets(isLimitingTo20: false)
+                                allPublicSetsViewActive.toggle()
                             }
                         }
+                        .padding(.bottom, 45)
                     }
                 }
+                if buildVM.dirtyBit > 0 && !buildVM.currCustomSet.title.isEmpty {
+                    GeometryReader { reader in
+                        formatter.color(.primaryFG)
+                            .frame(height: reader.safeAreaInsets.top, alignment: .top)
+                            .ignoresSafeArea()
+                    }
+                }
+                NavigationLink(destination: MobileProfileView()
+                    .navigationBarTitle("Profile", displayMode: .inline),
+                               isActive: $profileViewActive,
+                               label: { EmptyView() }).isDetailLink(false).hidden()
+                NavigationLink(destination: MobileViewAllPublicSetsView()
+                    .navigationBarTitle("All Public Sets", displayMode: .inline),
+                               isActive: $allPublicSetsViewActive,
+                               label: { EmptyView() }).isDetailLink(false).hidden()
+                NavigationLink(destination: MobileViewAllRecentSetsView()
+                    .navigationBarTitle("All Played Sets", displayMode: .inline),
+                               isActive: $allRecentSetsViewActive,
+                               label: { EmptyView() }).isDetailLink(false).hidden()
             }
             .navigationBarHidden(true)
+            .withBackground()
+            .edgesIgnoringSafeArea(.bottom)
         }
     }
 }
@@ -85,43 +108,76 @@ struct MobileSetHorizontalScrollView: View {
 
 struct MobileHomepageHeaderView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var buildVM : BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
+    @State var buildViewActive = false
     @State var profileViewActive = false
     
     var body: some View {
         ZStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                Spacer()
-                Text("Trivio!")
-                    .font(formatter.font(fontSize: .mediumLarge))
-                Spacer()
-                Button {
-                    profileViewActive.toggle()
-                } label: {
-                    Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
-                        .font(formatter.font(.boldItalic, fontSize: .micro))
-                        .frame(width: 30, height: 30)
-                        .background(formatter.color(.primaryAccent))
-                        .clipShape(Circle())
-                        .overlay(
-                                Circle()
-                                    .stroke(formatter.color(.highContrastWhite), lineWidth: 3)
-                            )
+            VStack (spacing: 0) {
+                if buildVM.dirtyBit > 0 && !buildVM.currCustomSet.title.isEmpty {
+                    HStack (alignment: .center) {
+                        VStack (alignment: .leading, spacing: 5) {
+                            Text("Set in progress")
+                                .font(formatter.font(fontSize: .small))
+                            Text("Tap to continue editing “\(buildVM.currCustomSet.title)”")
+                                .font(formatter.font(.regular, fontSize: .small))
+                        }
+                        Spacer()
+                        Button {
+                            buildVM.writeToFirestore()
+                            // This is so sketchy and I should switch to either a completion handler or async await but I'm LAZY right now!
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                buildVM.clearAll()
+                            }
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20))
+                                .padding()
+                        }
+                    }
+                    .padding(.leading)
+                    .padding(.bottom, 7)
+                    .background(formatter.color(.primaryFG))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        buildViewActive.toggle()
+                    }
                 }
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                    Spacer()
+                    Text("Trivio!")
+                        .font(formatter.font(fontSize: .mediumLarge))
+                    Spacer()
+                    Button {
+                        profileViewActive.toggle()
+                    } label: {
+                        Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
+                            .font(formatter.font(.boldItalic, fontSize: .micro))
+                            .frame(width: 30, height: 30)
+                            .background(formatter.color(.primaryAccent))
+                            .clipShape(Circle())
+                            .overlay(
+                                    Circle()
+                                        .stroke(formatter.color(.highContrastWhite), lineWidth: 3)
+                                )
+                    }
+                }
+                .padding([.horizontal, .top], 15)
             }
             
             NavigationLink(destination: MobileProfileView()
                 .navigationBarTitle("Profile", displayMode: .inline),
                            isActive: $profileViewActive,
                            label: { EmptyView() }).isDetailLink(false).hidden()
-            NavigationLink(destination: EmptyView()) {
-                EmptyView()
-            }.hidden()
+            NavigationLink (isActive: $buildViewActive) {
+                MobileBuildView()
+            } label: { EmptyView() }.hidden()
         }
-        .padding([.horizontal, .top], 15)
     }
 }
 
@@ -134,23 +190,8 @@ struct MobileExploreBuildPromptButtonView: View {
     var body: some View {
         ZStack {
             VStack {
-                if !buildVM.currCustomSet.title.isEmpty {
-                    Button {
-                        isPresentingBuildView.toggle()
-                    } label: {
-                        HStack {
-                            Image(systemName: "hammer.fill")
-                                .font(.system(size: 10, weight: .bold))
-                            Text("Resume \(buildVM.currCustomSet.title)")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(formatter.color(.secondaryAccent))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 15)
-                    }
-                }
                 Button {
+                    isPresentingBuildView.toggle()
                     buildVM.start()
                 } label: {
                     HStack {
@@ -169,9 +210,6 @@ struct MobileExploreBuildPromptButtonView: View {
                 MobileBuildView()
             } label: { EmptyView() }
                 .hidden()
-            NavigationLink(destination: EmptyView()) {
-                EmptyView()
-            }
         }
     }
 }

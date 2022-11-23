@@ -96,14 +96,15 @@ struct MobileGameSettingsCategoryPreviewView: View {
             .padding(.horizontal)
             MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
                 .padding(.bottom, 5)
-            
-            HStack {
-                Text("Round 2")
-                Text("(\(gamesVM.tidyCustomSet.round2Cats.count) categories)")
-                    .font(formatter.font(.regularItalic, fontSize: .regular))
+            if gamesVM.customSet.hasTwoRounds {
+                HStack {
+                    Text("Round 2")
+                    Text("(\(gamesVM.tidyCustomSet.round2Cats.count) categories)")
+                        .font(formatter.font(.regularItalic, fontSize: .regular))
+                }
+                .padding(.horizontal)
+                MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
             }
-            .padding(.horizontal)
-            MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
         }
     }
 }
@@ -387,7 +388,7 @@ struct MobileGameSettingsClueAppearanceView: View {
     @EnvironmentObject var formatter: MasterHandler
     
     @State var showingEditView = false
-    @State var currentSelection: String = "Classic"
+    @State var selectedAppearance: ClueAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "modern") ?? .modern
     
     var body: some View {
         VStack {
@@ -395,7 +396,7 @@ struct MobileGameSettingsClueAppearanceView: View {
                 Text("Clue Appearance")
                 Spacer()
                 HStack (spacing: 5) {
-                    Text("\(currentSelection)")
+                    Text("\(selectedAppearance == .modern ? "Modern" : "Classic")")
                     Image(systemName: "chevron.down")
                         .rotationEffect(Angle(degrees: showingEditView ? 180 : 0))
                 }
@@ -410,30 +411,41 @@ struct MobileGameSettingsClueAppearanceView: View {
             if showingEditView {
                 HStack (spacing: 7) {
                     Spacer()
-                    Text("Classic")
-                        .font(formatter.font(.regular, fontSize: .regular))
-                        .padding(7)
-                        .frame(width: 80)
-                        .foregroundColor(formatter.color(currentSelection == "Classic" ? .primaryFG : .highContrastWhite))
-                        .background(formatter.color(currentSelection == "Classic" ? .highContrastWhite : .primaryFG))
-                        .clipShape(Capsule())
-                        .onTapGesture {
-                            currentSelection = "Classic"
-                        }
-                    Text("Modern")
-                        .font(formatter.font(.regular, fontSize: .regular))
-                        .padding(7)
-                        .frame(width: 80)
-                        .foregroundColor(formatter.color(currentSelection == "Modern" ? .primaryFG : .highContrastWhite))
-                        .background(formatter.color(currentSelection == "Modern" ? .highContrastWhite : .primaryFG))
-                        .clipShape(Capsule())
-                        .onTapGesture {
-                            currentSelection = "Modern"
-                        }
+                    MobileGameSettingsClueAppearancePickerView(selectedAppearance: $selectedAppearance, clueAppearance: .modern, appearanceString: "Modern")
+                    MobileGameSettingsClueAppearancePickerView(selectedAppearance: $selectedAppearance, clueAppearance: .classic, appearanceString: "Classic")
                 }
             }
         }
         .padding()
+    }
+}
+
+struct MobileGameSettingsClueAppearancePickerView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
+    @Binding var selectedAppearance: ClueAppearance
+    
+    let clueAppearance: ClueAppearance
+    let appearanceString: String
+    let defaults = UserDefaults.standard
+    
+    var body: some View {
+        Text("\(appearanceString)")
+            .font(formatter.font(.regular, fontSize: .regular))
+            .padding(7).padding(.horizontal, 3)
+            .foregroundColor(formatter.color(selectedAppearance == clueAppearance ? .primaryFG : .highContrastWhite))
+            .background(formatter.color(selectedAppearance == clueAppearance ? .highContrastWhite : .primaryFG))
+            .clipShape(Capsule())
+            .onTapGesture {
+                UserDefaults.standard.set(clueAppearance.rawValue, forKey: "clueAppearance")
+                NotificationCenter.default.post(name: NSNotification.Name("ClueAppearanceChange"), object: nil)
+            }
+            .onAppear {
+                NotificationCenter.default.addObserver(forName: NSNotification.Name("ClueAppearanceChange"), object: nil, queue: .main) { (_) in
+                    let selectedAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "modern") ?? .modern
+                    self.selectedAppearance = selectedAppearance
+                }
+            }
     }
 }
 
@@ -667,6 +679,7 @@ struct MobileGameSettingsFooterView: View {
                 if gameIsPlayable {
                     isPresentingGameView.toggle()
                     gamesVM.gameSetupMode = .play
+                    gamesVM.gameplayDisplay = .grid
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                 }
             }, label: {

@@ -73,7 +73,7 @@ struct MobileGameplayGridView: View {
                     if gamesVM.gameplayDisplay == .grid {
                         ScrollViewReader { scrollView in
                             ScrollView (.horizontal, showsIndicators: false) {
-                                MobileGameGridView(clue: $clue, value: $value, response: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: $isDailyDouble, isTripleStumper: $isTripleStumper, allDone: $allDone, showInfoView: $showInfoView, category: $category)
+                                MobileGameGridView(clueString: $clue, pointValueString: $value, responseString: $response, amount: $amount, unsolved: $unsolved, isDailyDouble: $isDailyDouble, isTripleStumper: $isTripleStumper, allDone: $allDone, showInfoView: $showInfoView, category: $category)
                             }
                             .onAppear {
                                 if gamesVM.currentCategoryIndex != 0 {
@@ -82,7 +82,7 @@ struct MobileGameplayGridView: View {
                             }
                         }
                     } else if gamesVM.gameplayDisplay == .clue {
-                        MobileClueView(unsolved: $unsolved, category: category, clue: clue, response: response, amount: amount, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper)
+                        MobileClueView(unsolved: $unsolved, category: category, clueString: clue, responseString: response, pointValueInt: amount, isDailyDouble: isDailyDouble, isTripleStumper: isTripleStumper)
                             .padding(.horizontal)
                     }
                     if gamesVM.gamePhase == .finalRound && gamesVM.finalTrivioStage == .notBegun {
@@ -185,6 +185,7 @@ struct MobileGameplayHeaderView: View {
                 .frame(height: 30)
             } else if gamesVM.finalTrivioStage == .submitAnswer {
                 MobileFinalTrivioCountdownTimerView()
+                    .padding(.top, 10)
             }
         }
     }

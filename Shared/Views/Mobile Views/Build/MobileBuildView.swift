@@ -23,10 +23,6 @@ struct MobileBuildView: View {
         return buildVM.buildStage == .dtRound || buildVM.buildStage == .dtRoundDD
     }
     
-    init() {
-        UIScrollView.appearance().keyboardDismissMode = .onDrag
-    }
-    
     var body: some View {
         VStack (alignment: .leading) {
             if buildVM.currentDisplay != .buildAll {
@@ -41,9 +37,6 @@ struct MobileBuildView: View {
                 MobileBuildAllView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryIndex: $categoryIndex)
             case .finalTrivio:
                 MobileFinalTrivioFillView()
-                    .padding(.horizontal)
-            case .saveDraft:
-                MobileSaveDraftView()
                     .padding(.horizontal)
             default:
                 MobileBuildGridView(categoryIndex: $categoryIndex)

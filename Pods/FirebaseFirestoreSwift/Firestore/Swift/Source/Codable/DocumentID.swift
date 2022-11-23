@@ -78,24 +78,24 @@ import FirebaseFirestore
   @propertyWrapper
   public struct DocumentID<Value: DocumentIDWrappable & Codable>:
     DocumentIDProtocol, Codable {
-    var value: Value?
+    var pointValueString: Value?
 
-    public init(wrappedValue value: Value?) {
-      self.value = value
+    public init(wrappedValue pointValueString: Value?) {
+      self.pointValueString = pointValueString
     }
 
     public var wrappedValue: Value? {
-      get { value }
-      set { value = newValue }
+      get { pointValueString }
+      set { pointValueString = newValue }
     }
 
     // MARK: - `DocumentIDProtocol` conformance
 
     public init(from documentReference: DocumentReference?) throws {
       if let documentReference = documentReference {
-        value = try Value.wrap(documentReference)
+        pointValueString = try Value.wrap(documentReference)
       } else {
-        value = nil
+        pointValueString = nil
       }
     }
 

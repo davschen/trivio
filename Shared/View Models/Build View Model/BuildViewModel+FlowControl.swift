@@ -67,7 +67,13 @@ extension BuildViewModel {
             let passesCheckAtIndex = allBools[i]
             if passesCheckAtIndex {
                 guard let currStage = MobileBuildStageIndexDict().reverseDict[i] else { return }
-                mostAdvancedStage = currStage
+                // if the current stage (most advanced stage that passes checks) is more advanced than the current buildStage, assign it as the most advanced stage. Otherwise, assign the current buildStage.
+                guard let buildStageIndex = MobileBuildStageIndexDict().dict[buildStage] else { return }
+                if i > buildStageIndex {
+                    mostAdvancedStage = currStage
+                } else {
+                    mostAdvancedStage = buildStage
+                }
             } else {
                 return
             }

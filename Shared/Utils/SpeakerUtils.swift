@@ -123,6 +123,11 @@ enum SpeechLanguage: String {
     case americanEnglish = "americanEnglish"
 }
 
+enum ClueAppearance: String {
+    case classic = "britishEnglish"
+    case modern = "americanEnglish"
+}
+
 enum SpeechSpeed: Float {
     case slow = 0.45
     case medium = 0.5

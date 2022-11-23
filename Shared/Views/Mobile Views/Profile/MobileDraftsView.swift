@@ -58,6 +58,7 @@ struct MobileDraftCellView: View {
                 }
                 Text("\(draft.title)")
                     .font(formatter.font(fontSize: .mediumLarge))
+                    .lineLimit(1)
                 Spacer()
             }
             Text("\(draft.hasTwoRounds ? "2 rounds" : "1 round"), \(draft.numClues) clues")
@@ -90,7 +91,7 @@ struct MobileDraftCellView: View {
                     })
                     Button(action: {
                         formatter.setAlertSettings(alertAction: {
-                            buildVM.deleteSet(isDraft: true, setID: setID)
+                            buildVM.deleteSet(customSet: draft)
                         }, alertTitle: "Are You Sure?", alertSubtitle: "You're about to delete your draft named \"\(draft.title)\" — deleting a draft is irreversible.", hasCancel: true, actionLabel: "Yes, delete my draft")
                     }, label: {
                         Text("Delete")

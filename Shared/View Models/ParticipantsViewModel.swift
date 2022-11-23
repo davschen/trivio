@@ -181,8 +181,8 @@ class ParticipantsViewModel: ObservableObject {
         }
     }
     
-    func editScore(index: Int, amount: Int) {
-        teams[index].editScore(amount: amount)
+    func editScore(index: Int, pointValueInt: Int) {
+        teams[index].editScore(amount: pointValueInt)
     }
     
     func addMember(index: Int, name: String) {
@@ -403,12 +403,12 @@ class ParticipantsViewModel: ObservableObject {
         }
     }
     
-    func resetToLastIncrement(amount: Int) {
+    func resetToLastIncrement(pointValueInt: Int) {
         for i in 0..<teams.count {
             guard let last = scores[i].count > 0 ? scores[i].last : 0 else { return }
             var lastScore = last
             if toSubtracts[i] {
-                lastScore -= amount
+                lastScore -= pointValueInt
             }
             teams[i].score = lastScore
         }
@@ -481,9 +481,9 @@ class ParticipantsViewModel: ObservableObject {
         var amount = Int(self.wagers[index]) ?? 0
         if self.fjCorrects[index] {
             amount = -amount
-            self.editScore(index: index, amount: amount)
+            self.editScore(index: index, pointValueInt: amount)
         } else {
-            self.editScore(index: index, amount: amount)
+            self.editScore(index: index, pointValueInt: amount)
         }
         self.fjCorrects[index].toggle()
     }
@@ -491,10 +491,10 @@ class ParticipantsViewModel: ObservableObject {
     func addFJIncorrect(index: Int) {
         var amount = Int(self.wagers[index]) ?? 0
         if self.toSubtracts[index] {
-            self.editScore(index: index, amount: amount)
+            self.editScore(index: index, pointValueInt: amount)
         } else {
             amount = -amount
-            self.editScore(index: index, amount: amount)
+            self.editScore(index: index, pointValueInt: amount)
         }
         self.toSubtracts[index].toggle()
     }

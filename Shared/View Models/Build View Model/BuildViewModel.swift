@@ -19,7 +19,6 @@ class BuildViewModel: ObservableObject {
     
     @Published var isPreviewDisplayModern = true
     @Published var mostAdvancedStage: BuildStage = .details
-    @Published var gameID = ""
     @Published var isPublic = true
     @Published var tag = ""
     @Published var categories = [CustomSetCategory]()
@@ -55,16 +54,11 @@ class BuildViewModel: ObservableObject {
         self.djCategories.removeAll()
         self.currCustomSet = CustomSetCherry()
         
-        self.isRandomDD = false
         self.editingClueIndex = 0
         self.round1CatsShowing.removeAll()
         self.round2CatsShowing.removeAll()
-        self.moneySections = moneySectionsDJ
+        self.moneySections = moneySectionsJ
         self.fillBlanks()
-        
-        self.buildStage = .details
-        self.mostAdvancedStage = .details
-        self.currentDisplay = .settings
     }
     
     func getCategoryIDs(isDJ: Bool) -> [String] {
@@ -79,19 +73,20 @@ class BuildViewModel: ObservableObject {
     }
     
     func fillBlanks() {
+        guard let currSetID = currCustomSet.id else { return }
         for i in 0..<self.currCustomSet.round1Len {
-            self.jCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: gameID))
+            self.jCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: currSetID))
             round1CatsShowing.append(true)
         }
         for i in 0..<self.currCustomSet.round2Len {
-            self.djCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: gameID))
+            self.djCategories.append(Empty().category(index: i, emptyStrings: emptyStrings, gameID: currSetID))
             round2CatsShowing.append(true)
         }
-        
-        gameID = UUID().uuidString
-        currCustomSet.id = gameID
         moneySections = moneySectionsJ
+        
         buildStage = .details
+        currentDisplay = .settings
+        determineMostAdvancedStage()
     }
     
     func incrementDirtyBit() {
@@ -118,6 +113,7 @@ class BuildViewModel: ObservableObject {
                 }
             }
         }
+        if !currCustomSet.hasTwoRounds { return numClues }
         for i in 0..<currCustomSet.round2Len {
             let clues = djCategories[i].clues
             let responses = djCategories[i].responses
@@ -377,20 +373,6 @@ class BuildViewModel: ObservableObject {
         incrementDirtyBit()
     }
     
-    func deleteSet(isDraft: Bool = false, setID: String) {
-        db.collection(isDraft ? "drafts" : "userSets").document(setID).getDocument { (doc, error) in
-            if error != nil {
-                return
-            }
-            guard let doc = doc else { return }
-            guard let customSet = try? doc.data(as: CustomSet.self) else { return }
-            for id in customSet.jCategoryIDs {
-                self.db.collection("userCategories").document(id).delete()
-            }
-        }
-        db.collection(isDraft ? "drafts" : "userSets").document(setID).delete()
-    }
-    
     func getKeywords() -> [String] {
         // example title: Jeopardy with host Alex Trebek
         let splitTitle = currCustomSet.title.split(separator: " ")
@@ -460,12 +442,12 @@ struct MobileBuildStageIndexDict {
     ]
     
     var reverseDict: [Int:BuildStage] = [
-        1 : .details,
-        2 : .trivioRound,
-        3 : .trivioRoundDD,
-        4 : .dtRound,
-        5 : .dtRoundDD,
-        6 : .finalTrivio
+        0 : .details,
+        1 : .trivioRound,
+        2 : .trivioRoundDD,
+        3 : .dtRound,
+        4 : .dtRoundDD,
+        5 : .finalTrivio
     ]
     
     func getIndex(from buildStage: BuildStage) -> Int {

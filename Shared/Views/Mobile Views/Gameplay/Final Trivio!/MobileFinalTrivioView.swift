@@ -22,7 +22,7 @@ struct MobileFinalTrivioView: View {
     
     var body: some View {
         ZStack {
-            if gamesVM.finalTrivioStage == .makeWager {
+            if gamesVM.finalTrivioStage != .podium {
                 MobileFinalTrivioUserFlowView()
                     .transition(AnyTransition.move(edge: .leading))
             } else {
@@ -45,13 +45,13 @@ struct MobileFinalTrivioCountdownTimerView: View {
         GeometryReader { geometry in
             Capsule()
                 .frame(width: geometry.size.width)
-                .foregroundColor(formatter.color(.primaryAccent))
+                .foregroundColor(formatter.color(.secondaryFG))
             Rectangle()
                 .frame(width: timeRemaining > 0 ? geometry.size.width * CGFloat(Double(timeRemaining) / 30) : 0)
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .animation(.linear(duration: 1))
         }
-        .frame(height: 10)
+        .frame(height: 8)
         .clipShape(Capsule())
         .onReceive(timer) { time in
             self.timeRemaining -= 1

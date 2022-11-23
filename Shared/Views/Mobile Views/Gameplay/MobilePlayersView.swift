@@ -89,7 +89,9 @@ struct MobileIndividualPlayerView: View {
         .frame(height: 60)
         .background(formatter.color(.primaryAccent))
         .cornerRadius(5)
-        .background(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: participantsVM.selectedTeam == team ? 5 : 0))
+        .overlay(
+            RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: participantsVM.selectedTeam == team ? 2 : 0)
+        )
         .onTapGesture {
             if !(participantsVM.selectedTeam == team) {
                 participantsVM.setSelectedTeam(index: team.index)

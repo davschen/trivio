@@ -83,9 +83,7 @@ struct DraftCellView: View {
                 })
                 Button(action: {
                     formatter.setAlertSettings(alertAction: {
-                        if let id = draft.id {
-                            buildVM.deleteSet(isDraft: true, setID: id)
-                        }
+                        buildVM.deleteSet(customSet: draft)
                     }, alertTitle: "Are You Sure?", alertSubtitle: "You're about to delete your draft named \"\(draft.title)\" — deleting a draft is irreversible.", hasCancel: true, actionLabel: "Yes, delete my draft")
                 }, label: {
                     Text("Delete")

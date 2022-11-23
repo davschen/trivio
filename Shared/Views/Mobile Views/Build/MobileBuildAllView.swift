@@ -207,28 +207,6 @@ struct MobileBuildAllHeaderView: View {
     }
 }
 
-struct MobileBuildAllSwapView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    
-    @Binding var category: CustomSetCategory
-    @Binding var swapToIndex: Int
-    
-    var body: some View {
-        VStack (alignment: .leading) {
-            Text("Pick a cell to swap with")
-                .font(formatter.font(.regularItalic, fontSize: .medium))
-            HStack (spacing: 3) {
-                ForEach(0..<category.clues.count, id: \.self) { i in
-                    MobileSwapCellView(category: $category, preSwapIndex: $swapToIndex, clueIndex: i)
-                }
-            }
-            .frame(height: 50)
-            .padding(.horizontal, 2)
-        }
-    }
-}
-
 struct MobileBuildAllCluePickerView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel

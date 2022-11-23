@@ -172,35 +172,39 @@ class ExploreViewModel: ObservableObject {
         return initials.uppercased()
     }
     
-    func pullAllPublicSets() {
+    func pullAllPublicSets(isLimitingTo20: Bool = true) {
+        // Is it a bit janky to limit to 10,000? Yes. I will never have 10,000 sets on my app, however.
+        // When I do, I will be rich and I will sell this app to Kahoot or whomever and be even richer
         db.collection("userSets")
             .whereField("isPublic", isEqualTo: true)
             .order(by: filterBy, descending: isDescending)
+            .limit(to: isLimitingTo20 ? 20 : 10000)
             .getDocuments { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
+                if error != nil {
+                    print(error!.localizedDescription)
+                    return
+                }
+                guard let data = snap?.documents else { return }
+                self.allPublicSets = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
+                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
+                    if let id = customSet?.userID {
+                        self.addUsernameNameToDict(userID: id)
+                    }
+                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
+                        // Custom set for version 3.0
+                        self.addUsernameNameToDict(userID: customSetCherry.userID)
+                        return customSetCherry
+                    } else {
+                        // default
+                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                    }
+                })
             }
-            guard let data = snap?.documents else { return }
-            self.allPublicSets = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
-                let customSet = try? queryDocSnap.data(as: CustomSet.self)
-                if let id = customSet?.userID {
-                    self.addUsernameNameToDict(userID: id)
-                }
-                if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
-                    // Custom set for version 3.0
-                    self.addUsernameNameToDict(userID: customSetCherry.userID)
-                    return customSetCherry
-                } else {
-                    // default
-                    return CustomSetCherry(customSet: customSet ?? Empty().customSet)
-                }
-            })
-        }
     }
     
     private func pullRecentlyPlayedSets() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        self.addUsernameNameToDict(userID: uid)
         db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -232,6 +236,8 @@ class ExploreViewModel: ObservableObject {
                     // default
                     return
                 }
+                guard let customSetUserID = customSet?.userID else { return }
+                self.addUsernameNameToDict(userID: customSetUserID)
                 self.recentlyPlayedSets = self.recentlyPlayedSets.sorted(by: { $0.dateCreated > $1.dateCreated })
             }
     }
@@ -321,7 +327,7 @@ class ExploreViewModel: ObservableObject {
             filterBy = "plays"
             isDescending = true
         }
-        pullAllPublicSets()
+        pullAllPublicSets(isLimitingTo20: false)
     }
 }
 

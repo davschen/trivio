@@ -102,7 +102,7 @@ struct TeamBuildView: View {
                         .keyboardType(.numberPad)
                     Button(action: {
                         if !scoreToAdd.isEmpty {
-                            participantsVM.editScore(index: self.team.index, amount: Int(scoreToAdd) ?? 0)
+                            participantsVM.editScore(index: self.team.index, pointValueInt: Int(scoreToAdd) ?? 0)
                             scoreToAdd.removeAll()
                         }
                     }, label: {

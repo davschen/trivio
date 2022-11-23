@@ -69,7 +69,7 @@ struct MobileUserCustomSetCellView: View {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
                         .frame(width: 5, height: 5)
-                    Text("\(customSet.plays) play" + "\(customSet.plays > 1 ? "s" : "")")
+                    Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
                     Circle()
                         .frame(width: 5, height: 5)
                     Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")

@@ -54,7 +54,7 @@ struct MobileBuildDetailsView: View {
                     .cornerRadius(5)
                 }
                 VStack (alignment: .leading, spacing: 5) {
-                    Text("(Optional) Add a description for your set")
+                    Text("(Recommended) Add a description")
                         .font(formatter.font(.regularItalic, fontSize: .regular))
                     VStack (spacing: 2) {
                         ZStack (alignment: .leading) {
@@ -144,6 +144,7 @@ struct MobileBuildDetailsView: View {
                             .onTapGesture {
                                 buildVM.tag = tagString
                                 formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                                formatter.resignKeyboard()
                                 buildVM.addTag()
                                 tagString = ""
                             }
@@ -263,16 +264,18 @@ struct MobileBuildDetailsView: View {
                     Text("\(buildVM.currCustomSet.isPublic ? "Public: anyone can play this set" : "Private: only I can see this set")")
                         .font(formatter.font(.regular))
                 }
-                Text("Tip: Each category is considered complete when it has one or more clues. So, if you’re stuck on a category, just finish one clue and move on. You can always come back to it later, or you can leave it empty!")
+                Text("Tip: Each category is considered complete when it has one or more clues. So, if you’re stuck on a category, just finish one clue and move on. You can always come back to it later!")
                     .font(formatter.font(.regularItalic, fontSize: .regular))
                     .padding(.bottom, 45)
             }
             .keyboardAware()
         }
+        .resignKeyboardOnDragGesture()
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 setTitle = buildVM.currCustomSet.title
                 setDescription = buildVM.currCustomSet.description
+                buildVM.determineMostAdvancedStage()
             }
         }
     }

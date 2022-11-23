@@ -70,16 +70,17 @@ struct MobileMyCustomSetCellView: View {
                 }
                 Text(customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
+                    .lineLimit(1)
                 Spacer()
             }
             Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             HStack {
-                Text("2 rounds, \(customSet.numClues) clues")
+                Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                 Circle()
                     .frame(width: 5, height: 5)
-                Text("\(customSet.plays) play" + "\(customSet.plays > 1 ? "s" : "")")
+                Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
                 Circle()
                     .frame(width: 5, height: 5)
                 Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -132,7 +133,7 @@ struct MobileMyCustomSetCellView: View {
                     })
                     Button(action: {
                         formatter.setAlertSettings(alertAction: {
-                            buildVM.deleteSet(isDraft: true, setID: setID)
+                            buildVM.deleteSet(customSet: customSet)
                         }, alertTitle: "Are You Sure?", alertSubtitle: "You're about to delete your set named \"\(customSet.title)\" — deleting a set is irreversible.", hasCancel: true, actionLabel: "Yes, delete my set")
                     }, label: {
                         Text("Delete")

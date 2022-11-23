@@ -13,9 +13,9 @@ struct MobileGameGridView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @Binding var clue: String
-    @Binding var value: String
-    @Binding var response: String
+    @Binding var clueString: String
+    @Binding var pointValueString: String
+    @Binding var responseString: String
     @Binding var amount: Int
     @Binding var unsolved: Bool
     @Binding var isDailyDouble: Bool
@@ -52,8 +52,10 @@ struct MobileGameGridView: View {
                 Spacer()
                     .frame(width: 12)
                 ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
+                    // i represents column index
                     VStack (spacing: 4) {
                         ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { j in
+                            // j represents row index
                             let clueCounts: Int = gamesVM.clues[i].count
                             let responsesCounts: Int = gamesVM.responses[i].count
                             let gridClue: String = clueCounts - 1 >= j ? gamesVM.clues[i][j] : ""
@@ -81,6 +83,7 @@ struct MobileGameGridView: View {
         }
     }
     
+    // this is ancient code that needs to go now
     func gameCellTapped(gridClue: String, gridResponse: String, i: Int, j: Int) {
         if !(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty) {
             formatter.hapticFeedback(style: .rigid)
@@ -88,18 +91,18 @@ struct MobileGameGridView: View {
             unsolved = false
             updateDailyDouble(i: i, j: j)
             updateTripleStumper(i: i, j: j)
-            clue = gridClue
-            response = gridResponse
+            clueString = gridClue
+            responseString = gridResponse
             amount = Int(gamesVM.pointValueArray[j]) ?? 0 
             category = gamesVM.categories[i]
-            value = gamesVM.pointValueArray[j]
+            pointValueString = gamesVM.pointValueArray[j]
             
             participantsVM.setDefaultIndex()
             gamesVM.gameplayDisplay = .clue
             gamesVM.currentCategoryIndex = i
             
             if !isDailyDouble {
-                formatter.speaker.speak(clue)
+                formatter.speaker.speak(clueString)
             }
         }
     }

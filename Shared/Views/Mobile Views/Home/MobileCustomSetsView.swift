@@ -68,6 +68,7 @@ struct MobileCustomSetCellView: View {
             VStack (alignment: .leading, spacing: 7) {
                 Text(customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
+                    .lineLimit(1)
                 Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     .font(formatter.font(.regular))
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
