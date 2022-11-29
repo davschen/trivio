@@ -54,7 +54,8 @@ struct MobileBuildView: View {
         .toolbar {
             ToolbarItem {
                 Button(action: {
-                    buildVM.writeToFirestore()  
+                    formatter.resignKeyboard()
+                    buildVM.writeToFirestore()
                 }) {
                     ZStack {
                         Text(buildVM.dirtyBit == 0 ? "Saved" : "Save")

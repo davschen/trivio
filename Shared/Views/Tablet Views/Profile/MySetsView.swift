@@ -86,15 +86,6 @@ struct CustomSetView: View {
                     ForEach(customSets, id: \.self) { set in
                         if searchItem.isEmpty || set.title.contains(searchItem) {
                             CustomSetCellView(set: set, isMine: isMine)
-                                .onTapGesture {
-                                    if gamesVM.gameInProgress() {
-                                        formatter.setAlertSettings(alertAction: {
-                                            selectSet(set: set)
-                                        }, alertTitle: "Cancel current game?", alertSubtitle: "It looks like you have a game in progress. Choosing this one would erase all of your progress.", hasCancel: true, actionLabel: "Yes, choose this game")
-                                    } else {
-                                        selectSet(set: set)
-                                    }
-                                }
                         }
                     }
                 }
@@ -107,7 +98,6 @@ struct CustomSetView: View {
         guard let setID = set.id else { return }
         gamesVM.getCustomData(setID: setID)
         gamesVM.previewViewShowing = true
-        gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
     }
 }

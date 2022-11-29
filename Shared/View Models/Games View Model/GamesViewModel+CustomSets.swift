@@ -30,13 +30,13 @@ extension GamesViewModel {
                         return customSetCherry
                     } else {
                         // default
-                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                        return CustomSetCherry(customSet: customSet ?? CustomSet())
                     }
                 }
             }
         }
     }
-    
+
     func getUserName(userID: String) {
         db.collection("users").document(userID).getDocument { docSnap, error in
             if error != nil {
@@ -50,7 +50,7 @@ extension GamesViewModel {
         }
     }
     
-    func getCustomDataWithCompletion(setID: String, completion: @escaping (Bool) -> Void) {
+    func getCustomData(setID: String) {
         clearAll()
         reset()
         let group = DispatchGroup()
@@ -93,11 +93,10 @@ extension GamesViewModel {
                             self.tidyCustomSet.round1Clues[index] = customSetCategory.clues
                             self.tidyCustomSet.round1Responses[index] = customSetCategory.responses
                             self.tidyCustomSet.round1Cats[index] = customSetCategory.name
+                            self.finishedClues2D = self.generateFinishedClues2D()
                             self.clues = self.tidyCustomSet.round1Clues
                             self.responses = self.tidyCustomSet.round1Responses
                             self.categories = self.tidyCustomSet.round1Cats
-                            self.jRoundLen = customSet.round1Len
-                            self.djRoundLen = customSet.round2Len
                             customSetCategory.clues.forEach {
                                 self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
                                 self.jCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
@@ -144,20 +143,6 @@ extension GamesViewModel {
                 self.getUserName(userID: customSet.userID)
                 self.customSet = customSet
             }
-            group.leave()
-            group.notify(queue: .main) {
-                completion(true)
-            }
-        }
-    }
-    
-    func getCustomData(setID: String) {
-        self.loadingGame = true
-        print("GamesVM :: getCustomData (1)")
-        getCustomDataWithCompletion(setID: setID) { (success) in
-            if success {
-                self.loadingGame = false
-            }
         }
     }
     
@@ -173,8 +158,9 @@ extension GamesViewModel {
         customSets = copyOfCustomSets
     }
     
+    // for scrolling
     func getUnitPoint() -> UnitPoint {
-        let categoryCount = gamePhase == .round1 ? jRoundLen : djRoundLen
+        let categoryCount = gamePhase == .round1 ? customSet.round1Len : customSet.round2Len
         return currentCategoryIndex == categoryCount - 1 ? .trailing : .center
     }
 }

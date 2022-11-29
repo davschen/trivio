@@ -38,7 +38,7 @@ struct FinalTrivioPodiumView: View {
             // Finished button
             Button(action: {
                 guard let customSetID = gamesVM.customSet.id else { return }
-                participantsVM.incrementGameStep()
+                participantsVM.progressGame()
                 participantsVM.writeToFirestore(gameID: customSetID, myRating: rating)
                 participantsVM.resetScores()
                 gamesVM.reset()

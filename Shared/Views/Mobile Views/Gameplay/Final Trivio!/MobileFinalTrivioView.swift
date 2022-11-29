@@ -21,14 +21,12 @@ struct MobileFinalTrivioView: View {
     @State var rating = 0
     
     var body: some View {
-        ZStack {
-            if gamesVM.finalTrivioStage != .podium {
-                MobileFinalTrivioUserFlowView()
-                    .transition(AnyTransition.move(edge: .leading))
-            } else {
-                MobileFinalTrivioPodiumView()
-                    .transition(AnyTransition.move(edge: .leading))
-            }
+        if gamesVM.finalTrivioStage != .podium {
+            MobileFinalTrivioUserFlowView()
+                .transition(AnyTransition.move(edge: .leading))
+        } else {
+            MobileFinalTrivioPodiumView()
+                .transition(AnyTransition.move(edge: .leading))
         }
     }
 }

@@ -14,11 +14,14 @@ struct MobileHomepageView: View {
     
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
     @State var profileViewActive = false
     @State var allPublicSetsViewActive = false
+    @State var allPrivateSetsViewActive = false
     @State var allRecentSetsViewActive = false
+    @State var jeopardySeasonsViewActive = false
     
     var body: some View {
         NavigationView() {
@@ -48,8 +51,23 @@ struct MobileHomepageView: View {
                             MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSets,
                                                           labelText: "Public sets",
                                                           promptText: "View all") {
-                                exploreVM.pullAllPublicSets(isLimitingTo20: false)
                                 allPublicSetsViewActive.toggle()
+                            }
+                            Spacer()
+                                .frame(height: 5)
+                            if profileVM.myUserRecords.isAdmin {
+                                MobileSetHorizontalScrollView(customSets: $exploreVM.allPrivateSets,
+                                                              labelText: "Private sets",
+                                                              promptText: "View all") {
+                                    allPrivateSetsViewActive.toggle()
+                                }
+                                Spacer()
+                                    .frame(height: 5)
+                            }
+                            if profileVM.myUserRecords.isVIP {
+                                MobileJeopardySetsView(jeopardySeasonsViewActive: $jeopardySeasonsViewActive)
+                                Spacer()
+                                    .frame(height: 5)
                             }
                         }
                         .padding(.bottom, 45)
@@ -70,9 +88,16 @@ struct MobileHomepageView: View {
                     .navigationBarTitle("All Public Sets", displayMode: .inline),
                                isActive: $allPublicSetsViewActive,
                                label: { EmptyView() }).isDetailLink(false).hidden()
+                NavigationLink(destination: MobileViewAllPrivateSetsView(),
+                               isActive: $allPrivateSetsViewActive,
+                               label: { EmptyView() }).isDetailLink(false).hidden()
                 NavigationLink(destination: MobileViewAllRecentSetsView()
                     .navigationBarTitle("All Played Sets", displayMode: .inline),
                                isActive: $allRecentSetsViewActive,
+                               label: { EmptyView() }).isDetailLink(false).hidden()
+                NavigationLink(destination: MobileJeopardySeasonsView()
+                    .navigationBarTitle("All Seasons", displayMode: .inline),
+                               isActive: $jeopardySeasonsViewActive,
                                label: { EmptyView() }).isDetailLink(false).hidden()
             }
             .navigationBarHidden(true)
@@ -148,10 +173,8 @@ struct MobileHomepageHeaderView: View {
                     }
                 }
                 HStack {
-                    Image(systemName: "magnifyingglass")
-                    Spacer()
                     Text("Trivio!")
-                        .font(formatter.font(fontSize: .mediumLarge))
+                        .font(formatter.font(fontSize: .large))
                     Spacer()
                     Button {
                         profileViewActive.toggle()
@@ -163,7 +186,7 @@ struct MobileHomepageHeaderView: View {
                             .clipShape(Circle())
                             .overlay(
                                     Circle()
-                                        .stroke(formatter.color(.highContrastWhite), lineWidth: 3)
+                                        .stroke(formatter.color(.highContrastWhite), lineWidth: 2)
                                 )
                     }
                 }

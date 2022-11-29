@@ -28,9 +28,7 @@ struct GamePickerView: View {
                 } else if searchVM.isShowingSearchView && !searchVM.isShowingExpandedView {
                     SearchView()
                 }
-            }
-            .redacted(reason: gamesVM.loadingGame ? .placeholder : [])
-            .shimmering(active: gamesVM.loadingGame) 
+            } 
         }
         .padding(30)
     }
@@ -162,7 +160,7 @@ struct SeasonsListView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
-            ForEach(gamesVM.seasonFolders, id: \.self) { season in
+            ForEach(gamesVM.jeopardySeasons, id: \.self) { season in
                 let seasonID = season.id ?? "NID"
                 ZStack {
                     Text(season.title)
@@ -176,7 +174,6 @@ struct SeasonsListView: View {
                 .cornerRadius(5)
                 .onTapGesture {
                     self.gamesVM.getEpisodes(seasonID: seasonID)
-                    self.gamesVM.setSeason(folder: season)
                     self.gamesVM.clearAll()
                     self.gamesVM.previewViewShowing = false
                 }
@@ -192,7 +189,7 @@ struct JeopardyGamesView: View {
     @EnvironmentObject var formatter: MasterHandler
     
     var showingGames = true
-    var gamePreviews = [GamePreview]()
+    var gamePreviews = [JeopardySetPreview]()
     var games = [Game]()
     
     var showJeopardyGames: Bool {
@@ -203,10 +200,6 @@ struct JeopardyGamesView: View {
         if showJeopardyGames {
             GeometryReader { geometry in
                 VStack (alignment: .leading, spacing: 15) {
-                    if !showingGames {
-                        Text(gamesVM.currentSeason.title)
-                            .font(formatter.font(fontSize: .large))
-                    }
                     if gamesVM.previewViewShowing {
                         GamePreviewView(searchQuery: searchVM.capSplit)
                     }
@@ -243,7 +236,7 @@ struct ShowingJeopardyGamesView: View {
     var geometry: GeometryProxy
     
     var showingGames = true
-    var gamePreviews = [GamePreview]()
+    var gamePreviews = [JeopardySetPreview]()
     var games = [Game]()
     
     var body: some View {
@@ -303,7 +296,7 @@ struct NotShowingJeopardyGamesView: View {
     var geometry: GeometryProxy
     
     var showingGames = true
-    var gamePreviews = [GamePreview]()
+    var gamePreviews = [JeopardySetPreview]()
     var games = [Game]()
     
     var body: some View {

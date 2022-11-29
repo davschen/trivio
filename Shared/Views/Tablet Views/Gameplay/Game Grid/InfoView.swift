@@ -49,7 +49,7 @@ struct InfoView: View {
                     VStack (alignment: .leading) {
                         Text("\(gamesVM.customSet.title)")
                             .font(formatter.font(fontSize: .large))
-                        Text("Created by \(isCustom ? gamesVM.queriedUserName : "Trivio Official") on \(gamesVM.dateFormatter.string(from: isCustom ? customSet.dateCreated : gamesVM.date))")
+                        Text("Created by \(isCustom ? gamesVM.queriedUserName : "Trivio Official") on \(gamesVM.dateFormatter.string(from: isCustom ? customSet.dateCreated : Date()))")
                             .font(formatter.font(.regular))
                         HStack (spacing: 20) {
                             

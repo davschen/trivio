@@ -12,8 +12,6 @@ extension BuildViewModel {
         guard let currCustomSetID = self.currCustomSet.id else { return }
 
         currCustomSet.isDraft = !checkForSetIsComplete()
-        let docRef = db.collection(self.currCustomSet.isDraft ? "drafts" : "userSets").document(currCustomSetID)
-
         currCustomSet.dateLastModified = Date()
         currCustomSet.userID = myUID
         currCustomSet.round1CatIDs = jCategories[0..<currCustomSet.round1Len].compactMap { $0.id }
@@ -21,18 +19,15 @@ extension BuildViewModel {
         currCustomSet.categoryNames = getCategoryNames()
         currCustomSet.numClues = getNumClues()
         
-        docRef.getDocument { (doc, error) in
-            if error != nil { return }
-            DispatchQueue.main.async {
-                // TODO: find out why setData is dismissing BuildView only after `edit` is called
-                try? docRef.setData(from: self.currCustomSet)
-                self.writeCategories()
-                self.updateTagsDB()
-                self.dirtyBit = 0
-                if !self.currCustomSet.isDraft {
-                    self.db.collection("drafts").document(currCustomSetID).delete()
-                }
-            }
+        let docRef = db.collection(self.currCustomSet.isDraft ? "drafts" : "userSets").document(currCustomSetID)
+        
+        // TODO: find out why setData is dismissing BuildView only after `edit` is called
+        try? docRef.setData(from: self.currCustomSet)
+        self.writeCategories()
+        self.updateTagsDB()
+        self.dirtyBit = 0
+        if !self.currCustomSet.isDraft {
+            self.db.collection("drafts").document(currCustomSetID).delete()
         }
     }
     

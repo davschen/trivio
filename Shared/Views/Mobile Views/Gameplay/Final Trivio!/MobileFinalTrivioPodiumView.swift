@@ -10,6 +10,8 @@ import SwiftUI
 import ConfettiSwiftUI
 
 struct MobileFinalTrivioPodiumView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
@@ -19,50 +21,32 @@ struct MobileFinalTrivioPodiumView: View {
     
     var body: some View {
         VStack (spacing: 15) {
-            
-            // Title and rating
-            VStack {
-                Text(gamesVM.customSet.title)
-                    .font(formatter.font(fontSize: .mediumLarge))
-                    .foregroundColor(formatter.color(.primaryFG))
-                MobileRatingView(rating: $rating)
-            }
-            .padding()
-            .padding(.horizontal, 50)
-            .background(formatter.color(.highContrastWhite))
-            .cornerRadius(10)
-            
-            // Podiums View
             MobilePodiumsView()
-            
             // Finished button
             Button(action: {
                 guard let customSetID = gamesVM.customSet.id else { return }
+                presentationMode.wrappedValue.dismiss()
+                gamesVM.gameSetupMode = .settings
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
-                participantsVM.incrementGameStep()
+                participantsVM.progressGame()
                 profileVM.markAsPlayed(gameID: customSetID)
                 participantsVM.writeToFirestore(gameID: customSetID, myRating: rating)
                 participantsVM.resetScores()
                 gamesVM.reset()
-                gamesVM.clearAll()
             }, label: {
-                Text("Finish Game!")
-                    .font(formatter.font())
-                    .padding()
-                    .padding(.horizontal)
-                    .background(formatter.color(.lowContrastWhite))
+                Text("Finish Game")
+                    .foregroundColor(formatter.color(.primaryBG))
+                    .padding(20)
+                    .frame(maxWidth: .infinity)
+                    .background(formatter.color(.highContrastWhite))
                     .clipShape(Capsule())
             })
-            .keyboardAware()
         }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(formatter.color(.primaryAccent))
-        .cornerRadius(20)
     }
 }
 
 struct MobileRatingView: View {
+    // I intend on bringing this back someday but not today. Why? I cannot find a good design for it
     @EnvironmentObject var formatter: MasterHandler
     
     @Binding var rating: Int
@@ -94,47 +78,20 @@ struct MobilePodiumsView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @State var confettiCounter1: Int = 0
-    @State var confettiCounter2: Int = 0
-    @State var confettiCounter3: Int = 0
-    
     var body: some View {
         ScrollView (.vertical, showsIndicators: false) {
             VStack {
-                
                 if let firstPlaceIndex = participantsVM.getTeamIndexForPlace(.first) {
-                    ZStack {
-                        MobileSinglePodiumView(teamIndex: firstPlaceIndex, placing: .first)
-                        ConfettiCannon(counter: $confettiCounter1, repetitions: 3)
-                            .animation(.easeInOut(duration: 5))
-                    }
-                    .onAppear {
-                        confettiCounter1 += 1
-                    }
+                    MobileSinglePodiumView(teamIndex: firstPlaceIndex, placing: .first)
                 }
                 if let secondPlaceIndex = participantsVM.getTeamIndexForPlace(.second) {
-                    ZStack {
-                        MobileSinglePodiumView(teamIndex: secondPlaceIndex, placing: .second)
-                        ConfettiCannon(counter: $confettiCounter2, repetitions: 3)
-                            .animation(.easeInOut(duration: 5))
-                    }
-                    .onAppear {
-                        confettiCounter2 += 1
-                    }
+                    MobileSinglePodiumView(teamIndex: secondPlaceIndex, placing: .second)
                 }
                 if let thirdPlaceIndex = participantsVM.getTeamIndexForPlace(.third) {
-                    ZStack {
-                        MobileSinglePodiumView(teamIndex: thirdPlaceIndex, placing: .third)
-                        ConfettiCannon(counter: $confettiCounter3, repetitions: 3)
-                            .animation(.easeInOut(duration: 5))
-                    }
-                    .onAppear {
-                        confettiCounter3 += 1
-                    }
+                    MobileSinglePodiumView(teamIndex: thirdPlaceIndex, placing: .third)
                 }
             }
         }
-        .cornerRadius(10)
     }
 }
 
@@ -143,63 +100,48 @@ struct MobileSinglePodiumView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @State var isShowing = false
-    
     let teamIndex: Int
     let placing: Placing
     
-    var animationDelay: Double {
+    var placeNumString: String {
         switch placing {
-        case .first: return 0
-        case .second: return 1
-        case .third: return 2
+        case .first: return "1"
+        case .second: return "2"
+        case .third: return "3"
         }
     }
     
     var body: some View {
         VStack {
-            Spacer()
-            // Score label with confetti layer
-            Text("$\(participantsVM.teams[teamIndex].score)")
-                .font(formatter.font(fontSize: .large))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .background(formatter.color(.primaryBG))
-                .cornerRadius(10)
-            
-            // Podium with medals
-            VStack {
-                VStack (spacing: 0) {
-                    Text(participantsVM.teams[teamIndex].name)
-                        .font(formatter.font(fontSize: .semiLarge))
-                        .padding(.vertical, 20)
-                        .frame(maxWidth: .infinity)
-                        .background(ColorMap().getColor(color: participantsVM.teams[teamIndex].color))
-                        .cornerRadius(10)
-                    switch placing {
-                    case .first:
-                        Image("medal.1")
-                        Spacer()
-                            .frame(maxHeight: 30)
-                    case .second:
-                        Image("medal.2")
-                        Spacer()
-                            .frame(maxHeight: 20)
-                    default:
-                        Image("medal.3")
-                    }
-                }
-                .padding()
+            HStack (spacing: 15) {
+                Text(placeNumString)
+                    .font(formatter.font(fontSize: .small))
+                    .foregroundColor(formatter.color(.primaryAccent))
+                    .frame(width: 30, height: 30)
+                    .background(formatter.color(.highContrastWhite))
+                    .clipShape(Circle())
+                Text(participantsVM.teams[teamIndex].name)
+                    .font(formatter.font(fontSize: .semiLarge))
+                Spacer()
             }
-            .background(formatter.color(.primaryFG))
+            
+            HStack (spacing: 0) {
+                Rectangle()
+                    .frame(width: 20)
+                    .frame(maxHeight: .infinity)
+                    .foregroundColor(ColorMap().getColor(color: participantsVM.teams[teamIndex].color))
+                Text("\(participantsVM.teams[teamIndex].score)")
+                    .font(formatter.font(fontSize: .semiLarge))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(formatter.color(.primaryFG))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 75)
             .cornerRadius(10)
         }
-        .frame(maxWidth: .infinity)
-        .offset(x: isShowing ? 0 : -UIScreen.main.bounds.width)
-        .onAppear {
-            isShowing = true
-        }
-        .animation(.spring().delay(animationDelay))
+        .padding(20)
+        .background(formatter.color(.primaryAccent))
+        .cornerRadius(10)
     }
 }
 

@@ -18,7 +18,7 @@ struct FinalTrivioSubmitAnswerView: View {
             VStack (spacing: 15) {
                 
                 // Category name
-                Text(gamesVM.fjCategory.uppercased())
+                Text(gamesVM.customSet.finalCat.uppercased())
                     .font(formatter.font())
                     .padding()
                     .frame(width: 300, height: 130)
@@ -26,7 +26,7 @@ struct FinalTrivioSubmitAnswerView: View {
                     .cornerRadius(10)
                 
                 // Final Trivio Clue
-                Text(gamesVM.fjClue.uppercased())
+                Text(gamesVM.customSet.finalClue.uppercased())
                     .font(formatter.font(fontSize: .semiLarge))
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.5)

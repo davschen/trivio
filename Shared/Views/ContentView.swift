@@ -58,8 +58,3 @@ struct ContentView: View {
         }
     }
 }
-
-enum MenuChoice {
-    case explore, gamepicker, game, reports, profile
-}
-

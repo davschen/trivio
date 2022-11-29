@@ -20,7 +20,7 @@ struct FinalTrivioMakeWagerView: View {
             VStack (spacing: 15) {
                 // Category name view
                 ZStack (alignment: .topTrailing) {
-                    Text(gamesVM.fjCategory.uppercased())
+                    Text(gamesVM.customSet.finalCat.uppercased())
                         .font(formatter.font())
                         .padding()
                         .frame(width: 350, height: 150)

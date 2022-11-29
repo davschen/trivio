@@ -64,19 +64,15 @@ struct MobileIndividualPlayerView: View {
                 .frame(height: 2)
                 .foregroundColor(ColorMap().getColor(color: team.color))
             ZStack {
-                if abs(participantsVM.teams[team.index].score) > 0 {
-                    HStack (spacing: 0) {
-                        if participantsVM.teams[team.index].score < 0 {
-                            Text("-")
-                        }
-                        MovingNumbersView(
-                            number: Double(abs(participantsVM.teams[team.index].score)),
-                            numberOfDecimalPlaces: 0) { str in
-                                Text(str)
-                            }
+                HStack (spacing: 0) {
+                    if participantsVM.teams[team.index].score < 0 {
+                        Text("-")
                     }
-                } else {
-                    Text("0")
+                    MovingNumbersView(
+                        number: Double(abs(participantsVM.teams[team.index].score)),
+                        numberOfDecimalPlaces: 0) { str in
+                            Text(str)
+                        }
                 }
             }
             .font(formatter.font(fontSize: .mediumLarge))

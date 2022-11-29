@@ -23,7 +23,7 @@ struct MobileDraftsView: View {
                     MobileDraftCellView(expandedSetID: $expandedSetID, draft: draft)
                         .onAppear {
                             guard let firstSetID = profileVM.drafts.first?.id else { return }
-                            expandedSetID = firstSetID
+                            expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
                         }
                 }
             }
@@ -42,7 +42,8 @@ struct MobileDraftCellView: View {
     
     @Binding var expandedSetID: String
     
-    var draft: CustomSetCherry
+    @State var draft: CustomSetCherry
+    
     var setID: String {
         return draft.id ?? "NID"
     }
@@ -51,10 +52,11 @@ struct MobileDraftCellView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 10) {
-            HStack (spacing: 4) {
+            HStack (spacing: 2) {
                 if !draft.isPublic {
                     Image(systemName: "lock.fill")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(formatter.iconFont(.small))
+                        .offset(x: -2, y: -1)
                 }
                 Text("\(draft.title)")
                     .font(formatter.font(fontSize: .mediumLarge))
@@ -72,6 +74,7 @@ struct MobileDraftCellView: View {
                 HStack (spacing: 5) {
                     Button(action: {
                         isPresentingBuildView.toggle()
+                        draft.isDraft = true
                         buildVM.edit(customSet: draft)
                     }, label: {
                         ZStack {
@@ -95,12 +98,12 @@ struct MobileDraftCellView: View {
                         }, alertTitle: "Are You Sure?", alertSubtitle: "You're about to delete your draft named \"\(draft.title)\" — deleting a draft is irreversible.", hasCancel: true, actionLabel: "Yes, delete my draft")
                     }, label: {
                         Text("Delete")
-                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .foregroundColor(formatter.color(.red))
                             .font(formatter.font(fontSize: .medium))
                             .padding(10)
                             .frame(maxWidth: .infinity)
                             .frame(height: 45)
-                            .background(formatter.color(.primaryBG))
+                            .background(formatter.color(.primaryFG))
                             .cornerRadius(5)
                     })
                 }

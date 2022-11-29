@@ -48,10 +48,10 @@ struct MobileInfoView: View {
                 .padding(.vertical, 15)
                 .background(formatter.color(.secondaryFG))
                 ScrollView (.vertical, showsIndicators: false) {
-                    VStack (alignment: .leading) {
+                    VStack (alignment: .leading, spacing: 15) {
                         Text("\(gamesVM.customSet.title)")
                             .font(formatter.font(fontSize: .semiLarge))
-                        Text("Created by \(isCustom ? gamesVM.queriedUserName : "Trivio Official") on \(gamesVM.dateFormatter.string(from: isCustom ? customSet.dateCreated : gamesVM.date))")
+                        Text("Created by \(isCustom ? gamesVM.queriedUserName : "Trivio Official") on \(gamesVM.dateFormatter.string(from: isCustom ? customSet.dateCreated : Date()))")
                             .font(formatter.font(.regular))
                         HStack (spacing: 20) {
                             

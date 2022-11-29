@@ -18,21 +18,14 @@ struct MobileDuplexWagerView: View {
     
     @State var questionIsSelected = false
     
-    let category: String
-    let clue: String
-    
     var maxScore: Int {
-        if gamesVM.gamePhase == .round1 {
-            return 1000
-        } else {
-            return 2000
-        }
+        return gamesVM.gamePhase == .round1 ? 1000 : 2000
     }
     
     var body: some View {
-        VStack (spacing: 20) {
+        VStack (spacing: 15) {
             HStack (alignment: .top) {
-                Text(category)
+                Text(gamesVM.currentSelectedClue.categoryString.uppercased())
                     .font(formatter.font(fontSize: .medium))
                 Spacer()
                 Button {
@@ -47,7 +40,8 @@ struct MobileDuplexWagerView: View {
                     .font(formatter.font(fontSize: .extraLarge))
                     .frame(width: 200, alignment: .leading)
                     .multilineTextAlignment(.leading)
-                    .padding(.top, 20)
+                    .lineSpacing(7)
+                    .padding(.top, 10)
                 Spacer()
             }
             
@@ -74,7 +68,7 @@ struct MobileDuplexWagerView: View {
             Button {
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
                 self.ddWagerMade.toggle()
-                self.formatter.speaker.speak(clue)
+                self.formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
             } label: {
                 Text("Show me the clue")
                     .font(formatter.font(fontSize: .regular))

@@ -262,7 +262,7 @@ class ParticipantsViewModel: ObservableObject {
         self.solved += 1
     }
     
-    func incrementGameStep() {
+    func progressGame() {
         for team in self.teams {
             scores[team.index].append(team.score)
             if team.members.count > 0 {
@@ -270,6 +270,7 @@ class ParticipantsViewModel: ObservableObject {
             }
         }
         questionTicker += 1
+        resetSubtracts()
     }
 
     
@@ -349,12 +350,11 @@ class ParticipantsViewModel: ObservableObject {
             for step_i in 0..<self.questionTicker {
                 docRef.addDocument(data: [
                     "step" : step_i,
-                    "score" : scores[team_i][step_i]
+                    "score" : self.scores[team_i][step_i]
                 ])
             }
-            
             // get score averages
-            totalScore += teams[team_i].score
+            totalScore += self.teams[team_i].score
         }
         
         let myAverageScore: Int = teams.count > 0 ? (totalScore / teams.count) : 0
@@ -512,7 +512,7 @@ struct Team: Hashable, Identifiable, Decodable, Encodable {
     var score: Int
     var color: String
     
-    init(id: String = "", index: Int, name: String, members: [String], score: Int = 0, color: String) {
+    init(id: String = "", index: Int = 0, name: String = "", members: [String] = [], score: Int = 0, color: String = "Blue") {
         self.id = id == "" ? UUID().uuidString : id
         self.index = index
         self.name = name

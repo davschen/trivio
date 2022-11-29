@@ -53,6 +53,32 @@ struct CustomSet: Decodable, Hashable, Identifiable, Encodable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
+    
+    init(id: String? = nil, jCategoryIDs: [String] = [], djCategoryIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], fjCategory: String = "", fjClue: String = "", fjResponse: String = "", dateCreated: Date = Date(), jeopardyDailyDoubles: [Int] = [], djDailyDoubles1: [Int] = [], djDailyDoubles2: [Int] = [], userID: String = "", isPublic: Bool = true, tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numclues: Int = 0, averageScore: Double = 0.0, jRoundLen: Int = 6, djRoundLen: Int = 6) {
+        self.id = id
+        self.jCategoryIDs = jCategoryIDs
+        self.djCategoryIDs = djCategoryIDs
+        self.categoryNames = categoryNames
+        self.title = title
+        self.titleKeywords = titleKeywords
+        self.fjCategory = fjCategory
+        self.fjClue = fjClue
+        self.fjResponse = fjResponse
+        self.dateCreated = dateCreated
+        self.jeopardyDailyDoubles = jeopardyDailyDoubles
+        self.djDailyDoubles1 = djDailyDoubles1
+        self.djDailyDoubles2 = djDailyDoubles2
+        self.userID = userID
+        self.isPublic = isPublic
+        self.tags = tags
+        self.plays = plays
+        self.rating = rating
+        self.numRatings = numRatings
+        self.numclues = numclues
+        self.averageScore = averageScore
+        self.jRoundLen = jRoundLen
+        self.djRoundLen = djRoundLen
+    }
 }
 
 struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {

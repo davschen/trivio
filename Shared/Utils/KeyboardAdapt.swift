@@ -30,7 +30,7 @@ public class KeyboardInfo: ObservableObject {
 }
 
 struct KeyboardAware: ViewModifier {
-    @ObservedObject private var keyboard = KeyboardInfo.shared
+    @StateObject private var keyboard = KeyboardInfo.shared
     var heightFactor: CGFloat = 1
     func body(content: Content) -> some View {
         content

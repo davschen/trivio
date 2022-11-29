@@ -51,12 +51,24 @@ struct CustomSetCategory: Decodable, Hashable, Encodable {
     var clues: [String]
     var responses: [String]
     var gameID: String
+    // in hindsight the below does not work. I will implement it later.
     // stored as [<index>, <URL>]
     var imageURLs: [Int:String]
     var audioURLs: [Int:String]
     
     mutating func setIndex(index: Int) {
         self.index = index
+    }
+    
+    init(id: String? = UUID().uuidString, name: String = "", index: Int = 0, clues: [String] = ["", "", "", "", ""], responses: [String] = ["", "", "", "", ""], gameID: String = "", imageURLs: [Int : String] = [:], audioURLs: [Int : String] = [:]) {
+        self.id = id
+        self.name = name
+        self.index = index
+        self.clues = clues
+        self.responses = responses
+        self.gameID = gameID
+        self.imageURLs = imageURLs
+        self.audioURLs = audioURLs
     }
 }
 
@@ -116,4 +128,23 @@ struct JeopardyCategory: Decodable, Hashable, Identifiable, Encodable {
     var name: String
     var name_split: [String]
     var responses: [String]
+}
+
+struct Clue {
+    var categoryString, clueString, responseString: String
+    var isDailyDouble, isTripleStumper: Bool
+    var pointValueInt: Int
+    
+    init(categoryString: String = "", clueString: String = "", responseString: String = "", isDailyDouble: Bool = false, isTripleStumper: Bool = false, pointValueInt: Int = 200) {
+        self.categoryString = categoryString
+        self.clueString = clueString
+        self.responseString = responseString
+        self.isDailyDouble = isDailyDouble
+        self.isTripleStumper = isTripleStumper
+        self.pointValueInt = pointValueInt
+    }
+}
+
+enum MenuChoice {
+    case explore, game, gamepicker, reports, profile
 }

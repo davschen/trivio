@@ -24,6 +24,7 @@ struct MobileGameSettingsView: View {
     }
     
     var body: some View {
+        // Supa neat, supa tight, everyone be like MobileGameSettingsView
         ZStack {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
@@ -71,13 +72,34 @@ struct MobileGameSettingsHeaderView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     
+    @State var userViewActive = false
+    
     var body: some View {
-        VStack (alignment: .leading, spacing: 5) {
-            Text("\(gamesVM.customSet.title)")
-                .font(formatter.font(fontSize: .large))
-            Text("Created by \(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.userID)) on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
-                .font(formatter.font(.regular, fontSize: .regular))
-            // TODO: Space for an optional description
+        ZStack {
+            VStack (alignment: .leading, spacing: 5) {
+                Text("\(gamesVM.customSet.title)")
+                    .font(formatter.font(fontSize: .large))
+                HStack (spacing: 0) {
+                    Text("Created by ")
+                    Button {
+                        exploreVM.pullAllFromUser(withID: gamesVM.customSet.userID)
+                        userViewActive.toggle()
+                    } label: {
+                        Text(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.userID))
+                            .underline()
+                    }
+                    Text(" on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
+                }
+                if !gamesVM.customSet.description.isEmpty {
+                    Text(gamesVM.customSet.description)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .font(formatter.font(.regular, fontSize: .regular))
+            NavigationLink(destination: MobileUserView()
+                .navigationBarTitle("Profile", displayMode: .inline),
+                           isActive: $userViewActive,
+                           label: { EmptyView() }).hidden()
         }
     }
 }
@@ -106,6 +128,7 @@ struct MobileGameSettingsCategoryPreviewView: View {
                 MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
             }
         }
+        .id(UUID().uuidString)
     }
 }
 
@@ -302,11 +325,12 @@ struct MobileEditContestantsCellView: View {
                     formatter.setAlertSettings(alertAction: {
                         formatter.hapticFeedback(style: .soft)
                         participantsVM.removeTeamFromFirestore(id: team.id)
-                    }, alertTitle: "Delete \(team.name)?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                    }, alertTitle: "Remove \(team.name) from saved teams?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                 } label: {
                     Image(systemName: "trash")
                         .font(.system(size: 20))
                         .foregroundColor(formatter.color(.red))
+                        .padding(.leading, 5)
                 }
             }
             .padding(.horizontal)
@@ -388,7 +412,7 @@ struct MobileGameSettingsClueAppearanceView: View {
     @EnvironmentObject var formatter: MasterHandler
     
     @State var showingEditView = false
-    @State var selectedAppearance: ClueAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "modern") ?? .modern
+    @State var selectedAppearance: ClueAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "classic") ?? .classic
     
     var body: some View {
         VStack {

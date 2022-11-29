@@ -31,7 +31,7 @@ struct MobileMyCustomSetsView: View {
                 }
                 .onAppear {
                     guard let firstSetID = customSets.first?.id else { return }
-                    expandedSetID = firstSetID
+                    expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
                 }
             } else {
                 MobileEmptyListView(label: "You haven’t made any sets yet. Once you do, they’ll show up here.")
@@ -63,17 +63,24 @@ struct MobileMyCustomSetCellView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 10) {
-            HStack (spacing: 4) {
+            HStack (spacing: 2) {
                 if !customSet.isPublic {
                     Image(systemName: "lock.fill")
                         .font(formatter.iconFont(.small))
+                        .offset(x: -2, y: -1)
                 }
                 Text(customSet.title)
                     .font(formatter.font(fontSize: .mediumLarge))
                     .lineLimit(1)
                 Spacer()
             }
-            Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
+            if !customSet.description.isEmpty {
+                Text(customSet.description)
+                    .font(formatter.font(.regular))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineLimit(2)
+            }
+            Text("Tags: \(customSet.tags.map{ String($0).lowercased() }.joined(separator: ", "))")
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             HStack {
@@ -95,7 +102,6 @@ struct MobileMyCustomSetCellView: View {
                         formatter.hapticFeedback(style: .light)
                         gamesVM.reset()
                         gamesVM.getCustomData(setID: setID)
-                        gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
                         participantsVM.resetScores()
                     } label: {
                         ZStack {
@@ -137,12 +143,12 @@ struct MobileMyCustomSetCellView: View {
                         }, alertTitle: "Are You Sure?", alertSubtitle: "You're about to delete your set named \"\(customSet.title)\" — deleting a set is irreversible.", hasCancel: true, actionLabel: "Yes, delete my set")
                     }, label: {
                         Text("Delete")
-                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .foregroundColor(formatter.color(.red))
                             .font(formatter.font(fontSize: .medium))
                             .padding(10)
                             .frame(maxWidth: .infinity)
                             .frame(height: 45)
-                            .background(formatter.color(.primaryBG))
+                            .background(formatter.color(.primaryFG))
                             .cornerRadius(5)
                     })
                 }

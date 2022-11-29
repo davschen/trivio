@@ -20,41 +20,30 @@ class ProfileViewModel: ObservableObject {
     @Published var searchItem = ""
     @Published var showingSettingsView = false
     @Published var settingsMenuSelectedItem = "Game Settings"
-    @Published var numLiveTokens = 1
+    @Published var myUserRecords = MyUserRecords()
     
     private var db = Firestore.firestore()
     public var myUID = Auth.auth().currentUser?.uid
     
     init() {
-        getPlayedGameIDs()
         getUserInfo()
-    }
-    
-    private func getPlayedGameIDs() {
-        guard let uid = myUID else { return }
-        db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let snap = snap else { return }
-            snap.documentChanges.forEach { (diff) in
-                guard let playedGameID = diff.document.get("gameID") as? String else { return }
-                if diff.type == .added {
-                    self.playedGameIDs.append(playedGameID)
-                } else if diff.type == .removed {
-                    self.playedGameIDs = self.playedGameIDs.filter { $0 != playedGameID }
-                }
-            }
-        }
+        pullUserRecordsData()
     }
     
     func markAsPlayed(gameID: String) {
-        let playedRef = db.collection("users").document(Auth.auth().currentUser?.uid ?? "NID").collection("played")
-        if !playedGameIDs.contains(gameID) {
-            playedRef.addDocument(data: [
-                "gameID" : gameID
-            ])
+        guard let myUID = myUID else { return }
+        let playedRef = db.collection("users").document(myUID).collection("played")
+        
+        playedRef.whereField("gameID", isEqualTo: gameID).getDocuments { (snap, error) in
+            if error != nil {
+                return
+            }
+            guard let documentExists = snap?.documents.first?.exists else { return }
+            if !documentExists {
+                playedRef.addDocument(data: [
+                    "gameID" : gameID
+                ])
+            }
         }
     }
     
@@ -130,9 +119,52 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    private func pullUserRecordsData() {
+        guard let myUID = myUID else { return }
+        let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
+        cherryUpdatesDocRef.getDocument(completion: { (docSnap, error) in
+            if error != nil {
+                return
+            }
+            guard let doc = docSnap else { return }
+            if !doc.exists {
+                try? cherryUpdatesDocRef.setData(from: MyUserRecordsCherry())
+            } else {
+                // I like this deserialization strat enough for now. I may change it in the future if I learn something new
+                // I just learned something new 2 days later
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "LLLL"
+                
+                guard let myUserRecordsCherry = try? doc.data(as: MyUserRecordsCherry.self) else { return }
+                DispatchQueue.main.async {
+                    if myUserRecordsCherry.numLiveTokens == 0 && myUserRecordsCherry.freeTokenLastGeneratedMonth != dateFormatter.string(from: Date()) {
+                        // If the user is due for a free token
+                        self.incrementNumTokens()
+                        self.updateMyUserRecords(fieldName: "freeTokenLastGeneratedMonth", newValue: dateFormatter.string(from: Date()))
+                        var murCherry = myUserRecordsCherry
+                        murCherry.numLiveTokens += 1
+                        self.myUserRecords.assignFromMURCherry(myUserRecordsCherry: murCherry)
+                    } else {
+                        self.myUserRecords.assignFromMURCherry(myUserRecordsCherry: myUserRecordsCherry)
+                    }
+                    self.updateMyUserRecords(fieldName: "mostRecentSession", newValue: Date())
+                }
+            }
+        })
+    }
+    
+    public func updateMyUserRecords(fieldName: String, newValue: Any) {
+        guard let myUID = myUID else { return }
+        let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
+        cherryUpdatesDocRef.setData([
+            fieldName : newValue
+        ], merge: true)
+    }
+    
     private func getUserInfo() {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
-        db.collection("users").document(myUID).getDocument { (docSnap, error) in
+        let myProfileDocRef = db.collection("users").document(myUID)
+        myProfileDocRef.getDocument { (docSnap, error) in
             if error != nil { return }
             guard let doc = docSnap else { return }
             let name = doc.get("name") as? String ?? ""
@@ -140,13 +172,6 @@ class ProfileViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.name = name
                 self.username = username
-            }
-            guard let numLiveTokens = doc.get("numLiveTokens") as? Int else {
-                self.initializeNumTokens()
-                return
-            }
-            DispatchQueue.main.async {
-                self.numLiveTokens = numLiveTokens
             }
         }
         db.collection("drafts")
@@ -162,28 +187,19 @@ class ProfileViewModel: ObservableObject {
                         return customSetCherry
                     } else {
                         // default
-                        return CustomSetCherry(customSet: customSet ?? Empty().customSet)
+                        return CustomSetCherry(customSet: customSet ?? CustomSet())
                     }
                 }
         }
     }
     
-    private func initializeNumTokens() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
-        let usersRef = db.collection("users").document(myUID)
-        usersRef.setData([
-            "numLiveTokens" : 1,
-        ], merge: true)
-        self.numLiveTokens = 1
-    }
-    
     public func incrementNumTokens() {
         guard let myUID = Auth.auth().currentUser?.uid else { return }
-        let usersRef = db.collection("users").document(myUID)
+        let usersRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
         usersRef.setData([
             "numLiveTokens" : FieldValue.increment(Int64(1)),
         ], merge: true)
-        self.numLiveTokens += 1
+        self.myUserRecords.numLiveTokens += 1
     }
     
     func writeKeyValueToFirestore(key: String, value: Any) {
@@ -218,7 +234,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func updatePhoneNumber(newPhoneNumber: String) {
-        
+        // I assume I may try this in the future but definitely not anytime soon
     }
     
     func accountInformationError(usernameTaken: Bool) -> Bool {

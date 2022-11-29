@@ -21,6 +21,7 @@ struct MobileGamePreviewView: View {
             HStack (spacing: 7) {
                 ForEach(categories, id: \.self) { category in
                     MobileCategoryPreviewCellView(categoryName: category)
+                        .id(UUID().uuidString)
                 }
             }
             .frame(height: 80)
@@ -49,7 +50,6 @@ struct MobileCategoryPreviewCellView: View {
         }
         .frame(maxHeight: .infinity)
         .frame(width: 130)
-        .tag(UUID().uuidString)
         .background(formatter.color(.secondaryFG))
         .cornerRadius(5)
     }

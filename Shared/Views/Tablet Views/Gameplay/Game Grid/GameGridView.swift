@@ -32,8 +32,8 @@ struct GameGridView: View {
                 ForEach(0..<(gamesVM.categories.count), id: \.self) { i in
                     let category: String = gamesVM.categories[i]
                     ZStack {
-                        formatter.color(gamesVM.categoryDone(colIndex: i) ? .primaryFG : .primaryAccent)
-                        Text("\(gamesVM.categoryDone(colIndex: i) ? "" : category.uppercased())")
+                        formatter.color(gamesVM.finishedCategories[i] ? .primaryFG : .primaryAccent)
+                        Text("\(gamesVM.finishedCategories[i] ? "" : category.uppercased())")
                             .font(formatter.font(.extraBold, fontSize: .medium))
                             .foregroundColor(formatter.color(.highContrastWhite))
                             .multilineTextAlignment(.center)
@@ -64,10 +64,7 @@ struct GameGridView: View {
                                     gameCellTapped(gridClue: gridClue, gridResponse: gridResponse, i: i, j: j)
                                 }
                                 .onLongPressGesture {
-                                    if gamesVM.usedAnswers.contains(gridClue) && !gridClue.isEmpty {
-                                        gamesVM.removeAnswer(answer: gridClue)
-                                        gamesVM.removeFromCompletes(colIndex: i)
-                                    }
+                                    gamesVM.modifyFinishedClues2D(categoryIndex: i, clueIndex: j, newBool: false)
                                 }
                         }
                     }
@@ -78,7 +75,6 @@ struct GameGridView: View {
     
     func gameCellTapped(gridClue: String, gridResponse: String, i: Int, j: Int) {
         if !(gamesVM.usedAnswers.contains(gridClue) || gridClue.isEmpty) {
-            gamesVM.addToCompletes(colIndex: i)
             unsolved = false
             updateDailyDouble(i: i, j: j)
             updateTripleStumper(i: i, j: j)
@@ -100,18 +96,18 @@ struct GameGridView: View {
     func updateDailyDouble(i: Int, j: Int) {
         let toCheck: [Int] = [j, i]
         if gamesVM.gamePhase == .round1 {
-            isDailyDouble = toCheck == gamesVM.jeopardyDailyDoubles
+            isDailyDouble = toCheck == gamesVM.customSet.roundOneDaily
         } else if gamesVM.gamePhase == .round2 {
-            isDailyDouble = (toCheck == gamesVM.djDailyDoubles1 || toCheck == gamesVM.djDailyDoubles2)
+            isDailyDouble = (toCheck == gamesVM.customSet.roundTwoDaily1 || toCheck == gamesVM.customSet.roundTwoDaily2)
         }
     }
     
     func updateTripleStumper(i: Int, j: Int) {
         let toCheck: [Int] = [i, j]
         if gamesVM.gamePhase == .round1 {
-            isTripleStumper = gamesVM.jTripleStumpers.contains(toCheck)
+            isTripleStumper = gamesVM.round1TripleStumpers.contains(toCheck)
         } else if gamesVM.gamePhase == .round2 {
-            isTripleStumper = gamesVM.djTripleStumpers.contains(toCheck)
+            isTripleStumper = gamesVM.round2TripleStumpers.contains(toCheck)
         }
     }
 }

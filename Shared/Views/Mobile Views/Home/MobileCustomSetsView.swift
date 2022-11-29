@@ -9,14 +9,6 @@ import Foundation
 import SwiftUI
 
 struct MobileCustomSetsView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var exploreVM: ExploreViewModel
-    @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @State var idSelected = ""
-    
     @Binding var customSets: [CustomSetCherry]
     
     var body: some View {
@@ -42,7 +34,6 @@ struct MobileCustomSetsView: View {
 
 struct MobileCustomSetCellView: View {
     @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
@@ -66,9 +57,17 @@ struct MobileCustomSetCellView: View {
     var body: some View {
         ZStack {
             VStack (alignment: .leading, spacing: 7) {
-                Text(customSet.title)
-                    .font(formatter.font(fontSize: .mediumLarge))
-                    .lineLimit(1)
+                HStack (spacing: 2) {
+                    if !customSet.isPublic {
+                        Image(systemName: "lock.fill")
+                            .font(formatter.iconFont(.small))
+                            .offset(x: -2, y: -1)
+                    }
+                    Text(customSet.title)
+                        .font(formatter.font(fontSize: .mediumLarge))
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                }
                 Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     .font(formatter.font(.regular))
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
@@ -97,7 +96,7 @@ struct MobileCustomSetCellView: View {
                         Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
                             .font(formatter.font(.regular))
                         HStack {
-                            Text("\(customSet.plays) plays")
+                            Text("\(customSet.plays) \(customSet.plays == 1 ? "play" : "plays")")
                             Circle()
                                 .frame(width: 5, height: 5)
                             Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -129,9 +128,6 @@ struct MobileCustomSetCellView: View {
         guard let setID = customSet.id else { return }
         gamesVM.reset()
         gamesVM.getCustomData(setID: setID)
-        gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
         participantsVM.resetScores()
     }
 }
-
-

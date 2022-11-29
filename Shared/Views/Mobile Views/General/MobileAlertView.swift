@@ -33,6 +33,9 @@ struct MobileAlertView: View {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
                 .opacity(formatter.showingAlert ? 0.9 : 0)
+                .onTapGesture {
+                    if hasCancel { formatter.dismissAlert() }
+                }
             ZStack {
                 switch alertStyle {
                 case .view:
@@ -45,66 +48,69 @@ struct MobileAlertView: View {
                     .background(formatter.color(.secondaryFG))
                     .cornerRadius(20)
                 default:
-                    VStack {
+                    VStack (spacing: 10) {
+                        Spacer()
                         
-                        // Alert box with 1-2 action buttons
-                        VStack (spacing: 10) {
-                            VStack {
+                        VStack (spacing: 5) {
+                            VStack (spacing: 10) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.system(size: 26))
+                                    .padding(.bottom, 5)
                                 Text(titleText)
-                                    .font(formatter.font(fontSize: .mediumLarge))
+                                    .font(formatter.fontFloat(sizeFloat: 17))
                                 Text(subtitleText)
-                                    .font(formatter.font(.regular, fontSize: .small))
+                                    .font(formatter.fontFloat(.regular, sizeFloat: 14))
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(3)
                             }
-                            .padding(.bottom, 20)
-                            ActionButtonView(action: {
+                            .padding(20)
+                            Button {
                                 action()
                                 formatter.dismissAlert()
-                            }, label: actionLabel)
-                            if hasSecondaryAction {
-                                ActionButtonView(action: {
-                                    secondaryAction()
-                                    formatter.dismissAlert()
-                                }, label: secondaryActionLabel)
+                            } label: {
+                                Text(actionLabel)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(20)
+                                    .background(formatter.color(.primaryAccent))
+                                    .font(formatter.font(fontSize: .medium))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
                             }
                         }
-                        .padding()
-                        .background(formatter.color(.secondaryFG))
+                        .background(formatter.color(.primaryFG))
                         .cornerRadius(10)
-                        .shadow(color: formatter.color(.primaryBG).opacity(0.8), radius: 10)
+                        
+                        if hasSecondaryAction {
+                            Button {
+                                secondaryAction()
+                                formatter.dismissAlert()
+                            } label: {
+                                Text(secondaryActionLabel)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(20)
+                                    .background(formatter.color(.primaryAccent))
+                                    .font(formatter.font(fontSize: .medium))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
+                            }
+                        }
                         
                         // Cancel button
                         if hasCancel {
                             Button {
-                                formatter.hapticFeedback(style: .soft, intensity: .strong)
                                 formatter.dismissAlert()
                             } label: {
                                 Text("Cancel")
-                                    .font(formatter.font(fontSize: .medium))
+                                    .padding(20)
+                                    .frame(maxWidth: .infinity)
+                                    .background(formatter.color(.primaryFG))
+                                    .cornerRadius(10)
                             }
-                            .padding()
                         }
                     }
                 }
             }
-            .padding(.horizontal, 30)
-            .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height)
+            .padding()
+            .padding(.bottom)
+            .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height + 100)
         }
-    }
-    
-    func ActionButtonView(action: @escaping () -> (), label: String) -> some View {
-        var body: some View {
-            Button {
-                action()
-            } label: {
-                Text(label)
-                    .frame(maxWidth: .infinity)
-                    .padding(15)
-                    .background(formatter.color(.primaryAccent))
-                    .font(formatter.font(fontSize: .medium))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .clipShape(Capsule())
-            }
-        }
-        return body
     }
 }

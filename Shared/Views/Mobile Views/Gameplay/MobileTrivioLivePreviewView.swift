@@ -13,6 +13,10 @@ struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var appStoreManager: AppStoreManager
     
+    var hasSubscribed: Bool {
+        return UserDefaults.standard.bool(forKey: "iOS.Trivio.3.0.Cherry.OTLHT")
+    }
+    
     init() {
         Theme.navigationBarColors(
             background: UIColor(MasterHandler().color(.primaryFG)),
@@ -89,7 +93,7 @@ struct MobileTrivioLiveCodeCardView: View {
                         Circle()
                             .fill(formatter.color(.secondaryAccent))
                             .frame(width: 65, height: 65)
-                        Text("\(profileVM.numLiveTokens)")
+                        Text("\(profileVM.myUserRecords.numLiveTokens)")
                             .font(formatter.fontFloat(.bold, sizeFloat: 24.0))
                             .foregroundColor(formatter.color(.primaryBG))
                     }

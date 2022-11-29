@@ -456,8 +456,6 @@ struct MobileBuildStageIndexDict {
 }
 
 struct Empty {
-    var customSet = CustomSet(id: UUID().uuidString, jCategoryIDs: [], djCategoryIDs: [], categoryNames: [], title: "", titleKeywords: [], fjCategory: "", fjClue: "", fjResponse: "", dateCreated: Date(), jeopardyDailyDoubles: [], djDailyDoubles1: [], djDailyDoubles2: [], userID: "NID", isPublic: false, tags: [], plays: 0, rating: 0, numRatings: 0, numclues: 0, averageScore: 0, jRoundLen: 0, djRoundLen: 0)
-    
     var game = Game(id: "", date: Date(), dj_category_ids: [], dj_dds_1: [], dj_dds_2: [], dj_round_len: 0, fj_category: "", fj_clue: "", fj_response: "", game_id: "", group_index: 0, j_category_ids: [], j_round_len: 0, title: "", type: "", userID: "")
     var team = Team(id: UUID().uuidString, index: 0, name: "", members: [], score: 0, color: "blue")
     func category(index: Int, emptyStrings: [String], gameID: String) -> CustomSetCategory {

@@ -51,10 +51,11 @@ struct MobileFinalTrivioUserFlowView: View {
         VStack {
             ScrollView (.vertical, showsIndicators: false) {
                 VStack {
-                    VStack (alignment: gamesVM.finalTrivioStage == .makeWager ? .center : .leading, spacing: 5) {
+                    VStack (spacing: 10) {
                         if gamesVM.finalTrivioStage == .makeWager {
                             Text(gamesVM.customSet.finalCat.uppercased())
                                 .font(formatter.font(.bold, fontSize: .mediumLarge))
+                                .multilineTextAlignment(.center)
                         } else {
                             Text(gamesVM.customSet.finalCat.uppercased())
                                 .font(formatter.font(.bold, fontSize: .medium))
@@ -68,7 +69,7 @@ struct MobileFinalTrivioUserFlowView: View {
                     }
                     .padding()
                     .frame(height: 150)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .background(formatter.color(.primaryAccent))
                     .cornerRadius(10)
                     .padding(10)
@@ -131,7 +132,6 @@ struct MobileFinalTrivioUserFlowView: View {
                     .background(formatter.color(.highContrastWhite))
                     .clipShape(Capsule())
                     .contentShape(Capsule())
-                    .padding(.horizontal, 10)
                     .opacity(participantsVM.wagersValid() ? 1 : 0.4)
             })
         }

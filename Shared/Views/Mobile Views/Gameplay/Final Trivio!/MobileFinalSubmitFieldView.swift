@@ -13,6 +13,7 @@ struct MobileMakeWagerView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @State var hidden = false
+    @State var wagerString = ""
     
     let teamIndex: Int
     
@@ -41,12 +42,18 @@ struct MobileMakeWagerView: View {
                         .minimumScaleFactor(0.3)
                         .font(formatter.font(.boldItalic, fontSize: .medium))
                 } else {
-                    SecureField("Enter your wager", text: $participantsVM.wagers[teamIndex])
-                        .keyboardType(.numberPad)
+                    TextField("Enter your wager", text: $wagerString) { didBeginEditing in
+                        participantsVM.wagers[teamIndex] = wagerString
+                        if !didBeginEditing {
+                            hidden.toggle()
+                        }
+                    }
+                    .keyboardType(.numberPad)
                 }
                 Spacer()
                 Button(action: {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    participantsVM.wagers[teamIndex] = wagerString
                     hidden.toggle()
                 }, label: {
                     Text("\(hidden ? "Edit" : "Done")")
@@ -89,6 +96,7 @@ struct MobileSubmitAnswerView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @State var hidden = false
+    @State var responseString = ""
     
     let teamIndex: Int
     
@@ -103,13 +111,12 @@ struct MobileSubmitAnswerView: View {
     
     var body: some View {
         VStack (alignment: .leading) {
-            HStack (spacing: 10) {
+            HStack (spacing: 5) {
                 Circle()
                     .frame(width: 6, height: 6)
                     .foregroundColor(ColorMap().getColor(color: team.color))
                 Text(team.name)
                     .font(formatter.font(fontSize: .medium))
-                    .minimumScaleFactor(0.3)
                 Spacer()
             }
             
@@ -121,11 +128,17 @@ struct MobileSubmitAnswerView: View {
                         .minimumScaleFactor(0.3)
                         .font(formatter.font(.boldItalic, fontSize: .medium))
                 } else {
-                    SecureField("Enter your answer", text: $participantsVM.finalJeopardyAnswers[teamIndex])
+                    TextField("Enter your response", text: $responseString) { didBeginEditing in
+                        participantsVM.finalJeopardyAnswers[teamIndex] = responseString
+                        if !didBeginEditing {
+                            hidden.toggle()
+                        }
+                    }
                 }
                 Spacer()
                 Button(action: {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
+                    participantsVM.finalJeopardyAnswers[teamIndex] = responseString
                     hidden.toggle()
                 }, label: {
                     Text("\(hidden ? "Edit" : "Done")")
@@ -170,24 +183,26 @@ struct MobileRevealGradeView: View {
             }
             
             // Reveals answer
-            HStack {
+            HStack (spacing: 0) {
                 if !participantsVM.fjReveals[teamIndex] {
                     Text("REVEAL")
                         .font(formatter.font(.boldItalic, fontSize: .mediumLarge))
                 } else {
                     Button {
                         formatter.hapticFeedback(style: .soft, intensity: .strong)
-                        if self.participantsVM.fjCorrects[teamIndex] {
-                            self.participantsVM.addFJCorrect(index: teamIndex)
+                        if participantsVM.fjCorrects[teamIndex] {
+                            participantsVM.addFJCorrect(index: teamIndex)
                         }
-                        self.participantsVM.addFJIncorrect(index: teamIndex)
+                        participantsVM.addFJIncorrect(index: teamIndex)
                     } label: {
                         Image(systemName: "xmark")
-                            .frame(width: 70, height: 70)
-                            .background(formatter.color(!participantsVM.fjReveals[teamIndex] ? .secondaryFG : (correct ? .green : (incorrect ? .red : .lowContrastWhite))))
+                            .frame(width: 75)
+                            .frame(maxHeight: .infinity)
+                            .background(formatter.color(incorrect ? .red : .lowContrastWhite))
                     }
-                    VStack {
+                    VStack (spacing: 5) {
                         Text(participantsVM.finalJeopardyAnswers[teamIndex])
+                            .multilineTextAlignment(.center)
                         Text(!participantsVM.fjReveals[teamIndex] ? "" : ("Wager: " + participantsVM.wagers[teamIndex]))
                             .foregroundColor(formatter.color(incorrect ? .red : .green))
                             .font(formatter.font(.boldItalic, fontSize: .small))
@@ -195,22 +210,22 @@ struct MobileRevealGradeView: View {
                     .frame(maxWidth: .infinity)
                     Button {
                         formatter.hapticFeedback(style: .heavy, intensity: .strong)
-                        if self.participantsVM.toSubtracts[teamIndex] {
-                            self.participantsVM.addFJIncorrect(index: teamIndex)
+                        if participantsVM.toSubtracts[teamIndex] {
+                            participantsVM.addFJIncorrect(index: teamIndex)
                         }
-                        self.participantsVM.addFJCorrect(index: teamIndex)
+                        participantsVM.addFJCorrect(index: teamIndex)
                     } label: {
                         Image(systemName: "checkmark")
-                            .frame(width: 70, height: 70)
-                            .background(formatter.color(!participantsVM.fjReveals[teamIndex] ? .secondaryFG : (correct ? .green : (incorrect ? .red : .lowContrastWhite))))
+                            .frame(width: 75)
+                            .frame(maxHeight: .infinity)
+                            .background(formatter.color(correct ? .green : .lowContrastWhite))
                     }
                 }
             }
             .font(formatter.font(fontSize: .medium))
-            .padding()
             .frame(maxWidth: .infinity)
-            .frame(height: 70)
-            .background(formatter.color(!participantsVM.fjReveals[teamIndex] ? .secondaryFG : .primaryAccent))
+            .frame(height: 75)
+            .background(formatter.color(.secondaryFG))
             .contentShape(Rectangle())
             .cornerRadius(5)
             .onTapGesture {

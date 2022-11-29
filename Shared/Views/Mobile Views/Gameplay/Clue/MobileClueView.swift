@@ -13,40 +13,22 @@ struct MobileClueView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
-    
-    @Binding var unsolved: Bool
-    
-    let category: String
-    let clueString: String
-    let responseString: String
-    let pointValueInt: Int
-    let isDailyDouble: Bool
-    let isTripleStumper: Bool
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var wager: Double = 0
     @State var ddWagerMade = false
+    @State var isTutorialAnimating = false
     
     var body: some View {
-        ZStack {
-            if isDailyDouble && !ddWagerMade {
-                MobileDuplexWagerView(ddWagerMade: $ddWagerMade,
-                                      wager: $wager,
-                                      category: category, 
-                                      clue: clueString)
-            } else {
-                MobileDraggableClueResponseView(
-                    unsolved: $unsolved,
-                    category: category,
-                    clue: clueString,
-                    response: responseString,
-                    pointValueInt: pointValueInt,
-                    isDailyDouble: isDailyDouble,
-                    isTripleStumper: isTripleStumper,
-                    wager: $wager
-                )
+        if gamesVM.currentSelectedClue.isDailyDouble && !ddWagerMade {
+            MobileDuplexWagerView(ddWagerMade: $ddWagerMade, wager: $wager)
+        } else {
+            MobileDraggableClueResponseView(wager: $wager, ddWagerMade: $ddWagerMade)
+                .transition(AnyTransition.move(edge: .bottom))
+            if !profileVM.myUserRecords.hasShownSwipeToDismissClue {
+                MobileClueDismissTutorialView()
             }
         }
-        .transition(AnyTransition.move(edge: .bottom))
     }
 }
 
@@ -55,21 +37,13 @@ struct MobileDraggableClueResponseView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @Binding var unsolved: Bool
-    
-    let category: String
-    let clue: String
-    let response: String
-    let pointValueInt: Int
-    let isDailyDouble: Bool
-    let isTripleStumper: Bool
-    
     @Binding var wager: Double
+    @Binding var ddWagerMade: Bool
+    
     @State var yOffset: CGFloat = 0
     @State var hapticWillTrigger = true
     @State var showResponse = false
-    @State var ddCorrect = true
-    @State var teamCorrect = Team(index: 0, name: "", members: [], score: 0, color: "")
+    @State var teamCorrect = Team()
     
     var body: some View {
         ZStack (alignment: .topLeading) {
@@ -80,23 +54,12 @@ struct MobileDraggableClueResponseView: View {
                     .font(formatter.font())
             }
             .opacity(hapticWillTrigger ? (yOffset / 50) : 1)
-            MobileClueResponseView(unsolved: $unsolved,
-                                   wager: $wager,
-                                   showResponse: $showResponse,
-                                   ddCorrect: $ddCorrect,
-                                   teamCorrect: $teamCorrect,
-                                   isDailyDouble: isDailyDouble,
-                                   isTripleStumper: isTripleStumper,
-                                   clue: clue,
-                                   category: category,
-                                   response: response,
-                                   pointValueInt: pointValueInt,
-                                   progressGame: progressGame)
+            MobileClueResponseView(wager: $wager, showResponse: $showResponse, teamCorrect: $teamCorrect, progressGame: progressGame)
                 .offset(y: yOffset)
                 .gesture(
                     DragGesture()
                         .onChanged { gesture in
-                            if isDailyDouble {
+                            if gamesVM.currentSelectedClue.isDailyDouble {
                                 return
                             }
                             if gesture.translation.height > 0 {
@@ -119,26 +82,24 @@ struct MobileDraggableClueResponseView: View {
     }
     
     func progressGame() {
-        gamesVM.gameplayDisplay = .grid
-        gamesVM.usedAnswers.append(clue)
         formatter.speaker.stop()
-        showResponse = false
-        if self.ddCorrect && self.participantsVM.teams.count > 0 {
-            let teamIndex = participantsVM.selectedTeam.index
-            participantsVM.editScore(index: teamIndex, pointValueInt: Int(self.wager))
-        }
+        gamesVM.gameplayDisplay = .grid
         if !teamCorrect.id.isEmpty {
             participantsVM.addSolved()
         }
-        
-        if gamesVM.doneWithRound() && gamesVM.gamePhase == .round2 {
-            gamesVM.gamePhase = .finalRound
-        } else if gamesVM.doneWithRound() {
-            gamesVM.moveOntoRound2()
-            participantsVM.changeDJTeam()
+        if gamesVM.doneWithRound() {
+            if gamesVM.gamePhase == .round1 {
+                gamesVM.moveOntoRound2()
+                participantsVM.changeDJTeam()
+            } else {
+                gamesVM.gamePhase = .finalRound
+            }
         }
-        participantsVM.incrementGameStep()
-        participantsVM.resetSubtracts()
+        participantsVM.progressGame()
+        showResponse = false
+        ddWagerMade = false
+        wager = 0
+        teamCorrect = Team()
     }
 }
 
@@ -147,22 +108,13 @@ struct MobileClueResponseView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
-    @Binding var unsolved: Bool
     @Binding var wager: Double
     @Binding var showResponse: Bool
-    @Binding var ddCorrect: Bool
     @Binding var teamCorrect: Team
     
     @State var timeElapsed: Double = 0
     @State var usedBlocks = [Int]()
-    @State var showingVolumeSlider = false
     
-    let isDailyDouble: Bool
-    let isTripleStumper: Bool
-    let clue: String
-    let category: String
-    let response: String
-    let pointValueInt: Int
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var progressGame: () -> Void
@@ -174,174 +126,210 @@ struct MobileClueResponseView: View {
     var body: some View {
         ZStack {
             if clueAppearance == .modern {
-                VStack {
-                    MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
-                    VStack {
-                        VStack (spacing: 25) {
-                            // Category name and amount
-                            HStack (alignment: .top) {
-                                VStack (alignment: .leading, spacing: 5) {
-                                    if isDailyDouble {
-                                        Text("\(category.uppercased()) (Duplex)")
-                                        Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
-                                            .font(formatter.font(.regularItalic))
-                                    } else {
-                                        Text("\(category.uppercased()) for \(pointValueInt)")
-                                    }
-                                }
-                                .font(formatter.font())
-                                Spacer()
-                                Button {
-                                    progressGame()
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(formatter.iconFont(.small))
-                                }
-                                .opacity(isDailyDouble ? 0 : 1)
-                            }
-                            
-                            // Clue
-                            Text(clue)
-                                .lineSpacing(5)
-                                .font(formatter.font(.regular, fontSize: .semiLarge))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .multilineTextAlignment(.leading)
-                            
-                            // Response, if showing response
-                            if self.showResponse {
-                                VStack (spacing: 0) {
-                                    Text(response.capitalized)
-                                        .font(formatter.font(.regular, fontSize: .semiLarge))
-                                        .foregroundColor(formatter.color(isTripleStumper ? .red : .secondaryAccent))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .multilineTextAlignment(.leading)
-                                    if isTripleStumper {
-                                        Text("(Triple Stumper)")
-                                            .font(formatter.font(.regular, fontSize: .medium))
-                                            .foregroundColor(formatter.color(.red))
-                                            .shadow(color: Color.black.opacity(0.2), radius: 5)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                }
-                            }
-                        }
-                        .padding()
-                        
-                        Spacer()
-                        VStack {
-                            if self.isDailyDouble {
-                                if participantsVM.teams.count > 0 && showResponse {
-                                    MobileDailyTrivioGraderView(wager: $wager, ddCorrect: $ddCorrect) {
-                                        progressGame()
-                                    }
-                                }
-                            } else if showResponse {
-                                MobileCorrectSelectorView(teamCorrect: $teamCorrect, pointValueInt: self.pointValueInt)
-                                    .transition(.slide)
-                            }
-                            Button {
-                                formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                showResponse.toggle()
-                            } label: {
-                                Text("\(self.showResponse ? "Hide" : "Show") Response")
-                                    .font(formatter.font(fontSize: .regular))
-                                    .foregroundColor(formatter.color(showResponse ? .primaryBG : .highContrastWhite))
-                                    .padding(20)
-                                    .frame(maxWidth: .infinity)
-                                    .background(showResponse ? formatter.color(.highContrastWhite) : nil)
-                                    .clipShape(Capsule())
-                                    .overlay(
-                                        Capsule()
-                                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: showResponse ? 0 : 2)
-                                    )
-                            }
-                            .padding([.horizontal, .bottom])
-                        }
-                    }
-                    .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
-                    .cornerRadius(10)
-                }
+                MobileModernClueResponseView(wager: $wager, showResponse: $showResponse, teamCorrect: $teamCorrect, usedBlocks: $usedBlocks, timeElapsed: $timeElapsed, progressGame: progressGame)
             } else {
-                VStack {
-                    MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
-                    VStack (alignment: .leading, spacing: 0) {
-                        VStack (alignment: .leading, spacing: 5) {
-                            if isDailyDouble {
-                                Text("\(category.uppercased()) (Duplex)")
-                                Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
-                                    .font(formatter.font(.regularItalic))
-                            } else {
-                                Text("\(category.uppercased()) for \(pointValueInt)")
-                            }
-                        }
-                        .font(formatter.font(.bold, fontSize: .regular))
-                        .id(category)
-                        .frame(maxWidth: .infinity)
-                        .multilineTextAlignment(.center)
-                        .padding(20)
-                        .background(formatter.color(.lowContrastWhite))
-                        Spacer(minLength: 15)
-                        VStack {
-                            Text(clue.uppercased())
-                                .font(formatter.font(.bold, fontSize: .mediumLarge))
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .multilineTextAlignment(.center)
-                                .id(clue)
-                                .lineSpacing(3)
-                                .padding(.horizontal)
-                                .padding(.bottom, showResponse ? 5 : 0)
-                            if showResponse {
-                                Text(response.uppercased())
-                                    .font(formatter.font(.bold, fontSize: .mediumLarge))
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(formatter.color(.secondaryAccent))
-                                    .id(response)
-                                    .padding([.horizontal, .bottom])
-                            }
-                        }
-                        Spacer(minLength: 0)
-                        VStack {
-                            if self.isDailyDouble {
-                                if participantsVM.teams.count > 0 && showResponse {
-                                    MobileDailyTrivioGraderView(wager: $wager, ddCorrect: $ddCorrect) {
-                                        progressGame()
-                                    }
-                                }
-                            } else if showResponse {
-                                MobileCorrectSelectorView(teamCorrect: $teamCorrect, pointValueInt: self.pointValueInt)
-                                    .transition(.slide)
-                            }
-                            Button {
-                                showResponse.toggle()
-                            } label: {
-                                Text(showResponse ? "Hide Response" : "Show Response")
-                                    .font(formatter.font(fontSize: .regular))
-                                    .foregroundColor(formatter.color(showResponse ? .primaryBG : .highContrastWhite))
-                                    .padding(20)
-                                    .frame(maxWidth: .infinity)
-                                    .background(showResponse ? formatter.color(.highContrastWhite) : nil)
-                                    .clipShape(Capsule())
-                                    .overlay(
-                                        Capsule()
-                                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: showResponse ? 0 : 2)
-                                    )
-                            }
-                            .padding([.horizontal, .bottom])
-                        }
-                    }
-                    .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
-                    .cornerRadius(10)
-                }
+                MobileClassicClueResponseView(wager: $wager, showResponse: $showResponse, teamCorrect: $teamCorrect, usedBlocks: $usedBlocks, timeElapsed: $timeElapsed, progressGame: progressGame)
             }
         }
         .onReceive(timer) { time in
-            if !self.formatter.speaker.isSpeaking
-                && self.timeElapsed < self.gamesVM.timeRemaining {
-                self.timeElapsed += 1
-                let elapsed = self.gamesVM.getCountdown(second: Int(timeElapsed))
-                self.usedBlocks.append(contentsOf: [elapsed.upper, elapsed.lower])
+            if !formatter.speaker.isSpeaking
+                && timeElapsed < gamesVM.timeRemaining {
+                timeElapsed += 1
+                let elapsed = gamesVM.getCountdown(second: Int(timeElapsed))
+                usedBlocks.append(contentsOf: [elapsed.upper, elapsed.lower])
             }
+        }
+    }
+}
+
+struct MobileModernClueResponseView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var wager: Double
+    @Binding var showResponse: Bool
+    @Binding var teamCorrect: Team
+    @Binding var usedBlocks: [Int]
+    @Binding var timeElapsed: Double
+    
+    var progressGame: () -> Void
+    
+    var body: some View {
+        VStack {
+            MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
+            VStack {
+                VStack (spacing: 25) {
+                    // Category name and amount
+                    HStack (alignment: .top) {
+                        VStack (alignment: .center, spacing: 5) {
+                            if gamesVM.currentSelectedClue.isDailyDouble {
+                                Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Duplex)")
+                                Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
+                                    .font(formatter.font(.regularItalic, fontSize: .regular))
+                            } else {
+                                Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) for \(gamesVM.currentSelectedClue.pointValueInt)")
+                            }
+                        }
+                        .font(formatter.font())
+                        Spacer()
+                        Button {
+                            progressGame()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(formatter.iconFont(.small))
+                        }
+                        .opacity(gamesVM.currentSelectedClue.isDailyDouble ? 0 : 1)
+                    }
+                    
+                    // Clue
+                    Text(gamesVM.currentSelectedClue.clueString)
+                        .lineSpacing(5)
+                        .font(formatter.font(.regular, fontSize: .semiLarge))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .multilineTextAlignment(.leading)
+                    
+                    // Response, if showing response
+                    if self.showResponse {
+                        VStack (spacing: 0) {
+                            Text(gamesVM.currentSelectedClue.responseString.capitalized)
+                                .font(formatter.font(.regular, fontSize: .semiLarge))
+                                .foregroundColor(formatter.color(gamesVM.currentSelectedClue.isTripleStumper ? .red : .secondaryAccent))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .multilineTextAlignment(.leading)
+                            if gamesVM.currentSelectedClue.isTripleStumper {
+                                Text("(Triple Stumper)")
+                                    .font(formatter.font(.regular, fontSize: .medium))
+                                    .foregroundColor(formatter.color(.red))
+                                    .shadow(color: Color.black.opacity(0.2), radius: 5)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    }
+                }
+                .padding()
+                
+                Spacer()
+                VStack {
+                    if gamesVM.currentSelectedClue.isDailyDouble {
+                        if participantsVM.teams.count > 0 && showResponse {
+                            MobileDailyTrivioGraderView(wager: $wager) {
+                                progressGame()
+                            }
+                        }
+                    } else if showResponse {
+                        MobileCorrectSelectorView(teamCorrect: $teamCorrect, pointValueInt: gamesVM.currentSelectedClue.pointValueInt)
+                            .transition(.slide)
+                    }
+                    Button {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
+                        showResponse.toggle()
+                    } label: {
+                        Text("\(self.showResponse ? "Hide" : "Show") Response")
+                            .font(formatter.font(fontSize: .regular))
+                            .foregroundColor(formatter.color(showResponse ? .primaryBG : .highContrastWhite))
+                            .padding(20)
+                            .frame(maxWidth: .infinity)
+                            .background(showResponse ? formatter.color(.highContrastWhite) : nil)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(formatter.color(.highContrastWhite), lineWidth: showResponse ? 0 : 2)
+                            )
+                    }
+                    .padding([.horizontal, .bottom])
+                }
+            }
+            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
+            .cornerRadius(10)
+        }
+    }
+}
+
+struct MobileClassicClueResponseView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var wager: Double
+    @Binding var showResponse: Bool
+    @Binding var teamCorrect: Team
+    @Binding var usedBlocks: [Int]
+    @Binding var timeElapsed: Double
+    
+    var progressGame: () -> Void
+    
+    var body: some View {
+        VStack {
+            MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
+            VStack (alignment: .leading, spacing: 0) {
+                VStack (alignment: .leading, spacing: 5) {
+                    if gamesVM.currentSelectedClue.isDailyDouble {
+                        Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Duplex)")
+                        Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
+                            .font(formatter.font(.regularItalic))
+                    } else {
+                        Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) for \(gamesVM.currentSelectedClue.pointValueInt)")
+                    }
+                }
+                .font(formatter.font(.regular, fontSize: .regular))
+                .id(gamesVM.currentSelectedClue.categoryString)
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
+                .padding(20)
+                .background(formatter.color(.lowContrastWhite))
+                Spacer(minLength: 15)
+                VStack {
+                    Text(gamesVM.currentSelectedClue.clueString.uppercased())
+                        .font(formatter.font(.bold, fontSize: .mediumLarge))
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
+                        .id(gamesVM.currentSelectedClue.clueString)
+                        .lineSpacing(3)
+                        .padding(.horizontal)
+                        .padding(.bottom, showResponse ? 5 : 0)
+                    if showResponse {
+                        Text(gamesVM.currentSelectedClue.responseString.uppercased())
+                            .font(formatter.font(.bold, fontSize: .mediumLarge))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(formatter.color(.secondaryAccent))
+                            .id(gamesVM.currentSelectedClue.responseString)
+                            .padding([.horizontal, .bottom])
+                    }
+                }
+                Spacer(minLength: 0)
+                VStack {
+                    if gamesVM.currentSelectedClue.isDailyDouble {
+                        if participantsVM.teams.count > 0 && showResponse {
+                            MobileDailyTrivioGraderView(wager: $wager) {
+                                progressGame()
+                            }
+                        }
+                    } else if showResponse {
+                        MobileCorrectSelectorView(teamCorrect: $teamCorrect, pointValueInt: gamesVM.currentSelectedClue.pointValueInt)
+                            .transition(.slide)
+                    }
+                    Button {
+                        showResponse.toggle()
+                    } label: {
+                        Text(showResponse ? "Hide Response" : "Show Response")
+                            .font(formatter.font(fontSize: .regular))
+                            .foregroundColor(formatter.color(showResponse ? .primaryBG : .highContrastWhite))
+                            .padding(20)
+                            .frame(maxWidth: .infinity)
+                            .background(showResponse ? formatter.color(.highContrastWhite) : nil)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(formatter.color(.highContrastWhite), lineWidth: showResponse ? 0 : 2)
+                            )
+                    }
+                    .padding([.horizontal, .bottom])
+                }
+            }
+            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
+            .cornerRadius(10)
         }
     }
 }
@@ -372,7 +360,6 @@ struct MobileDailyTrivioGraderView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     
     @Binding var wager: Double
-    @Binding var ddCorrect: Bool
     
     var progressGame: () -> Void
     
@@ -391,9 +378,7 @@ struct MobileDailyTrivioGraderView: View {
                 Button(action: {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     let teamIndex = participantsVM.selectedTeam.index
-                    let wager = Int(self.ddCorrect ? -self.wager : self.wager)
-                    self.participantsVM.editScore(index: teamIndex, pointValueInt: wager)
-                    self.ddCorrect.toggle()
+                    participantsVM.editScore(index: teamIndex, pointValueInt: Int(-wager))
                     progressGame()
                 }, label: {
                     Image(systemName: "xmark")
@@ -409,6 +394,8 @@ struct MobileDailyTrivioGraderView: View {
                 
                 // Checkmark button
                 Button(action: {
+                    let teamIndex = participantsVM.selectedTeam.index
+                    participantsVM.editScore(index: teamIndex, pointValueInt: Int(wager))
                     progressGame()
                 }, label: {
                     Image(systemName: "checkmark")
@@ -579,6 +566,49 @@ struct MobileVolumeControlView: View {
                 Text("Effective next clue")
                     .font(formatter.font(fontSize: .small))
             }
+        }
+    }
+}
+
+struct MobileClueDismissTutorialView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var profileVM: ProfileViewModel
+    
+    @State var isTutorialAnimating = false
+    
+    var body: some View {
+        ZStack {
+            formatter.color(.primaryBG)
+                .edgesIgnoringSafeArea(.all)
+                .opacity(0.8)
+            VStack (spacing: 30) {
+                Image(systemName: "hand.point.up.fill")
+                    .font(.system(size: 80))
+                    .offset(y: isTutorialAnimating ? 100 : 0)
+                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: false))
+                    .padding(.bottom, 100)
+                Text("Swipe down to go back to the board")
+                    .font(formatter.font(fontSize: .mediumLarge))
+                    .frame(width: 300)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(5)
+                Button {
+                    isTutorialAnimating = false
+                    profileVM.myUserRecords.hasShownSwipeToDismissClue.toggle()
+                    profileVM.updateMyUserRecords(fieldName: "hasShownSwipeToDismissClue", newValue: true)
+                } label: {
+                    Text("Got it")
+                        .foregroundColor(formatter.color(.primaryBG))
+                        .frame(maxWidth: .infinity)
+                        .padding(20)
+                        .background(formatter.color(.highContrastWhite))
+                        .clipShape(Capsule())
+                        .padding(.horizontal)
+                }
+            }
+        }
+        .onAppear {
+            isTutorialAnimating = true
         }
     }
 }

@@ -157,7 +157,6 @@ struct SummaryView: View {
             guard let setID = set.id else { return }
             gamesVM.getCustomData(setID: setID)
             gamesVM.previewViewShowing = true
-            gamesVM.gameQueryFromType = gamesVM.menuChoice == .profile ? .profile : .explore
             participantsVM.resetScores()
             profileVM.menuSelectedItem = "My Sets"
         }

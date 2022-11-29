@@ -19,7 +19,7 @@ struct FinalTrivioRevealResponseView: View {
                 
                 // Category name
                 HStack {
-                    Text(gamesVM.fjCategory.uppercased())
+                    Text(gamesVM.customSet.finalCat.uppercased())
                         .font(formatter.font())
                         .padding(20)
                         .frame(width: 350)
@@ -29,7 +29,7 @@ struct FinalTrivioRevealResponseView: View {
                 }
                 
                 // Final Trivio Clue
-                Text(gamesVM.fjClue)
+                Text(gamesVM.customSet.finalClue)
                     .font(formatter.font(fontSize: .mediumLarge))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -39,7 +39,7 @@ struct FinalTrivioRevealResponseView: View {
                     Image(systemName: "checkmark.square.fill")
                         .font(.system(size: 30))
                     Text("Correct Response:")
-                    Text(gamesVM.fjResponse)
+                    Text(gamesVM.customSet.finalResponse)
                         .foregroundColor(formatter.color(.secondaryAccent))
                     Spacer()
                 }

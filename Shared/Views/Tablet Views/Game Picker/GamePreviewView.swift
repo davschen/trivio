@@ -18,60 +18,58 @@ struct GamePreviewView: View {
     @State var roundSelector = "Trivio Round"
     
     var body: some View {
-        if gamesVM.menuChoice == gamesVM.gameQueryFromType {
-            VStack (alignment: .leading, spacing: 10) {
-                VStack (alignment: .leading, spacing: 0) {
-                    Text("Trivio Round Categories")
-                        .font(formatter.font())
-                    HStack {
-                        ForEach(gamesVM.jeopardyCategories, id: \.self) { category in
-                            CategoryPreviewView(category: category, searchQuery: searchQuery)
-                        }
-                    }
-                    .frame(height: 100)
-                }
-                VStack (alignment: .leading, spacing: 0) {
-                    Text("Double Trivio Round Categories")
-                        .font(formatter.font())
-                    HStack {
-                        ForEach(gamesVM.doubleJeopardyCategories, id: \.self) { category in
-                            CategoryPreviewView(category: category, searchQuery: searchQuery)
-                        }
-                    }
-                    .frame(height: 100)
-                }
+        VStack (alignment: .leading, spacing: 10) {
+            VStack (alignment: .leading, spacing: 0) {
+                Text("Trivio Round Categories")
+                    .font(formatter.font())
                 HStack {
-                    Spacer()
-                    Button(action: {
-                        gamesVM.previewViewShowing.toggle()
-                    }, label: {
-                        HStack {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 15, weight: .bold))
-                            Text("Close")
-                        }
-                        .font(formatter.font())
-                        .foregroundColor(formatter.color(.primaryFG))
-                        .padding(10)
-                        .background(formatter.color(.highContrastWhite))
-                        .cornerRadius(5)
-                    })
-                    Button(action: {
-                        gamesVM.menuChoice = .game
-                        gamesVM.reset()
-                    }, label: {
-                        HStack {
-                            Image(systemName: "gamecontroller.fill")
-                                .font(.system(size: 15, weight: .bold))
-                            Text("Play")
-                        }
-                        .font(formatter.font())
-                        .foregroundColor(formatter.color(.primaryFG))
-                        .padding(10)
-                        .background(formatter.color(.highContrastWhite))
-                        .cornerRadius(5)
-                    })
+                    ForEach(gamesVM.tidyCustomSet.round1Cats, id: \.self) { category in
+                        CategoryPreviewView(category: category, searchQuery: searchQuery)
+                    }
                 }
+                .frame(height: 100)
+            }
+            VStack (alignment: .leading, spacing: 0) {
+                Text("Double Trivio Round Categories")
+                    .font(formatter.font())
+                HStack {
+                    ForEach(gamesVM.tidyCustomSet.round2Cats, id: \.self) { category in
+                        CategoryPreviewView(category: category, searchQuery: searchQuery)
+                    }
+                }
+                .frame(height: 100)
+            }
+            HStack {
+                Spacer()
+                Button(action: {
+                    gamesVM.previewViewShowing.toggle()
+                }, label: {
+                    HStack {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 15, weight: .bold))
+                        Text("Close")
+                    }
+                    .font(formatter.font())
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .padding(10)
+                    .background(formatter.color(.highContrastWhite))
+                    .cornerRadius(5)
+                })
+                Button(action: {
+                    gamesVM.menuChoice = .game 
+                    gamesVM.reset()
+                }, label: {
+                    HStack {
+                        Image(systemName: "gamecontroller.fill")
+                            .font(.system(size: 15, weight: .bold))
+                        Text("Play")
+                    }
+                    .font(formatter.font())
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .padding(10)
+                    .background(formatter.color(.highContrastWhite))
+                    .cornerRadius(5)
+                })
             }
         }
     }

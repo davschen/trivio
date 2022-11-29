@@ -51,6 +51,8 @@ struct MobileBuildHUDView: View {
                 )
                 .opacity(getBuildStageIndex(.trivioRound) <= mostAdvancedStageIndex ? 1 : 0.4)
                 .onTapGesture {
+                    // In case a user is confused and wants to move on
+                    formatter.resignKeyboard()
                     if getBuildStageIndex(.trivioRound) <= mostAdvancedStageIndex {
                         formatter.hapticFeedback(style: .rigid)
                         buildVM.changePointValues(isAdvancing: false)

@@ -17,61 +17,37 @@ class GamesViewModel: ObservableObject {
     @Published var gameSetupMode: GameSetupMode = .settings
     @Published var gamePhase: GamePhase = .round1
     @Published var gameplayDisplay: GameplayDisplay = .grid
+    @Published var finalTrivioStage: FinalTrivioStage = .makeWager
     
-    @Published var gamePreviews = [GamePreview]()
-    @Published var seasonFolders = [SeasonFolder]()
-    @Published var currentSeason = SeasonFolder(id: "", collection_index: 0, num_games: 0, title: "")
-    
-    @Published var categories = [String]()
+    @Published var gamePreviews = [JeopardySetPreview]()
+    @Published var jeopardySeasons = [JeopardySeason]()
     
     // Nested arrays clues & responses can be indexed into with [i][j]
     // where categoryIndex = i and pointValueIndex = j
+    @Published var categories = [String]()
     @Published var clues: [[String]] = []
     @Published var responses: [[String]] = []
-    
-    @Published var jeopardySet = JeopardySet()
-    @Published var tidyCustomSet = TidyCustomSet()
-    @Published var liveGameCustomSet = LiveGameCustomSet() 
-    
-    @Published var jRoundLen = 6
-    @Published var djRoundLen = 6
-    @Published var jeopardyCategories = [String](repeating: "", count: 6)
-    @Published var doubleJeopardyCategories = [String](repeating: "", count: 6)
-    @Published var jeopardyDailyDoubles = [Int]()
-    @Published var djDailyDoubles1 = [Int]()
-    @Published var djDailyDoubles2 = [Int]()
-    @Published var jeopardyRoundResponses: [[String]] = []
-    @Published var doubleJeopardyRoundResponses: [[String]] = []
-    @Published var fjCategory = ""
-    @Published var fjClue = ""
-    @Published var fjResponse = ""
+    @Published var round1TripleStumpers: [[Int]] = []
+    @Published var round2TripleStumpers: [[Int]] = []
     
     @Published var selectedSeason = ""
+    @Published var finishedClues2D = [[Bool]]()
+    @Published var finishedCategories = [Bool](repeating: false, count: 6)
     @Published var usedAnswers = [String]()
     @Published var timeRemaining: Double = 5
     
-    @Published var date = Date()
-    @Published var jRoundScores = [String]()
-    @Published var djRoundScores = [String]()
-    @Published var finalScores = [String]()
-    @Published var jTripleStumpers: [[Int]] = []
-    @Published var djTripleStumpers: [[Int]] = []
-    
-    // Following @Published variables will be for custom sets
+    @Published var customSets = [CustomSetCherry]()
     @Published var customSet = CustomSetCherry()
+    @Published var jeopardySet = JeopardySet()
+    @Published var tidyCustomSet = TidyCustomSet()
+    @Published var liveGameCustomSet = LiveGameCustomSet()
     @Published var title = ""
     @Published var queriedUserName = ""
-    
-    // From profile view
+
     @Published var previewViewShowing = false
     @Published var playedGames = [String]()
-    @Published var setOffsets = [String:CGFloat]()
-    @Published var customSets = [CustomSetCherry]()
     
-    @Published var loadingGame = false
-    @Published var finalTrivioStage: FinalTrivioStage = .makeWager
-    @Published var gameQueryFromType: MenuChoice = .explore
-    
+    public var currentSelectedClue = Clue()
     public var currentCategoryIndex = 0
     public var categoryCompletes = [Int](repeating: 0, count: 6)
     public var jCategoryCompletesReference = [Int](repeating: 0, count: 6)
@@ -89,55 +65,41 @@ class GamesViewModel: ObservableObject {
     private var round2PointValues = ["400", "800", "1200", "1600", "2000"]
     
     public var db = Firestore.firestore()
-    public let isVIP = UserDefaults.standard.value(forKey: "isVIP") as? Bool ?? false
     
     init() {
         getSeasons()
         readCustomData()
-        if isVIP {
-            menuChoice = .gamepicker
-            gameQueryFromType = .gamepicker
-        } else {
-            gameQueryFromType = .explore
-        }
-    }
-    
-    func removeAnswer(answer: String) {
-        self.usedAnswers = self.usedAnswers.filter { $0 != answer }
     }
     
     // for starting a new game
     func reset() {
-        self.gamePhase = .round1
-        self.clues = tidyCustomSet.round1Clues
-        self.responses = tidyCustomSet.round2Clues
-        self.usedAnswers.removeAll()
-        self.pointValueArray = round1PointValues
-        self.categories = tidyCustomSet.round1Cats
-        self.clearCategoryDones()
-        self.finalTrivioStage = .notBegun
-        self.currentCategoryIndex = 0
+        gamePhase = .round1
+        clues = tidyCustomSet.round1Clues
+        responses = tidyCustomSet.round1Responses
+        finishedClues2D = generateFinishedClues2D()
+        pointValueArray = round1PointValues
+        categories = tidyCustomSet.round1Cats
+        finalTrivioStage = .notBegun
+        currentCategoryIndex = 0
     }
     
     func moveOntoRound2() {
-        self.gamePhase = .round2
-        self.clues = tidyCustomSet.round2Clues
-        self.responses = tidyCustomSet.round2Responses
-        self.usedAnswers.removeAll()
-        self.pointValueArray = round2PointValues
-        self.categories = tidyCustomSet.round2Cats
-        self.clearCategoryDones()
-        self.currentCategoryIndex = 0
+        gamePhase = .round2
+        categories = tidyCustomSet.round2Cats
+        finishedClues2D = generateFinishedClues2D()
+        clues = tidyCustomSet.round2Clues
+        responses = tidyCustomSet.round2Responses
+        pointValueArray = round2PointValues
+        currentCategoryIndex = 0
     }
     
-    func setSeason(folder: SeasonFolder) {
-        self.selectedSeason = folder.id ?? "NID"
-        self.currentSeason = folder
+    func setSeason(jeopardySeason: JeopardySeason) {
+        selectedSeason = jeopardySeason.id ?? "NID"
     }
     
     func getCountdown(second: Int) -> (lower: Int, upper: Int) {
-        let highBound = Int(self.timeRemaining * 2)
-        if second <= Int(self.timeRemaining) {
+        let highBound = Int(timeRemaining * 2)
+        if second <= Int(timeRemaining) {
             return (second, highBound - second)
         } else {
             return (0, 0)
@@ -146,56 +108,84 @@ class GamesViewModel: ObservableObject {
     
     // for clearing your selection
     func clearAll() {
-        self.jeopardyCategories.removeAll()
-        self.doubleJeopardyCategories.removeAll()
-        self.usedAnswers.removeAll()
-        self.tidyCustomSet = TidyCustomSet()
-        self.gamePhase = .round1
-        self.gameSetupMode = .settings
-        self.jeopardyDailyDoubles.removeAll()
-        self.djDailyDoubles1.removeAll()
-        self.djDailyDoubles2.removeAll()
-        self.jTripleStumpers.removeAll()
-        self.djTripleStumpers.removeAll()
-        self.date = Date()
-        self.customSet = CustomSetCherry(customSet: Empty().customSet)
-        self.jRoundScores.removeAll()
-        self.djRoundScores.removeAll()
-        self.finalScores.removeAll()
-        self.clearCategoryDones()
-        self.jCategoryCompletesReference = [Int](repeating: 0, count: 6)
-        self.djCategoryCompletesReference = [Int](repeating: 0, count: 6)
-        self.jRoundCompletes = 0
-        self.djRoundCompletes = 0
-        self.queriedUserName.removeAll()
+        usedAnswers.removeAll()
+        tidyCustomSet = TidyCustomSet()
+        gamePhase = .round1
+        gameSetupMode = .settings
+        round1TripleStumpers.removeAll()
+        round2TripleStumpers.removeAll()
+        customSet = CustomSetCherry(customSet: CustomSet())
+        clearCategoryDones()
+        jCategoryCompletesReference = [Int](repeating: 0, count: 6)
+        djCategoryCompletesReference = [Int](repeating: 0, count: 6)
+        jRoundCompletes = 0
+        djRoundCompletes = 0
+        queriedUserName.removeAll()
     }
     
-    func addToCompletes(colIndex: Int) {
-        self.categoryCompletes[colIndex] += 1
+    func generateFinishedClues2D() -> [[Bool]] {
+        // finished clues dict will take the following form: [Int:[Bool]]
+        // where key = category index and value (boolean array) represents
+        // whether or not that clue is finished
+        let cluesNestedArray = gamePhase == .round1 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
+        var finishedClues2D = [[Bool]]()
+        cluesNestedArray.forEach { cluesArray in
+            finishedClues2D.append(cluesArray.compactMap { $0.isEmpty })
+        }
+        finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
+        return finishedClues2D
     }
     
-    func removeFromCompletes(colIndex: Int) {
-        self.categoryCompletes[colIndex] -= 1
+    func modifyFinishedClues2D(categoryIndex: Int, clueIndex: Int, newBool: Bool = true) {
+        // turns old "finished" value into either true or false, defaults to true
+        finishedClues2D[categoryIndex][clueIndex] = newBool
+        // this tricky piece of code marks a category as finished if all of its clues are finished
+        finishedCategories[categoryIndex] = finishedClues2D[categoryIndex].allSatisfy({$0})
     }
     
-    func categoryDone(colIndex: Int) -> Bool {
-        var reference = -1
+    func getNumCompletedClues() -> Int {
+        return finishedClues2D.joined().filter{$0}.count
+    }
+    
+    func getCurrentSelectedClue() -> Clue {
+        return currentSelectedClue
+    }
+    
+    func setCurrentSelectedClue(categoryIndex: Int, clueIndex: Int) {
+        let clueCounts: Int = clues[categoryIndex].count
+        let responsesCounts: Int = responses[categoryIndex].count
+        let clueString: String = clueCounts - 1 >= clueIndex ? clues[categoryIndex][clueIndex] : ""
+        let responseString: String = responsesCounts - 1 >= clueIndex ? responses[categoryIndex][clueIndex] : ""
+        let pointValueInt = Int(pointValueArray[clueIndex]) ?? 0
+        
+        currentSelectedClue = Clue(categoryString: categories[categoryIndex], clueString: clueString, responseString: responseString, isDailyDouble: clueIsDailyDouble(categoryIndex: categoryIndex, clueIndex: clueIndex), isTripleStumper: clueIsTripleStumper(categoryIndex: categoryIndex, clueIndex: clueIndex), pointValueInt: pointValueInt)
+        
+        modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex)
+        gameplayDisplay = .clue
+        currentCategoryIndex = categoryIndex
+    }
+    
+    func clueIsDailyDouble(categoryIndex: Int, clueIndex: Int) -> Bool {
+        let toCheck: [Int] = queriedUserName.isEmpty ? [clueIndex, categoryIndex] : [categoryIndex, clueIndex]
         if gamePhase == .round1 {
-            reference = jCategoryCompletesReference[colIndex]
-            return categoryCompletes[colIndex] == reference
-        } else if gamePhase == .round2 {
-            reference = djCategoryCompletesReference[colIndex]
-            return categoryCompletes[colIndex] == reference
+            return toCheck == customSet.roundOneDaily
         } else {
-            return true
+            return (toCheck == customSet.roundTwoDaily1 || toCheck == customSet.roundTwoDaily2)
+        }
+    }
+    
+    func clueIsTripleStumper(categoryIndex: Int, clueIndex: Int) -> Bool {
+        let toCheck: [Int] = [categoryIndex, clueIndex]
+        if gamePhase == .round1 {
+            return round1TripleStumpers.contains(toCheck)
+        } else {
+            return round2TripleStumpers.contains(toCheck)
         }
     }
     
     func doneWithRound() -> Bool {
-        if gamePhase == .round1 {
-            return jRoundCompletes == usedAnswers.count
-        } else if gamePhase == .round2 {
-            return djRoundCompletes == usedAnswers.count
+        if gamePhase != .finalRound {
+            return finishedCategories.allSatisfy({ $0 })
         } else {
             return false
         }
@@ -203,12 +193,12 @@ class GamesViewModel: ObservableObject {
     
     func clearCategoryDones() {
         for i in 0..<self.categoryCompletes.count {
-            self.categoryCompletes[i] = 0
+            categoryCompletes[i] = 0
         }
     }
     
     func gameInProgress() -> Bool {
-        if gamePhase == .round1 && usedAnswers.count == 0 {
+        if gamePhase == .round1 && finishedClues2D.joined().filter({$0}).count == 0 {
             return false
         } else {
             return true
