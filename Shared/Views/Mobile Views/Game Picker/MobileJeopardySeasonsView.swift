@@ -13,7 +13,7 @@ struct MobileJeopardySeasonsView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     
     @State var episodesViewActive = false
-    @State var seasonString = ""
+    @State var selectedSeason: JeopardySeason = JeopardySeason()
     
     var body: some View {
         ZStack {
@@ -34,8 +34,8 @@ struct MobileJeopardySeasonsView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 guard let seasonID = season.id else { return }
-                                gamesVM.getEpisodes(seasonID: seasonID)
-                                self.seasonString = season.title
+                                gamesVM.getEpisodes(seasonID: seasonID, purge: true)
+                                self.selectedSeason = season
                                 episodesViewActive.toggle()
                             }
                         }
@@ -47,7 +47,7 @@ struct MobileJeopardySeasonsView: View {
             .withBackground()
             .edgesIgnoringSafeArea(.bottom)
             
-            NavigationLink(destination: MobileJeopardySeasonEpisodesView(seasonString: seasonString),
+            NavigationLink(destination: MobileJeopardySeasonEpisodesView(selectedSeason: selectedSeason),
                            isActive: $episodesViewActive,
                            label: { EmptyView() }).isDetailLink(false).hidden()
         }
@@ -61,7 +61,7 @@ struct MobileJeopardySeasonEpisodesView: View {
     
     @State var setPreviewActive = false
     
-    let seasonString: String
+    let selectedSeason: JeopardySeason
     
     var body: some View {
         ZStack {
@@ -84,11 +84,25 @@ struct MobileJeopardySeasonEpisodesView: View {
                             .frame(height: 100)
                             .background(formatter.color(.primaryFG))
                             .contentShape(Rectangle())
+                            .transaction { transaction in
+                                transaction.animation = nil
+                            }
                             .onTapGesture {
                                 selectSet(jeopardySetPreview: preview)
                                 setPreviewActive.toggle()
                             }
                         }
+                        Button {
+                            gamesVM.getEpisodes(seasonID: selectedSeason.id)
+                        } label: {
+                            Text("Load more")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .transaction { transaction in
+                                    transaction.animation = nil
+                                }
+                        }
+                        .padding(.bottom, 45)
+                        .padding()
                     }
                 }
                 .padding(.bottom, 25)
@@ -102,7 +116,7 @@ struct MobileJeopardySeasonEpisodesView: View {
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()
         }
-        .navigationBarTitle("\(seasonString)", displayMode: .inline)
+        .navigationBarTitle("\(selectedSeason.title)", displayMode: .inline)
     }
     
     func selectSet(jeopardySetPreview: JeopardySetPreview) {

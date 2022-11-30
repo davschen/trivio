@@ -94,7 +94,7 @@ struct MobileFinalTrivioUserFlowView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        Spacer(minLength: 20)
+                        Spacer(minLength: 10)
                         
                         VStack (spacing: 15) {
                             // Each player's textbox for entering wagers

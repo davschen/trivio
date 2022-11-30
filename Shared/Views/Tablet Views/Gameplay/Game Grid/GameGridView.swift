@@ -64,7 +64,7 @@ struct GameGridView: View {
                                     gameCellTapped(gridClue: gridClue, gridResponse: gridResponse, i: i, j: j)
                                 }
                                 .onLongPressGesture {
-                                    gamesVM.modifyFinishedClues2D(categoryIndex: i, clueIndex: j, newBool: false)
+                                    gamesVM.modifyFinishedClues2D(categoryIndex: i, clueIndex: j, completed: false)
                                 }
                         }
                     }

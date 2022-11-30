@@ -31,7 +31,7 @@ extension GamesViewModel {
                     
                     // what even is this
                     if let mostRecentSeason = self.jeopardySeasons.first, let seasonID = mostRecentSeason.id {
-                        self.getEpisodes(seasonID: seasonID)
+                        self.getEpisodes(seasonID: seasonID, purge: false)
                         self.setSeason(jeopardySeason: mostRecentSeason)
                     }
                 }
@@ -40,20 +40,32 @@ extension GamesViewModel {
     }
     
     // Read previews
-    func getEpisodes(seasonID: String) {
-        db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).getDocuments { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let data = snap?.documents else { return }
-            
-            DispatchQueue.main.async {
-                self.gamePreviews = data.compactMap { (querySnapshot) -> JeopardySetPreview? in
-                    var preview = try? querySnapshot.data(as: JeopardySetPreview.self)
-                    preview?.setID(id: querySnapshot.documentID)
-                    return preview
-                }
+    func getEpisodes(seasonID: String?, purge: Bool = false) {
+        if purge {
+            gamePreviews.removeAll()
+            latestJeopardyDoc = nil
+        }
+        var query: Query!
+
+        guard let seasonID = seasonID else { return }
+        if gamePreviews.isEmpty {
+            query = db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).limit(to: 10)
+        } else {
+            query = db.collection("folders").document(seasonID).collection("games").order(by: "group_index", descending: true).start(afterDocument: latestJeopardyDoc!).limit(to: 10)
+        }
+        
+        query.getDocuments { (snap, error) in
+            if let error = error {
+                print("\(error.localizedDescription)")
+            } else {
+                guard let data = snap?.documents else { return }
+                let newJeopardySets = data.compactMap({ (queryDocSnap) -> JeopardySetPreview? in
+                    var gamePreview = try? queryDocSnap.data(as: JeopardySetPreview.self)
+                    gamePreview?.setID(id: queryDocSnap.documentID)
+                    return gamePreview
+                })
+                self.gamePreviews.append(contentsOf: newJeopardySets)
+                self.latestJeopardyDoc = data.last
             }
         }
     }
@@ -186,7 +198,7 @@ struct JeopardySetPreview: Decodable, Hashable, Identifiable {
     }
     
     static func == (lhs: JeopardySetPreview, rhs: JeopardySetPreview) -> Bool {
-        lhs.id == rhs.id
+        lhs.title == rhs.title
     }
     
     mutating func setID(id: String) {

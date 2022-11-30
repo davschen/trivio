@@ -17,6 +17,7 @@ class MasterHandler: ObservableObject {
     @Published var speaker = Speaker()
     
     var alertStyle: AlertStyle = .standard
+    var alertType: AlertType = .warning
     var alertAction: () -> () = { print("default alert") }
     var alertTitle = ""
     var alertSubtitle = ""
@@ -36,6 +37,7 @@ class MasterHandler: ObservableObject {
     }
     
     func setAlertSettings(alertAction: @escaping () -> () = { return },
+                          alertType: AlertType = .warning,
                           alertTitle: String = "",
                           alertSubtitle: String = "",
                           hasCancel: Bool = true,
@@ -43,6 +45,7 @@ class MasterHandler: ObservableObject {
                           hasSecondaryAction: Bool = false,
                           secondaryAction: @escaping () -> () = { return },
                           secondaryActionLabel: String = "") {
+        self.alertType = alertType
         self.alertStyle = .loading
         self.alertAction = alertAction
         self.alertTitle = alertTitle

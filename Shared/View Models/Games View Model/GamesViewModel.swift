@@ -31,7 +31,7 @@ class GamesViewModel: ObservableObject {
     @Published var round2TripleStumpers: [[Int]] = []
     
     @Published var selectedSeason = ""
-    @Published var finishedClues2D = [[Bool]]()
+    @Published var finishedClues2D = [[ClueCompletionStatus]]()
     @Published var finishedCategories = [Bool](repeating: false, count: 6)
     @Published var usedAnswers = [String]()
     @Published var timeRemaining: Double = 5
@@ -54,6 +54,7 @@ class GamesViewModel: ObservableObject {
     public var djCategoryCompletesReference = [Int](repeating: 0, count: 6)
     public var jRoundCompletes = 0
     public var djRoundCompletes = 0
+    public var latestJeopardyDoc: DocumentSnapshot? = nil
     
     public var dateFormatter: DateFormatter {
         let df = DateFormatter()
@@ -123,28 +124,28 @@ class GamesViewModel: ObservableObject {
         queriedUserName.removeAll()
     }
     
-    func generateFinishedClues2D() -> [[Bool]] {
+    func generateFinishedClues2D() -> [[ClueCompletionStatus]] {
         // finished clues dict will take the following form: [Int:[Bool]]
         // where key = category index and value (boolean array) represents
         // whether or not that clue is finished
         let cluesNestedArray = gamePhase == .round1 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
-        var finishedClues2D = [[Bool]]()
+        var finishedClues2D = [[ClueCompletionStatus]]()
         cluesNestedArray.forEach { cluesArray in
-            finishedClues2D.append(cluesArray.compactMap { $0.isEmpty })
+            finishedClues2D.append(cluesArray.compactMap { $0.isEmpty ? .empty : .incomplete })
         }
         finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
         return finishedClues2D
     }
     
-    func modifyFinishedClues2D(categoryIndex: Int, clueIndex: Int, newBool: Bool = true) {
-        // turns old "finished" value into either true or false, defaults to true
-        finishedClues2D[categoryIndex][clueIndex] = newBool
+    func modifyFinishedClues2D(categoryIndex: Int, clueIndex: Int, completed: Bool = true) {
+        if finishedClues2D[categoryIndex][clueIndex] == .empty { return }
+        finishedClues2D[categoryIndex][clueIndex] = completed ? .complete : .incomplete
         // this tricky piece of code marks a category as finished if all of its clues are finished
-        finishedCategories[categoryIndex] = finishedClues2D[categoryIndex].allSatisfy({$0})
+        finishedCategories[categoryIndex] = finishedClues2D[categoryIndex].allSatisfy({$0 != .incomplete})
     }
     
     func getNumCompletedClues() -> Int {
-        return finishedClues2D.joined().filter{$0}.count
+        return finishedClues2D.joined().filter{$0 == .complete}.count
     }
     
     func getCurrentSelectedClue() -> Clue {
@@ -152,6 +153,8 @@ class GamesViewModel: ObservableObject {
     }
     
     func setCurrentSelectedClue(categoryIndex: Int, clueIndex: Int) {
+        gameplayDisplay = .clue
+        
         let clueCounts: Int = clues[categoryIndex].count
         let responsesCounts: Int = responses[categoryIndex].count
         let clueString: String = clueCounts - 1 >= clueIndex ? clues[categoryIndex][clueIndex] : ""
@@ -161,7 +164,6 @@ class GamesViewModel: ObservableObject {
         currentSelectedClue = Clue(categoryString: categories[categoryIndex], clueString: clueString, responseString: responseString, isDailyDouble: clueIsDailyDouble(categoryIndex: categoryIndex, clueIndex: clueIndex), isTripleStumper: clueIsTripleStumper(categoryIndex: categoryIndex, clueIndex: clueIndex), pointValueInt: pointValueInt)
         
         modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex)
-        gameplayDisplay = .clue
         currentCategoryIndex = categoryIndex
     }
     
@@ -198,12 +200,16 @@ class GamesViewModel: ObservableObject {
     }
     
     func gameInProgress() -> Bool {
-        if gamePhase == .round1 && finishedClues2D.joined().filter({$0}).count == 0 {
+        if gamePhase == .round1 && finishedClues2D.joined().filter({$0 == .complete}).count == 0 {
             return false
         } else {
             return true
         }
     }
+}
+
+enum ClueCompletionStatus {
+    case empty, incomplete, complete
 }
 
 enum GameSetupMode {

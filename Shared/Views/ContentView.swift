@@ -7,6 +7,8 @@
 
 import SwiftUI
 import CoreData
+import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 struct ContentView: View {
     @State var isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false

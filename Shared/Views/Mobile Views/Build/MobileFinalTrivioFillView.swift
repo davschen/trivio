@@ -54,11 +54,22 @@ struct MobileFinalTrivioFillView: View {
                                 .font(formatter.font(.boldItalic))
                                 .foregroundColor(formatter.color(.lowContrastWhite))
                         }
-                        MobileMultilineTextField("", text: $finalClue) {
-                            buildVM.currCustomSet.finalClue = finalClue
+                        HStack (alignment: .bottom) {
+                            MobileMultilineTextField("", text: $finalClue) {
+                                buildVM.currCustomSet.finalClue = finalClue
+                            }
+                            .accentColor(formatter.color(.highContrastWhite))
+                            .offset(x: -5)
+                            Button {
+                                buildVM.currCustomSet.finalClue = finalClue
+                                formatter.resignKeyboard()
+                            } label: {
+                                Text("Done")
+                                    .font(formatter.font(.regular))
+                                    .padding(.vertical, 7)
+                            }
+                            .opacity(buildVM.currCustomSet.finalClue == finalClue ? 0 : 1)
                         }
-                        .accentColor(formatter.color(.highContrastWhite))
-                        .offset(x: -5)
                     }
                     
                     Rectangle()
@@ -74,12 +85,23 @@ struct MobileFinalTrivioFillView: View {
                                 .font(formatter.font(.boldItalic))
                                 .foregroundColor(formatter.color(.lowContrastWhite))
                         }
-                        TextField("", text: $finalResponse, onEditingChanged: { editingChanged in
-                            buildVM.currCustomSet.finalResponse = finalResponse
-                        })
-                        .accentColor(formatter.color(.secondaryAccent))
-                        .font(formatter.font(.bold))
-                        .foregroundColor(formatter.color(.secondaryAccent))
+                        HStack {
+                            TextField("", text: $finalResponse, onEditingChanged: { editingChanged in
+                                buildVM.currCustomSet.finalResponse = finalResponse
+                            })
+                            .accentColor(formatter.color(.secondaryAccent))
+                            .font(formatter.font(.bold))
+                            .foregroundColor(formatter.color(.secondaryAccent))
+                            Button {
+                                buildVM.currCustomSet.finalResponse = finalResponse
+                                formatter.resignKeyboard()
+                            } label: {
+                                Text("Done")
+                                    .font(formatter.font(.regular))
+                                    .padding(.vertical, 5)
+                            }
+                            .opacity(buildVM.currCustomSet.finalResponse == finalResponse ? 0 : 1)
+                        }
                     }
                     Rectangle()
                         .fill(formatter.color(.secondaryAccent))
@@ -89,6 +111,7 @@ struct MobileFinalTrivioFillView: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .resignKeyboardOnDragGesture()
     }
 }
 

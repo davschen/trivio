@@ -51,9 +51,10 @@ struct MobileGameplayGridView: View {
                     MobileFinalTrivioView()
                         .padding(.horizontal)
                 } else {
-                    if gamesVM.gameplayDisplay == .grid {
-                        MobileGameGridView()
-                    } else if gamesVM.gameplayDisplay == .clue {
+                    MobileGameGridView()
+                        .opacity(gamesVM.gameplayDisplay == .grid ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.2))
+                    if gamesVM.gameplayDisplay == .clue {
                         MobileClueView()
                             .padding(.horizontal)
                     }
@@ -63,7 +64,6 @@ struct MobileGameplayGridView: View {
                 }
             }
             MobileInfoView(showInfoView: $showInfoView)
-                .shadow(radius: 20)
         }
     }
 }
@@ -80,11 +80,11 @@ struct MobileGameplayHeaderView: View {
     var headerString: String {
         switch gamesVM.gamePhase {
         case .round1:
-            return "Trivio! Round"
+            return "Round 1"
         case .round2:
-            return "Double Trivio! Round"
+            return "Round 2"
         default:
-            return "Final Trivio!"
+            return "Final Clue"
         }
     }
     
@@ -93,7 +93,7 @@ struct MobileGameplayHeaderView: View {
     }
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 0) {
+        VStack (alignment: .leading, spacing: 5) {
             HStack {
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
@@ -106,21 +106,19 @@ struct MobileGameplayHeaderView: View {
                 Text("\(headerString)")
                     .font(formatter.font(fontSize: .semiLarge))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.5)
                 Spacer()
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     showInfoView.toggle()
                 } label: {
-                    Image(systemName: "info.circle")
-                        .font(.system(size: 18, weight: .bold))
+                    Image(systemName: showInfoView ? "info.circle.fill" : "info.circle")
+                        .font(.system(size: 18))
                 }
             }
             // Progress bar
             if gamesVM.gamePhase == .round1 || gamesVM.gamePhase == .round2 {
-                GeometryReader { geometry in
-                    VStack (alignment: .leading, spacing: 4) {
-                        Spacer()
+                VStack {
+                    GeometryReader { geometry in
                         ZStack (alignment: .leading) {
                             Capsule()
                                 .frame(width: geometry.size.width, height: 10)
@@ -129,25 +127,25 @@ struct MobileGameplayHeaderView: View {
                                 .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
                         }
-                        HStack {
-                            Text("Progress: \(gamesVM.getNumCompletedClues()) of \(cluesInRound) clues completed")
-                            Spacer()
-                            Button {
-                                if gamesVM.gamePhase == .round1 {
-                                    gamesVM.moveOntoRound2()
-                                } else {
-                                    gamesVM.gamePhase = gamesVM.gamePhase.next()
-                                }
-                            } label: {
-                                Text("Skip round")
-                                    .font(formatter.font(.boldItalic, fontSize: .small))
+                    }
+                    // Must specify frame height b/c using geometryReader
+                    .frame(height: 10)
+                    HStack {
+                        Text("Progress: \(gamesVM.getNumCompletedClues()) of \(cluesInRound) clues completed")
+                            .font(formatter.font(.regularItalic, fontSize: .small))
+                        Spacer()
+                        Button {
+                            if gamesVM.gamePhase == .round1 && gamesVM.customSet.hasTwoRounds {
+                                gamesVM.moveOntoRound2()
+                            } else {
+                                gamesVM.gamePhase = .finalRound
                             }
-
+                        } label: {
+                            Text("Skip round")
+                                .font(formatter.font(.boldItalic, fontSize: .small))
                         }
                     }
-                    .font(formatter.font(.regularItalic, fontSize: .small))
                 }
-                .frame(height: 30)
             } else if gamesVM.finalTrivioStage == .submitAnswer {
                 MobileFinalTrivioCountdownTimerView()
                     .padding(.top, 10)

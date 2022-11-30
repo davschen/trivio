@@ -42,6 +42,7 @@ struct MobileGameSettingsView: View {
                         
                         // Game Settings
                         MobileGameSettingsCardView()
+                            .padding(.horizontal)
                             .padding(.bottom, 45)
                     }
                 }
@@ -93,6 +94,7 @@ struct MobileGameSettingsHeaderView: View {
                 if !gamesVM.customSet.description.isEmpty {
                     Text(gamesVM.customSet.description)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(formatter.color(.mediumContrastWhite))
                 }
             }
             .font(formatter.font(.regular, fontSize: .regular))
@@ -235,6 +237,7 @@ struct MobileContestantsCellView: View {
             .opacity(team.id == editingID ? 0.4 : 1)
             Spacer()
             Button {
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
                 if editingID == team.id {
                     // "Done"
                     if editingName.isEmpty && team.name.isEmpty {
@@ -364,7 +367,7 @@ struct MobileColorPickerView: View {
     }
 }
 
-// MARK: - Mobile Game Settings
+// MARK: - Mobile Game Settings Card
 
 struct MobileGameSettingsCardView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -376,63 +379,60 @@ struct MobileGameSettingsCardView: View {
             Text("Game Settings")
                 .font(formatter.font(.bold, fontSize: .mediumLarge))
                 .padding(.horizontal).padding(.bottom, 10)
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .foregroundColor(formatter.color(.lowContrastWhite))
-            MobileGameSettingsClueAppearanceView()
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .foregroundColor(formatter.color(.lowContrastWhite))
-            MobileGameSettingsVoiceTypeView()
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .foregroundColor(formatter.color(.lowContrastWhite))
-            MobileGameSettingsVoiceSpeedView()
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .foregroundColor(formatter.color(.lowContrastWhite))
-            MobileGameSettingsGenderView()
-            Rectangle()
-                .frame(maxWidth: .infinity)
-                .frame(height: 1)
-                .foregroundColor(formatter.color(.lowContrastWhite))
+            ThinDividerView()
+            MobileGameSettingsClueAppearanceView(editingSettingName: $editingSettingName)
+            ThinDividerView()
+            MobileGameSettingsVoiceTypeView(editingSettingName: $editingSettingName)
+            ThinDividerView()
+            MobileGameSettingsVoiceSpeedView(editingSettingName: $editingSettingName)
+            ThinDividerView()
+            MobileGameSettingsGenderView(editingSettingName: $editingSettingName)
+            ThinDividerView()
         }
         .padding(.vertical)
         .background(formatter.color(.secondaryFG))
         .cornerRadius(5)
-        .padding(.horizontal).padding(.bottom, 20)
+        .padding(.bottom, 20)
+        .animation(.easeIn(duration: 0.15))
+    }
+    
+    func ThinDividerView() -> some View {
+        return Rectangle()
+            .frame(maxWidth: .infinity)
+            .frame(height: 1)
+            .foregroundColor(formatter.color(.lowContrastWhite))
     }
 }
 
 struct MobileGameSettingsClueAppearanceView: View {
     @EnvironmentObject var formatter: MasterHandler
     
-    @State var showingEditView = false
+    @Binding var editingSettingName: String
+    
     @State var selectedAppearance: ClueAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "classic") ?? .classic
+    
+    let settingName = "Clue Appearance"
     
     var body: some View {
         VStack {
             HStack {
-                Text("Clue Appearance")
+                Text(settingName)
                 Spacer()
                 HStack (spacing: 5) {
                     Text("\(selectedAppearance == .modern ? "Modern" : "Classic")")
                     Image(systemName: "chevron.down")
-                        .rotationEffect(Angle(degrees: showingEditView ? 180 : 0))
+                        .rotationEffect(Angle(degrees: editingSettingName == settingName ? 180 : 0))
                 }
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                showingEditView.toggle()
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                editingSettingName = editingSettingName == settingName ? "" : settingName
             }
             
-            if showingEditView {
+            if editingSettingName == settingName {
                 HStack (spacing: 7) {
                     Spacer()
                     MobileGameSettingsClueAppearancePickerView(selectedAppearance: $selectedAppearance, clueAppearance: .modern, appearanceString: "Modern")
@@ -461,6 +461,7 @@ struct MobileGameSettingsClueAppearancePickerView: View {
             .background(formatter.color(selectedAppearance == clueAppearance ? .highContrastWhite : .primaryFG))
             .clipShape(Capsule())
             .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .weak)
                 UserDefaults.standard.set(clueAppearance.rawValue, forKey: "clueAppearance")
                 NotificationCenter.default.post(name: NSNotification.Name("ClueAppearanceChange"), object: nil)
             }
@@ -476,29 +477,33 @@ struct MobileGameSettingsClueAppearancePickerView: View {
 struct MobileGameSettingsVoiceTypeView: View {
     @EnvironmentObject var formatter: MasterHandler
     
-    @State var showingEditView = false
+    @Binding var editingSettingName: String
+
     @State var selectedLanguage: SpeechLanguage = SpeechLanguage(rawValue: UserDefaults.standard.string(forKey: "speechLanguage") ?? "americanEnglish") ?? .britishEnglish
+    
+    let settingName = "Reading Voice"
     
     var emphasisColor: ColorType = .primaryFG
     
     var body: some View {
         VStack {
             HStack {
-                Text("Reading Voice")
+                Text(settingName)
                 Spacer()
                 HStack (spacing: 5) {
                     Text("\(selectedLanguage == .americanEnglish ? "American" : "British") English")
                     Image(systemName: "chevron.down")
-                        .rotationEffect(Angle(degrees: showingEditView ? 180 : 0))
+                        .rotationEffect(Angle(degrees: editingSettingName == settingName ? 180 : 0))
                 }
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                showingEditView.toggle()
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                editingSettingName = editingSettingName == settingName ? "" : settingName
             }
-            if showingEditView {
+            if editingSettingName == settingName {
                 HStack (spacing: 7) {
                     Spacer()
                     MobileGameSettingsLanguagePickerView(selectedLanguage: $selectedLanguage, speechLanguage: .americanEnglish, languageString: "American English")
@@ -527,6 +532,7 @@ struct MobileGameSettingsLanguagePickerView: View {
             .background(formatter.color(selectedLanguage == speechLanguage ? .highContrastWhite : .primaryFG))
             .clipShape(Capsule())
             .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .weak)
                 UserDefaults.standard.set(speechLanguage.rawValue, forKey: "speechLanguage")
                 NotificationCenter.default.post(name: NSNotification.Name("SpeechLanguageChange"), object: nil)
             }
@@ -543,8 +549,11 @@ struct MobileGameSettingsLanguagePickerView: View {
 struct MobileGameSettingsVoiceSpeedView: View {
     @EnvironmentObject var formatter: MasterHandler
     
-    @State var showingEditView = false
+    @Binding var editingSettingName: String
+    
     @State var selectedSpeed: Float = UserDefaults.standard.value(forKey: "speechSpeed") as? Float ?? 0.5
+    
+    let settingName = "Reading Speed"
     
     var emphasisColor: ColorType = .primaryFG
     var floatSpeedToString: [Float:String] {
@@ -558,21 +567,22 @@ struct MobileGameSettingsVoiceSpeedView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Reading Speed")
+                Text(settingName)
                 Spacer()
                 HStack (spacing: 5) {
                     Text(floatSpeedToString[selectedSpeed] ?? "Medium")
                     Image(systemName: "chevron.down")
-                        .rotationEffect(Angle(degrees: showingEditView ? 180 : 0))
+                        .rotationEffect(Angle(degrees: editingSettingName == settingName ? 180 : 0))
                 }
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                showingEditView.toggle()
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                editingSettingName = editingSettingName == settingName ? "" : settingName
             }
-            if showingEditView {
+            if editingSettingName == settingName {
                 HStack (spacing: 7) {
                     Spacer()
                     MobileGameSettingsSpeedPickerView(selectedSpeed: $selectedSpeed, speechSpeed: .slow, speedString: "Slow")
@@ -588,27 +598,31 @@ struct MobileGameSettingsVoiceSpeedView: View {
 struct MobileGameSettingsGenderView: View {
     @EnvironmentObject var formatter: MasterHandler
     
-    @State var showingEditView = false
+    @Binding var editingSettingName: String
+    
     @State var selectedGender: SpeechGender = SpeechGender(rawValue: UserDefaults.standard.string(forKey: "speechGender") ?? "male") ?? .male
+    
+    let settingName = "Narration Gender"
     
     var body: some View {
         VStack {
             HStack {
-                Text("Narration Gender")
+                Text(settingName)
                 Spacer()
                 HStack (spacing: 5) {
                     Text("\(selectedGender == .male ? "Male" : "Female")")
                     Image(systemName: "chevron.down")
-                        .rotationEffect(Angle(degrees: showingEditView ? 180 : 0))
+                        .rotationEffect(Angle(degrees: editingSettingName == settingName ? 180 : 0))
                 }
                 .font(formatter.font(.regular))
                 .foregroundColor(formatter.color(.lowContrastWhite))
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                showingEditView.toggle()
+                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                editingSettingName = editingSettingName == settingName ? "" : settingName
             }
-            if showingEditView {
+            if editingSettingName == settingName {
                 HStack (spacing: 7) {
                     Spacer()
                     MobileGameSettingsGenderPickerView(selectedGender: $selectedGender, speechGender: .male, genderString: "Male")
@@ -637,6 +651,7 @@ struct MobileGameSettingsGenderPickerView: View {
             .background(formatter.color(selectedGender == speechGender ? .highContrastWhite : .primaryFG))
             .clipShape(Capsule())
             .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .weak)
                 UserDefaults.standard.set(speechGender.rawValue, forKey: "speechGender")
                 NotificationCenter.default.post(name: NSNotification.Name("SpeechGenderChange"), object: nil)
             }
@@ -668,6 +683,7 @@ struct MobileGameSettingsSpeedPickerView: View {
             .background(formatter.color(selectedSpeed == speechSpeed.rawValue ? .highContrastWhite : .primaryFG))
             .clipShape(Capsule())
             .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .weak)
                 UserDefaults.standard.set(speechSpeed.rawValue, forKey: "speechSpeed")
                 NotificationCenter.default.post(name: NSNotification.Name("SpeechSpeedChange"), object: nil)
             }

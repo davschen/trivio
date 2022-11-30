@@ -51,28 +51,21 @@ extension BuildViewModel {
             round2FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
         }
         
-        let detailsCheck = !self.currCustomSet.tags.isEmpty && !self.currCustomSet.title.isEmpty
-        let trivioRoundCheck = round1FilledCount >= self.currCustomSet.round1Len
-        let dtRoundCheck = round2FilledCount >= self.currCustomSet.round2Len
-        let roundOneDailyCheck = !self.currCustomSet.roundOneDaily.isEmpty
-        let roundTwoDailyCheck = !self.currCustomSet.roundTwoDaily1.isEmpty && !self.currCustomSet.roundTwoDaily2.isEmpty
-        let finalCheck = !self.currCustomSet.finalCat.isEmpty && !self.currCustomSet.finalClue.isEmpty && !self.currCustomSet.finalResponse.isEmpty
+        let trivioRoundCheck = !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
+        let roundOneDailyCheck = round1FilledCount >= currCustomSet.round1Len
+        let dtRoundCheck = !currCustomSet.roundOneDaily.isEmpty
+        let roundTwoDailyCheck = round2FilledCount >= currCustomSet.round2Len
+        let finalCheck = !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
         
-        var allBools = [detailsCheck, trivioRoundCheck, roundOneDailyCheck, dtRoundCheck, roundTwoDailyCheck, finalCheck]
-        if !currCustomSet.hasTwoRounds {
-            allBools = [detailsCheck, trivioRoundCheck, roundOneDailyCheck, finalCheck]
-        }
-        
+        let allBools = currCustomSet.hasTwoRounds ? [trivioRoundCheck, roundOneDailyCheck, dtRoundCheck, roundTwoDailyCheck, finalCheck] : [trivioRoundCheck, roundOneDailyCheck, dtRoundCheck]
+
         for i in allBools.indices {
-            let passesCheckAtIndex = allBools[i]
-            if passesCheckAtIndex {
-                guard let currStage = MobileBuildStageIndexDict().reverseDict[i] else { return }
-                // if the current stage (most advanced stage that passes checks) is more advanced than the current buildStage, assign it as the most advanced stage. Otherwise, assign the current buildStage.
-                guard let buildStageIndex = MobileBuildStageIndexDict().dict[buildStage] else { return }
-                if i > buildStageIndex {
-                    mostAdvancedStage = currStage
+            if allBools[i] {
+                guard let stageAtIndex = MobileBuildStageIndexDict().reverseDict[i] else { return }
+                if stageAtIndex == .dtRound && !currCustomSet.hasTwoRounds {
+                    mostAdvancedStage = .finalTrivio
                 } else {
-                    mostAdvancedStage = buildStage
+                    mostAdvancedStage = stageAtIndex
                 }
             } else {
                 return
@@ -145,5 +138,27 @@ extension BuildViewModel {
             }
             return checkForSetIsComplete()
         }
+    }
+}
+
+struct MobileBuildStageIndexDict {
+    var dict: [BuildStage:Int] = [
+        .trivioRound: 0,
+        .trivioRoundDD: 1,
+        .dtRound: 2,
+        .dtRoundDD: 3,
+        .finalTrivio: 4
+    ]
+    
+    var reverseDict: [Int:BuildStage] = [
+        0 : .trivioRound,
+        1 : .trivioRoundDD,
+        2 : .dtRound,
+        3 : .dtRoundDD,
+        4 : .finalTrivio
+    ]
+    
+    func getIndex(from buildStage: BuildStage) -> Int {
+        return dict[buildStage] ?? 0
     }
 }

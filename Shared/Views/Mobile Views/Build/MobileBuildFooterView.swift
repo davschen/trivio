@@ -11,6 +11,7 @@ import SwiftUI
 struct MobileBuildFooterView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
     var body: some View {

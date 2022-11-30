@@ -55,6 +55,7 @@ struct MobileUserView: View {
 
 struct MobileUserCustomSetCellView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
 
@@ -101,7 +102,7 @@ struct MobileUserCustomSetCellView: View {
             }
             .padding(.horizontal, 15).padding(.vertical, 20)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(formatter.color(.primaryFG))
+            .background(formatter.color(exploreVM.recentlyPlayedSets.contains(customSet) ? .primaryFG : .secondaryFG))
             
             NavigationLink(destination: MobileGameSettingsView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import StoreKit
 
 struct MobileHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -39,38 +40,37 @@ struct MobileHomepageView: View {
                                 profileViewActive.toggle()
                             }
                             MobileExploreBuildPromptButtonView()
-                            Spacer()
-                                .frame(height: 5)
+                            if profileVM.myUserRecords.isAdmin {
+                                MobileHomepageAdminPanelView()
+                                    .padding(.horizontal)
+                            }
                             MobileSetHorizontalScrollView(customSets: $exploreVM.recentlyPlayedSets,
+                                                          emptyLabelString: "You haven't played any games yet! When you do, you'll see them here.",
                                                           labelText: "Recently played",
-                                                          promptText: "View all") {
+                                                          promptText: "View all")  {
                                 allRecentSetsViewActive.toggle()
                             }
-                            Spacer()
-                                .frame(height: 5)
+                                                          .padding(.top, 5)
                             MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSets,
                                                           labelText: "Public sets",
                                                           promptText: "View all") {
                                 allPublicSetsViewActive.toggle()
                             }
-                            Spacer()
-                                .frame(height: 5)
+                                                          .padding(.top, 5)
                             if profileVM.myUserRecords.isAdmin {
                                 MobileSetHorizontalScrollView(customSets: $exploreVM.allPrivateSets,
                                                               labelText: "Private sets",
                                                               promptText: "View all") {
                                     allPrivateSetsViewActive.toggle()
                                 }
-                                Spacer()
-                                    .frame(height: 5)
+                                                              .padding(.top, 5)
                             }
                             if profileVM.myUserRecords.isVIP {
                                 MobileJeopardySetsView(jeopardySeasonsViewActive: $jeopardySeasonsViewActive)
-                                Spacer()
-                                    .frame(height: 5)
+                                    .padding(.top, 5)
                             }
                         }
-                        .padding(.bottom, 45)
+                        .padding(.bottom, 100)
                     }
                 }
                 if buildVM.dirtyBit > 0 && !buildVM.currCustomSet.title.isEmpty {
@@ -111,23 +111,27 @@ struct MobileSetHorizontalScrollView: View {
     @EnvironmentObject var formatter: MasterHandler
     @Binding var customSets: [CustomSetCherry]
     
+    var emptyLabelString: String = "Nothing yet! When you make a set, it’ll show up here."
+    
     let labelText: String
     let promptText: String
     let buttonAction: () -> ()
     
     var body: some View {
-        HStack {
-            Text("\(labelText)")
-            Spacer()
-            Button {
-                buttonAction()
-            } label: {
-                Text("\(promptText)")
-                    .foregroundColor(formatter.color(.secondaryAccent))
+        VStack (spacing: 5) {
+            HStack {
+                Text("\(labelText)")
+                Spacer()
+                Button {
+                    buttonAction()
+                } label: {
+                    Text("\(promptText)")
+                        .foregroundColor(formatter.color(.secondaryAccent))
+                }
             }
+            .padding(.horizontal, 15)
+            MobileCustomSetsView(customSets: $customSets, emptyLabelString: emptyLabelString)
         }
-        .padding(.horizontal, 15)
-        MobileCustomSetsView(customSets: $customSets)
     }
 }
 
@@ -207,6 +211,7 @@ struct MobileHomepageHeaderView: View {
 struct MobileExploreBuildPromptButtonView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var isPresentingBuildView = false
     
@@ -216,6 +221,14 @@ struct MobileExploreBuildPromptButtonView: View {
                 Button {
                     isPresentingBuildView.toggle()
                     buildVM.start()
+                    if profileVM.myUserRecords.numTrackedSessions > 10 && !profileVM.myUserRecords.hasShownRatingsPromptCherry {
+//                        if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
+//                            if UIApplication.shared.canOpenURL(url) {
+//                                UIApplication.shared.open(url, options: [:])
+//                            }
+//                        }
+                        if let windowScene = UIApplication.shared.windows.first?.windowScene { SKStoreReviewController.requestReview(in: windowScene) }
+                    }
                 } label: {
                     HStack {
                         Image(systemName: "hammer.fill")

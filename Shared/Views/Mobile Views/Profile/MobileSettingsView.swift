@@ -161,6 +161,31 @@ struct MobileAccountSettingsEditView: View {
                         .font(formatter.font(.regular, fontSize: .regular))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                
+                if profileVM.myUserRecords.isAdmin {
+                    VStack (alignment: .leading, spacing: 5) {
+                        Text("Showing admin UI features")
+                            .font(formatter.font())
+                        HStack {
+                            Text("Yes")
+                                .frame(maxWidth: .infinity)
+                                .padding(20)
+                                .background(formatter.color(profileVM.myUserRecords.isAdmin ? .secondaryFG : .primaryFG))
+                                .cornerRadius(5)
+                                .onTapGesture {
+                                    profileVM.myUserRecords.isAdmin = true
+                                }
+                            Text("No")
+                                .frame(maxWidth: .infinity)
+                                .padding(20)
+                                .background(formatter.color(profileVM.myUserRecords.isAdmin ? .primaryFG : .secondaryFG))
+                                .cornerRadius(5)
+                                .onTapGesture {
+                                    profileVM.myUserRecords.isAdmin = false
+                                }
+                        }
+                    }
+                }
             }
             .padding()
         }

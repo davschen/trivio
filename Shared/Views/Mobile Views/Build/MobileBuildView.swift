@@ -30,7 +30,6 @@ struct MobileBuildView: View {
             }
             switch buildVM.currentDisplay {
             case .settings:
-                Text("")
                 MobileBuildDetailsView()
                     .padding(.horizontal)
             case .buildAll:

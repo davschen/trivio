@@ -36,7 +36,7 @@ struct MobileContentView: View {
                     .environmentObject(searchVM)
                     .environmentObject(dtVM)
                     .environmentObject(appStoreManager)
-                MobileAlertView(alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
+                MobileAlertView(alertType: formatter.alertType, alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                     formatter.alertAction()
                 }, hasSecondaryAction: formatter.hasSecondaryAction, secondaryAction: {
                     formatter.secondaryAction()

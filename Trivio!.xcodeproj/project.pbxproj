@@ -215,12 +215,11 @@
 		8BEDCBF026A6912700E89359 /* GameGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBEF26A6912700E89359 /* GameGridView.swift */; };
 		8BEDCBF326A7984000E89359 /* DuplexWagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBF226A7983F00E89359 /* DuplexWagerView.swift */; };
 		8BEDCBF626A799BD00E89359 /* Shimmer in Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBF526A799BD00E89359 /* Shimmer */; };
-		8BFBF1AF293560C40024174F /* Trivio Splash Logo.svg in Resources */ = {isa = PBXBuildFile; fileRef = 8BFBF1AE293560C40024174F /* Trivio Splash Logo.svg */; };
-		8BFBF1B1293560D10024174F /* Trivio Splash BG.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B0293560D10024174F /* Trivio Splash BG.png */; };
 		8BFBF1B329358A6B0024174F /* MobileJeopardySeasonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B229358A6B0024174F /* MobileJeopardySeasonsView.swift */; };
 		8BFBF1B62935A5D40024174F /* ExploreViewModel+Sort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B52935A5D40024174F /* ExploreViewModel+Sort.swift */; };
 		8BFBF1B82935A6080024174F /* ExploreViewModel+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B72935A6080024174F /* ExploreViewModel+Search.swift */; };
-		8BFBF1BA2935BD5E0024174F /* Trivio Launch Screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B92935BD5E0024174F /* Trivio Launch Screen.png */; };
+		8BFBF1BC2936FF270024174F /* MobileAdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1BB2936FF270024174F /* MobileAdminView.swift */; };
+		8BFBF1BE2937820E0024174F /* Trivio Launch Screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */; };
 		8BFC125C26A152F100D3E513 /* MySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125B26A152F100D3E513 /* MySetsView.swift */; };
 		8BFC126426A15A0A00D3E513 /* ReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125F26A1591F00D3E513 /* ReportViewModel.swift */; };
 		8BFC126526A15A0A00D3E513 /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125E26A1591F00D3E513 /* ExploreViewModel.swift */; };
@@ -408,12 +407,11 @@
 		8BEDCBEC26A6139A00E89359 /* TeamBuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamBuildView.swift; sourceTree = "<group>"; };
 		8BEDCBEF26A6912700E89359 /* GameGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameGridView.swift; sourceTree = "<group>"; };
 		8BEDCBF226A7983F00E89359 /* DuplexWagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplexWagerView.swift; sourceTree = "<group>"; };
-		8BFBF1AE293560C40024174F /* Trivio Splash Logo.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "Trivio Splash Logo.svg"; sourceTree = "<group>"; };
-		8BFBF1B0293560D10024174F /* Trivio Splash BG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Trivio Splash BG.png"; sourceTree = "<group>"; };
 		8BFBF1B229358A6B0024174F /* MobileJeopardySeasonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileJeopardySeasonsView.swift; sourceTree = "<group>"; };
 		8BFBF1B52935A5D40024174F /* ExploreViewModel+Sort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExploreViewModel+Sort.swift"; sourceTree = "<group>"; };
 		8BFBF1B72935A6080024174F /* ExploreViewModel+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExploreViewModel+Search.swift"; sourceTree = "<group>"; };
-		8BFBF1B92935BD5E0024174F /* Trivio Launch Screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Trivio Launch Screen.png"; sourceTree = "<group>"; };
+		8BFBF1BB2936FF270024174F /* MobileAdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAdminView.swift; sourceTree = "<group>"; };
+		8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Trivio Launch Screen.png"; sourceTree = "<group>"; };
 		8BFC125B26A152F100D3E513 /* MySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySetsView.swift; sourceTree = "<group>"; };
 		8BFC125E26A1591F00D3E513 /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
 		8BFC125F26A1591F00D3E513 /* ReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportViewModel.swift; sourceTree = "<group>"; };
@@ -670,6 +668,7 @@
 				8BA62BB2293463B40010835A /* MobileJeopardySetsView.swift */,
 				8B88EAC026AD1ABB001C5C2C /* MobileUserView.swift */,
 				8BA62BAC292D857A0010835A /* MobileViewAllSetsView.swift */,
+				8BFBF1BB2936FF270024174F /* MobileAdminView.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -735,9 +734,7 @@
 			isa = PBXGroup;
 			children = (
 				8B80C7D32666D27600ED942A /* Trivio!.entitlements */,
-				8BFBF1AE293560C40024174F /* Trivio Splash Logo.svg */,
-				8BFBF1B92935BD5E0024174F /* Trivio Launch Screen.png */,
-				8BFBF1B0293560D10024174F /* Trivio Splash BG.png */,
+				8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */,
 				8BC53835265B5DFA0099D05B /* Shared */,
 				8BC5383F265B5DFF0099D05B /* iOS */,
 				8BC53846265B5DFF0099D05B /* macOS */,
@@ -1120,10 +1117,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8BFBF1B1293560D10024174F /* Trivio Splash BG.png in Resources */,
 				8B80C7D52666E12100ED942A /* LaunchScreen.storyboard in Resources */,
 				8BEAE4C32696744F00BF932C /* Metropolis-RegularItalic.otf in Resources */,
-				8BFBF1BA2935BD5E0024174F /* Trivio Launch Screen.png in Resources */,
 				8BEAE4C62696744F00BF932C /* Metropolis-Regular.otf in Resources */,
 				8B80C7D82667072000ED942A /* GoogleService-Info.plist in Resources */,
 				8BEAE4F92697EF0800BF932C /* Metropolis-ExtraBoldItalic.otf in Resources */,
@@ -1131,7 +1126,7 @@
 				8BEAE4C42696744F00BF932C /* Metropolis-Medium.otf in Resources */,
 				8BEAE4C52696744F00BF932C /* Metropolis-Bold.otf in Resources */,
 				8BEAE4C22696744F00BF932C /* Metropolis-ExtraBold.otf in Resources */,
-				8BFBF1AF293560C40024174F /* Trivio Splash Logo.svg in Resources */,
+				8BFBF1BE2937820E0024174F /* Trivio Launch Screen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1336,6 +1331,7 @@
 				8BEAE4DE2697A75100BF932C /* ExploreView.swift in Sources */,
 				8BA62BA32927061E0010835A /* BuildViewModel+Categories.swift in Sources */,
 				8B88EAE026AD1F12001C5C2C /* MobileClueView.swift in Sources */,
+				8BFBF1BC2936FF270024174F /* MobileAdminView.swift in Sources */,
 				8BA62B94292701550010835A /* KeyboardAdapt.swift in Sources */,
 				8BA62B8C29262B1A0010835A /* AppStoreManager.swift in Sources */,
 				8BEAE4C92696794800BF932C /* Color.swift in Sources */,

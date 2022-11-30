@@ -91,7 +91,6 @@ struct MobileIndividualPlayerView: View {
         .onTapGesture {
             if !(participantsVM.selectedTeam == team) {
                 participantsVM.setSelectedTeam(index: team.index)
-                print(participantsVM.teams[team.index].score)
             }
         }
         .onAppear {

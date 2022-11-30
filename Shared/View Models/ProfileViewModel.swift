@@ -21,6 +21,9 @@ class ProfileViewModel: ObservableObject {
     @Published var showingSettingsView = false
     @Published var settingsMenuSelectedItem = "Game Settings"
     @Published var myUserRecords = MyUserRecords()
+    @Published var allUserRecords = [MyUserRecords]()
+    
+    @Published var currentVIPs = [String:String]()
     
     private var db = Firestore.firestore()
     public var myUID = Auth.auth().currentUser?.uid
@@ -32,15 +35,15 @@ class ProfileViewModel: ObservableObject {
     
     func markAsPlayed(gameID: String) {
         guard let myUID = myUID else { return }
-        let playedRef = db.collection("users").document(myUID).collection("played")
-        
-        playedRef.whereField("gameID", isEqualTo: gameID).getDocuments { (snap, error) in
+        let playedRef = db.collection("users").document(myUID).collection("played").document(gameID)
+        playedRef.getDocument { (docSnap, error) in
             if error != nil {
+                print(error!.localizedDescription)
                 return
             }
-            guard let documentExists = snap?.documents.first?.exists else { return }
-            if !documentExists {
-                playedRef.addDocument(data: [
+            guard let doc = docSnap else { return }
+            if !doc.exists {
+                playedRef.setData([
                     "gameID" : gameID
                 ])
             }
@@ -119,6 +122,26 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    private func pullAllVIPs() {
+        db.collectionGroup("myUserRecords").getDocuments { (snap, error) in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            data.forEach { docSnap in
+                guard let username = docSnap.get("username") as? String else { return }
+                guard let isVIP = docSnap.get("isVIP") as? Bool else { return }
+                guard isVIP else { return }
+                self.db.collection("users").whereField("username", isEqualTo: username).getDocuments { (snap, error) in
+                    if error != nil { return }
+                    guard let data = snap?.documents else { return }
+                    guard let firstDoc = data.first else { return }
+                    guard let username = firstDoc.get("username") as? String else { return }
+                    guard let name = firstDoc.get("name") as? String else { return }
+                    self.currentVIPs[username] = name
+                }
+            }
+        }
+    }
+    
     private func pullUserRecordsData() {
         guard let myUID = myUID else { return }
         let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
@@ -128,10 +151,15 @@ class ProfileViewModel: ObservableObject {
             }
             guard let doc = docSnap else { return }
             if !doc.exists {
-                try? cherryUpdatesDocRef.setData(from: MyUserRecordsCherry())
+                self.db.collection("users").document(myUID).getDocument(completion: { (docSnap, error) in
+                    if error != nil { return }
+                    guard let doc = docSnap else { return }
+                    let username = doc.get("username") as! String
+                    var newUserRecord = MyUserRecordsCherry()
+                    newUserRecord.username = username
+                    try? cherryUpdatesDocRef.setData(from: newUserRecord)
+                })
             } else {
-                // I like this deserialization strat enough for now. I may change it in the future if I learn something new
-                // I just learned something new 2 days later
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "LLLL"
                 
@@ -147,10 +175,36 @@ class ProfileViewModel: ObservableObject {
                     } else {
                         self.myUserRecords.assignFromMURCherry(myUserRecordsCherry: myUserRecordsCherry)
                     }
-                    self.updateMyUserRecords(fieldName: "mostRecentSession", newValue: Date())
+                    self.updateMostRecentSession()
+                    self.incrementNumSessions()
+                    if self.myUserRecords.isAdmin { self.pullAllVIPs() }
+                }
+                if myUserRecordsCherry.isAdmin {
+                    self.pullAllUserRecords()
                 }
             }
         })
+    }
+    
+    private func pullAllUserRecords() {
+        db.collection("userSessions").order(by: "mostRecentSession").limit(to: 50).getDocuments { (snap, error) in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            let userSessionIDs = data.compactMap({ (docSnap) -> String in
+                return docSnap.documentID
+            })
+            userSessionIDs.forEach { userID in
+                self.db.collection("users").document(userID).collection("myUserRecords").document("myUserRecordsCherry").getDocument { (docSnap, error) in
+                    if error != nil {
+                        return
+                    }
+                    guard let myUserRecordCherry = try? docSnap?.data(as: MyUserRecordsCherry.self) else { return }
+                    var userRecord = MyUserRecords()
+                    userRecord.assignFromMURCherry(myUserRecordsCherry: myUserRecordCherry)
+                    self.allUserRecords.append(userRecord)
+                }
+            }
+        }
     }
     
     public func updateMyUserRecords(fieldName: String, newValue: Any) {
@@ -158,6 +212,17 @@ class ProfileViewModel: ObservableObject {
         let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
         cherryUpdatesDocRef.setData([
             fieldName : newValue
+        ], merge: true)
+    }
+    
+    public func updateMostRecentSession() {
+        guard let myUID = myUID else { return }
+        let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
+        cherryUpdatesDocRef.setData([
+            "mostRecentSession" : Date()
+        ], merge: true)
+        db.collection("userSessions").document(myUID).setData([
+            "mostRecentSession" : Date()
         ], merge: true)
     }
     
@@ -200,6 +265,15 @@ class ProfileViewModel: ObservableObject {
             "numLiveTokens" : FieldValue.increment(Int64(1)),
         ], merge: true)
         self.myUserRecords.numLiveTokens += 1
+    }
+    
+    public func incrementNumSessions() {
+        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        let usersRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
+        usersRef.setData([
+            "numTrackedSessions" : FieldValue.increment(Int64(1)),
+        ], merge: true)
+        self.myUserRecords.numTrackedSessions += 1
     }
     
     func writeKeyValueToFirestore(key: String, value: Any) {

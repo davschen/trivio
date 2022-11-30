@@ -100,11 +100,11 @@ struct MobileBuildAllCategoryView: View {
                                     .font(formatter.font(.boldItalic, fontSize: .medium))
                                     .foregroundColor(formatter.color(.lowContrastWhite))
                             }
-                            MobilePaddedTextField(text: $categoryName) {
-                                print("MobilePaddedTextField : Done")
+                            TextField("", text: $categoryName) {
                                 formatter.resignKeyboard()
                                 category.name = categoryName
                             }
+                            .padding(.vertical, 20)
                         }
                         Button {
                             formatter.resignKeyboard()
@@ -407,7 +407,7 @@ struct MobileBuildAllCluePreviewView: View {
             } else {
                 VStack (alignment: .leading, spacing: 0) {
                     Text("\(category.name.uppercased()) for \(buildVM.moneySections[buildVM.editingClueIndex])")
-                        .font(formatter.font(.bold, fontSize: .regular))
+                        .font(formatter.font(.regular, fontSize: .regular))
                         .id(category.name)
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)

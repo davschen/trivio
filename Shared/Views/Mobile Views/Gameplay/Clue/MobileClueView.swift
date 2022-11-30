@@ -25,6 +25,7 @@ struct MobileClueView: View {
         } else {
             MobileDraggableClueResponseView(wager: $wager, ddWagerMade: $ddWagerMade)
                 .transition(AnyTransition.move(edge: .bottom))
+                .animation(.easeInOut(duration: 0.2))
             if !profileVM.myUserRecords.hasShownSwipeToDismissClue {
                 MobileClueDismissTutorialView()
             }
@@ -36,6 +37,7 @@ struct MobileDraggableClueResponseView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @Binding var wager: Double
     @Binding var ddWagerMade: Bool
@@ -66,7 +68,8 @@ struct MobileDraggableClueResponseView: View {
                                 yOffset = log2(gesture.translation.height * 7000)
                             }
                             if yOffset >= 20 && hapticWillTrigger {
-                                formatter.hapticFeedback(style: .heavy)
+                                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                                formatter.speaker.stop()
                                 hapticWillTrigger.toggle()
                             }
                         }
@@ -88,12 +91,18 @@ struct MobileDraggableClueResponseView: View {
             participantsVM.addSolved()
         }
         if gamesVM.doneWithRound() {
-            if gamesVM.gamePhase == .round1 {
+            if gamesVM.gamePhase == .round1 && gamesVM.customSet.hasTwoRounds {
                 gamesVM.moveOntoRound2()
                 participantsVM.changeDJTeam()
             } else {
                 gamesVM.gamePhase = .finalRound
             }
+        }
+        if !profileVM.myUserRecords.hasShownHeldClueCell {
+            formatter.setAlertSettings(alertAction: {
+                profileVM.updateMyUserRecords(fieldName: "hasShownHeldClueCell", newValue: true)
+                profileVM.myUserRecords.hasShownHeldClueCell = true
+            }, alertType: .tip, alertTitle: "Some advice", alertSubtitle: "If you'd like to bring back a clue, just hold down on the empty grid cell for a few seconds", hasCancel: false, actionLabel: "Got it")
         }
         participantsVM.progressGame()
         showResponse = false
@@ -162,7 +171,7 @@ struct MobileModernClueResponseView: View {
                 VStack (spacing: 25) {
                     // Category name and amount
                     HStack (alignment: .top) {
-                        VStack (alignment: .center, spacing: 5) {
+                        VStack (alignment: .leading, spacing: 5) {
                             if gamesVM.currentSelectedClue.isDailyDouble {
                                 Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Duplex)")
                                 Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
@@ -174,6 +183,7 @@ struct MobileModernClueResponseView: View {
                         .font(formatter.font())
                         Spacer()
                         Button {
+                            formatter.speaker.stop()
                             progressGame()
                         } label: {
                             Image(systemName: "xmark")
@@ -222,7 +232,7 @@ struct MobileModernClueResponseView: View {
                             .transition(.slide)
                     }
                     Button {
-                        formatter.hapticFeedback(style: .soft, intensity: .strong)
+                        formatter.hapticFeedback(style: .soft, intensity: .normal)
                         showResponse.toggle()
                     } label: {
                         Text("\(self.showResponse ? "Hide" : "Show") Response")
@@ -263,7 +273,7 @@ struct MobileClassicClueResponseView: View {
         VStack {
             MobileClueCountdownTimerView(usedBlocks: $usedBlocks)
             VStack (alignment: .leading, spacing: 0) {
-                VStack (alignment: .leading, spacing: 5) {
+                VStack (alignment: .center, spacing: 5) {
                     if gamesVM.currentSelectedClue.isDailyDouble {
                         Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Duplex)")
                         Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
@@ -311,6 +321,7 @@ struct MobileClassicClueResponseView: View {
                             .transition(.slide)
                     }
                     Button {
+                        formatter.hapticFeedback(style: .light, intensity: .normal)
                         showResponse.toggle()
                     } label: {
                         Text(showResponse ? "Hide Response" : "Show Response")

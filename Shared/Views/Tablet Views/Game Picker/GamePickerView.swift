@@ -173,7 +173,7 @@ struct SeasonsListView: View {
                 .background(formatter.color(.secondaryAccent).opacity(gamesVM.selectedSeason == seasonID ? 1 : 0))
                 .cornerRadius(5)
                 .onTapGesture {
-                    self.gamesVM.getEpisodes(seasonID: seasonID)
+                    self.gamesVM.getEpisodes(seasonID: seasonID, purge: true)
                     self.gamesVM.clearAll()
                     self.gamesVM.previewViewShowing = false
                 }

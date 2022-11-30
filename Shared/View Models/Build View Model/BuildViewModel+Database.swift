@@ -28,6 +28,8 @@ extension BuildViewModel {
         self.dirtyBit = 0
         if !self.currCustomSet.isDraft {
             self.db.collection("drafts").document(currCustomSetID).delete()
+        } else {
+            self.db.collection("userSets").document(currCustomSetID).delete()
         }
     }
     
@@ -152,6 +154,7 @@ extension BuildViewModel {
                 self.categories = self.jCategories
                 self.round1CatsShowing = [Bool](repeating: true, count: customSet.round1Len) + [Bool](repeating: false, count: 6 - customSet.round1Len)
                 self.round2CatsShowing = [Bool](repeating: true, count: customSet.round2Len) + [Bool](repeating: false, count: 6 - customSet.round2Len)
+                self.determineMostAdvancedStage()
             }
         }
     }

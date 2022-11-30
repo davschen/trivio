@@ -11,6 +11,8 @@ import SwiftUI
 struct MobileCustomSetsView: View {
     @Binding var customSets: [CustomSetCherry]
     
+    var emptyLabelString: String = "No sets yet! When you make a set, it’ll show up here."
+    
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
             if customSets.count > 0 {
@@ -24,8 +26,8 @@ struct MobileCustomSetsView: View {
                     }
                 }
             } else {
-                MobileEmptyListView(label: "Nothing yet! When you make a set, it’ll show up here.")
-                    .padding()
+                MobileEmptyListView(label: emptyLabelString)
+                    .padding(.horizontal)
             }
         }
         .keyboardAware()
@@ -72,7 +74,13 @@ struct MobileCustomSetCellView: View {
                     .font(formatter.font(.regular))
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
                     .font(formatter.font(.regular))
-                    .foregroundColor(formatter.color(.lowContrastWhite))
+                    .foregroundColor(formatter.color(.mediumContrastWhite))
+                    .lineLimit(1)
+                Text("\(customSet.description)")
+                    .font(formatter.font(.regular))
+                    .foregroundColor(formatter.color(customSet.description.isEmpty ? .secondaryFG : .lowContrastWhite))
+                    .lineLimit(1)
+                    .frame(height: 20)
                     .padding(.bottom, 5)
                 HStack (spacing: 10) {
                     ZStack {
@@ -95,6 +103,7 @@ struct MobileCustomSetCellView: View {
                     VStack (alignment: .leading, spacing: 2) {
                         Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
                             .font(formatter.font(.regular))
+                            .lineLimit(1)
                         HStack {
                             Text("\(customSet.plays) \(customSet.plays == 1 ? "play" : "plays")")
                             Circle()
@@ -112,8 +121,8 @@ struct MobileCustomSetCellView: View {
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()
         }
-        .padding(.horizontal, 15).padding(.vertical, 20)
-        .frame(width: 250, height: 145, alignment: .leading)
+        .padding()
+        .frame(width: 280, alignment: .leading)
         .background(formatter.color(.secondaryFG))
         .cornerRadius(10)
         .contentShape(Rectangle())

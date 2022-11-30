@@ -49,7 +49,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Trivio Launch Screen" width="395" height="844"/>
+        <image name="Trivio Launch Screen" width="390" height="844"/>
         <namedColor name="MainAccent">
             <color red="0.9570000171661377" green="0.88200002908706665" blue="0.49000000953674316" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

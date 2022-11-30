@@ -39,6 +39,7 @@ struct MobileMyCustomSetsView: View {
             }
         }
         .keyboardAware()
+        .animation(.easeInOut(duration: 0.2))
     }
 }
 

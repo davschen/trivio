@@ -62,7 +62,7 @@ struct MobileBuildHUDView: View {
                 }
             Rectangle()
                 .fill(formatter.color(.primaryAccent))
-                .frame(width: 7, height: 50)
+                .frame(width: 10, height: 50)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -99,7 +99,7 @@ struct MobileBuildHUDView: View {
                     }
                 Rectangle()
                     .fill(formatter.color(.primaryAccent))
-                    .frame(width: 7, height: 50)
+                    .frame(width: 10, height: 50)
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 5)
@@ -115,7 +115,7 @@ struct MobileBuildHUDView: View {
                         }
                     }
             }
-            Text("Final Round")
+            Text("Final Clue")
                 .font(formatter.font(fontSize: .small))
                 .frame(maxWidth: .infinity)
                 .frame(height: 50)
@@ -128,6 +128,7 @@ struct MobileBuildHUDView: View {
                 .opacity(getBuildStageIndex(.finalTrivio) <= mostAdvancedStageIndex ? 1 : 0.4)
                 .onTapGesture {
                     if getBuildStageIndex(.finalTrivio) <= mostAdvancedStageIndex {
+                        formatter.hapticFeedback(style: .rigid)
                         buildVM.buildStage = .finalTrivio
                         buildVM.currentDisplay = .finalTrivio
                     }

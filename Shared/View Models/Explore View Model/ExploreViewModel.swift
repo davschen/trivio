@@ -38,13 +38,12 @@ class ExploreViewModel: ObservableObject {
     @Published var isShowingUserView = false
     @Published var usernameIDDict = [String:String]()
     @Published var nameIDDict = [String:String]()
+    @Published var queriedUserRecords = [MyUserRecords]()
     
     public var db = Firestore.firestore()
     
     private var latestPublicDoc: DocumentSnapshot? = nil
-    private var fetchingMorePublicData = false
     private var latestPrivateDoc: DocumentSnapshot? = nil
-    private var fetchingMorePrivateData = false
     
     public var currentSort: String {
         if filterBy == "dateCreated" && isDescending == true {
@@ -99,14 +98,13 @@ class ExploreViewModel: ObservableObject {
         return initials.uppercased()
     }
     
-    public func pullAllPublicSets() {
+    public func pullAllPublicSets(isAppending: Bool = true) {
         // Is it a bit janky to limit to 10,000? Yes. I will never have 10,000 sets on my app, however.
         // When I do, I will be rich and I will sell this app to Kahoot or whomever and be even richer
-        fetchingMorePublicData = true
         var query: Query!
 
-        if allPublicSets.isEmpty {
-            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 20)
+        if allPublicSets.isEmpty || !isAppending {
+            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 10)
         } else {
             query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).start(afterDocument: latestPublicDoc!).limit(to: 10)
         }
@@ -114,9 +112,6 @@ class ExploreViewModel: ObservableObject {
         query.getDocuments { (snap, error) in
             if let error = error {
                 print("\(error.localizedDescription)")
-            } else if snap!.isEmpty {
-                self.fetchingMorePublicData = false
-                return
             } else {
                 guard let data = snap?.documents else { return }
                 let newPublicSets = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
@@ -134,22 +129,16 @@ class ExploreViewModel: ObservableObject {
                     }
                 })
                 self.allPublicSets.append(contentsOf: newPublicSets)
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                    self.fetchingMorePublicData = false
-                })
-
                 self.latestPublicDoc = data.last
             }
         }
     }
     
     public func pullAllPrivateSets(isLimitingTo20: Bool = true) {
-        fetchingMorePrivateData = true
         var query: Query!
 
         if allPrivateSets.isEmpty {
-            query = db.collection("userSets").whereField("isPublic", isEqualTo: false).order(by: filterBy, descending: isDescending).limit(to: 20)
+            query = db.collection("userSets").whereField("isPublic", isEqualTo: false).order(by: filterBy, descending: isDescending).limit(to: 10)
         } else {
             query = db.collection("userSets").whereField("isPublic", isEqualTo: false).order(by: filterBy, descending: isDescending).start(afterDocument: latestPrivateDoc!).limit(to: 10)
         }
@@ -157,9 +146,6 @@ class ExploreViewModel: ObservableObject {
         query.getDocuments { (snap, error) in
             if let error = error {
                 print("\(error.localizedDescription)")
-            } else if snap!.isEmpty {
-                self.fetchingMorePrivateData = false
-                return
             } else {
                 guard let data = snap?.documents else { return }
                 let newPrivateSets = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
@@ -177,11 +163,6 @@ class ExploreViewModel: ObservableObject {
                     }
                 })
                 self.allPrivateSets.append(contentsOf: newPrivateSets)
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-                    self.fetchingMorePrivateData = false
-                })
-
                 self.latestPrivateDoc = data.last
             }
         }
@@ -202,6 +183,41 @@ class ExploreViewModel: ObservableObject {
                     self.addToRecentlyPlayed(customSetID: playedGameID)
                 }
             }
+        }
+    }
+    
+    public func queryUserRecord(username: String) {
+        self.queriedUserRecords.removeAll()
+        db.collection("users").whereField("username", isEqualTo: username).getDocuments { (snap, error) in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            let userIDs = data.compactMap({ (queryDocSnap) -> String in
+                return queryDocSnap.documentID
+            })
+            
+            userIDs.forEach { userID in
+                self.db.collection("users").document(userID).collection("myUserRecords").document("myUserRecordsCherry").getDocument { (docSnap, error) in
+                    if error != nil { return }
+                    guard let myUserRecordsCherry = try? docSnap?.data(as: MyUserRecordsCherry.self) else { return }
+                    var userRecord = MyUserRecords()
+                    userRecord.assignFromMURCherry(myUserRecordsCherry: myUserRecordsCherry)
+                    self.queriedUserRecords.append(userRecord)
+                }
+            }
+        }
+    }
+    
+    public func toggleUserRecordIsVIP(username: String) {
+        guard username == queriedUserRecords.first?.username else { return }
+        queriedUserRecords[0].isVIP.toggle()
+        db.collection("users").whereField("username", isEqualTo: username).getDocuments { (snap, error) in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            guard let docID = data.first?.documentID else { return }
+            guard let currentIsVIP = self.queriedUserRecords.first?.isVIP else { return }
+            self.db.collection("users").document(docID).collection("myUserRecords").document("myUserRecordsCherry").setData([
+                "isVIP" : currentIsVIP
+            ], merge: true)
         }
     }
     

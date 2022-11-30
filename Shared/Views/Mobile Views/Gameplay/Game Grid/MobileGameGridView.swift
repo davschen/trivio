@@ -14,65 +14,58 @@ struct MobileGameGridView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     var body: some View {
-        ScrollViewReader { scrollView in
-            ScrollView (.horizontal, showsIndicators: false) {
-                VStack (spacing: 0) {
-                    // Horizontal arrangement of category names
-                    HStack (spacing: 5) {
-                        ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
-                            let category: String = gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats[i] : gamesVM.tidyCustomSet.round2Cats[i]
-                            
-                            ZStack {
-                                formatter.color(gamesVM.finishedCategories[i] ? .primaryFG : .primaryAccent)
-                                Text("\(gamesVM.finishedCategories[i] ? "" : category.uppercased())")
-                                    .font(formatter.font(.bold, fontSize: .medium))
-                                    .foregroundColor(formatter.color(.highContrastWhite))
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 10)
-                                    .frame(maxWidth: .infinity)
-                                    .minimumScaleFactor(0.1)
-                            }
-                            .frame(width: 160, height: 90)
-                            .cornerRadius(10)
+        ScrollView (.horizontal, showsIndicators: false) {
+            VStack (spacing: 0) {
+                // Horizontal arrangement of category names
+                HStack (spacing: 5) {
+                    ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
+                        let category: String = gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats[i] : gamesVM.tidyCustomSet.round2Cats[i]
+                        
+                        ZStack {
+                            formatter.color(gamesVM.finishedCategories[i] ? .primaryFG : .primaryAccent)
+                            Text("\(gamesVM.finishedCategories[i] ? "" : category.uppercased())")
+                                .font(formatter.font(.bold, fontSize: .medium))
+                                .foregroundColor(formatter.color(.highContrastWhite))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 10)
+                                .frame(maxWidth: .infinity)
+                                .minimumScaleFactor(0.1)
                         }
-                    }
-                    .padding(.bottom, 5)
-
-                    // Clues grid
-                    HStack (spacing: 5) {
-                        Spacer()
-                            .frame(width: 12)
-                        ForEach(gamesVM.categories.indices, id: \.self) { categoryIndex in
-                            VStack (spacing: 4) {
-                                ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { clueIndex in
-                                    MobileGameCellView(categoryIndex: categoryIndex, clueIndex: clueIndex)
-                                        .frame(width: 160)
-                                        .frame(maxHeight: .infinity)
-                                        .shadow(color: Color.black.opacity(0.2), radius: 10)
-                                        .onTapGesture {
-                                            gameCellTapped(categoryIndex: categoryIndex, clueIndex: clueIndex)
-                                        }
-                                        .onLongPressGesture {
-                                            gamesVM.modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex, newBool: false)
-                                        }
-                                }
-                            }
-                        }
-                        Spacer()
-                            .frame(width: 12)
+                        .frame(width: 160, height: 90)
+                        .cornerRadius(10)
                     }
                 }
-            }
-            .onAppear {
-                if gamesVM.currentCategoryIndex != 0 {
-                    scrollView.scrollTo(gamesVM.currentCategoryIndex, anchor: gamesVM.getUnitPoint())
+                .padding(.bottom, 5)
+
+                // Clues grid
+                HStack (spacing: 5) {
+                    Spacer()
+                        .frame(width: 12)
+                    ForEach(gamesVM.categories.indices, id: \.self) { categoryIndex in
+                        VStack (spacing: 4) {
+                            ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { clueIndex in
+                                MobileGameCellView(categoryIndex: categoryIndex, clueIndex: clueIndex)
+                                    .frame(width: 160)
+                                    .frame(maxHeight: .infinity)
+                                    .shadow(color: Color.black.opacity(0.2), radius: 10)
+                                    .onTapGesture {
+                                        gameCellTapped(categoryIndex: categoryIndex, clueIndex: clueIndex)
+                                    }
+                                    .onLongPressGesture {
+                                        gamesVM.modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex, completed: false)
+                                    }
+                            }
+                        }
+                    }
+                    Spacer()
+                        .frame(width: 12)
                 }
             }
         }
     }
     
     func gameCellTapped(categoryIndex: Int, clueIndex: Int) {
-        if !gamesVM.finishedClues2D[categoryIndex][clueIndex] {
+        if gamesVM.finishedClues2D[categoryIndex][clueIndex] == .incomplete {
             formatter.hapticFeedback(style: .rigid)
             gamesVM.setCurrentSelectedClue(categoryIndex: categoryIndex, clueIndex: clueIndex)
             participantsVM.setDefaultIndex()
@@ -93,23 +86,23 @@ struct MobileGameCellView: View {
     
     var body: some View {
         ZStack {
-            formatter.color(isComplete() ? .primaryFG : .primaryAccent)
+            formatter.color(isIncomplete() ? .primaryAccent : .primaryFG)
             Text("\(gamesVM.pointValueArray[clueIndex])")
                 .font(formatter.font(.bold, fontSize: .jumbo))
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .shadow(color: Color.black.opacity(0.2), radius: 5)
                 .multilineTextAlignment(.center)
-                .opacity(isComplete() ? 0 : 1)
+                .opacity(isIncomplete() ? 1 : 0)
                 .minimumScaleFactor(0.1)
         }
         .cornerRadius(10)
     }
     
-    func isComplete() -> Bool {
+    func isIncomplete() -> Bool {
         if categoryIndex >= gamesVM.categories.count {
             return false
         }
-        return gamesVM.finishedClues2D[categoryIndex][clueIndex]
+        return gamesVM.finishedClues2D[categoryIndex][clueIndex] == .incomplete
     }
 }
 

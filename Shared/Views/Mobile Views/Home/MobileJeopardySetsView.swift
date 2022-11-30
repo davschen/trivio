@@ -15,7 +15,7 @@ struct MobileJeopardySetsView: View {
     @Binding var jeopardySeasonsViewActive: Bool
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 5) {
+        VStack (alignment: .leading, spacing: 10) {
             HStack {
                 Text("Jeopardy! Sets")
                 Spacer()

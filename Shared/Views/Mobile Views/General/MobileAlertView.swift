@@ -18,6 +18,7 @@ struct MobileAlertView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var searchVM: SearchViewModel
     
+    var alertType: AlertType = .warning
     var alertStyle: AlertStyle
     var titleText = ""
     var subtitleText = ""
@@ -53,7 +54,7 @@ struct MobileAlertView: View {
                         
                         VStack (spacing: 5) {
                             VStack (spacing: 10) {
-                                Image(systemName: "exclamationmark.triangle")
+                                Image(systemName: alertType == .warning ? "exclamationmark.triangle" : "sparkles")
                                     .font(.system(size: 26))
                                     .padding(.bottom, 5)
                                 Text(titleText)
@@ -113,4 +114,8 @@ struct MobileAlertView: View {
             .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height + 100)
         }
     }
+}
+
+enum AlertType {
+    case warning, tip
 }

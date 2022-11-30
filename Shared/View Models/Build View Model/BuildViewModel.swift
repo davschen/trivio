@@ -223,7 +223,7 @@ class BuildViewModel: ObservableObject {
         case .dtRoundDD:
             stepString = "Double Trivio! Round Duplexes"
         case .finalTrivio:
-            stepString = "Final Trivio! Round"
+            stepString = "Final Trivio! Clue"
         default:
             stepString = "Finishing Touches"
         }
@@ -428,30 +428,6 @@ class BuildViewModel: ObservableObject {
             djCategories[categoryIndex].clues[swapToIndex] = tempClue
             djCategories[categoryIndex].responses[swapToIndex] = tempResponse
         }
-    }
-}
-
-struct MobileBuildStageIndexDict {
-    var dict: [BuildStage:Int] = [
-        .details: 0,
-        .trivioRound: 1,
-        .trivioRoundDD: 2,
-        .dtRound: 3,
-        .dtRoundDD: 4,
-        .finalTrivio: 5
-    ]
-    
-    var reverseDict: [Int:BuildStage] = [
-        0 : .details,
-        1 : .trivioRound,
-        2 : .trivioRoundDD,
-        3 : .dtRound,
-        4 : .dtRoundDD,
-        5 : .finalTrivio
-    ]
-    
-    func getIndex(from buildStage: BuildStage) -> Int {
-        return dict[buildStage] ?? 0
     }
 }
 
