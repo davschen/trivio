@@ -17,7 +17,6 @@ struct MobileContentView: View {
     @ObservedObject var profileVM = ProfileViewModel()
     @ObservedObject var reportVM = ReportViewModel()
     @ObservedObject var searchVM = SearchViewModel()
-    @ObservedObject var dtVM = DailyTrivioViewModel()
     @ObservedObject var appStoreManager = AppStoreManager()
     
     var body: some View {
@@ -34,7 +33,6 @@ struct MobileContentView: View {
                     .environmentObject(profileVM)
                     .environmentObject(reportVM)
                     .environmentObject(searchVM)
-                    .environmentObject(dtVM)
                     .environmentObject(appStoreManager)
                 MobileAlertView(alertType: formatter.alertType, alertStyle: .standard, titleText: formatter.alertTitle, subtitleText: formatter.alertSubtitle, hasCancel: formatter.hasCancel, actionLabel: formatter.actionLabel, action: {
                     formatter.alertAction()

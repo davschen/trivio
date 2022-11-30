@@ -53,7 +53,7 @@ struct MobileGamePreviewView: View {
             }
             
             NavigationLink(isActive: $isPresentingGameView, destination: {
-                MobileGameplayView()
+                MobileGameBoardView()
             }, label: { EmptyView() })
             .isDetailLink(false)
             .hidden()

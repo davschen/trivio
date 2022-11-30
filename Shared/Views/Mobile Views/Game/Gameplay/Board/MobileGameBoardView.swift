@@ -1,5 +1,5 @@
 //
-//  MobileGameplayView.swift
+//  MobileGameBoardView.swift
 //  Trivio!
 //
 //  Created by David Chen on 7/24/21.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct MobileGameplayView: View {
+struct MobileGameBoardView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
@@ -23,7 +23,7 @@ struct MobileGameplayView: View {
             VStack (spacing: 10) {
                 MobileGameplayHeaderView(showInfoView: $showInfoView)
                     .padding(.horizontal)
-                MobilePlayersView()
+                MobileGamePlayersView()
                     .padding(.horizontal)
                 MobileGameplayGridView(showInfoView: $showInfoView)
             }
@@ -63,7 +63,7 @@ struct MobileGameplayGridView: View {
                     }
                 }
             }
-            MobileInfoView(showInfoView: $showInfoView)
+            MobileGameInfoView(showInfoView: $showInfoView)
         }
     }
 }
@@ -118,7 +118,7 @@ struct MobileGameplayHeaderView: View {
             }
             // Progress bar
             if gamesVM.gamePhase == .round1 || gamesVM.gamePhase == .round2 {
-                VStack {
+                VStack (spacing: 7) {
                     GeometryReader { geometry in
                         ZStack (alignment: .leading) {
                             Capsule()

@@ -1,5 +1,5 @@
 //
-//  MobilePlayersView.swift
+//  MobileGamePlayersView.swift
 //  Trivio!
 //
 //  Created by David Chen on 7/24/21.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import MovingNumbersView
 
-struct MobilePlayersView: View {
+struct MobileGamePlayersView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
