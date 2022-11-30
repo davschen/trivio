@@ -72,7 +72,7 @@ struct MobileFinalTrivioUserFlowView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(formatter.color(.primaryAccent))
                     .cornerRadius(10)
-                    .padding(10)
+                    .padding([.horizontal, .top], 10)
                     
                     VStack (spacing: 5) {
                         HStack {
@@ -94,8 +94,7 @@ struct MobileFinalTrivioUserFlowView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        Spacer(minLength: 10)
-                        
+                        Spacer(minLength: 5)
                         VStack (spacing: 15) {
                             // Each player's textbox for entering wagers
                             ForEach(participantsVM.teams, id: \.self) { team in

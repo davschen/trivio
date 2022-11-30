@@ -94,7 +94,7 @@ struct MobileGameplayHeaderView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
-            HStack {
+            HStack (spacing: 7) {
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     presentationMode.wrappedValue.dismiss()
@@ -104,15 +104,16 @@ struct MobileGameplayHeaderView: View {
                         .font(.system(size: 20))
                 }
                 Text("\(headerString)")
-                    .font(formatter.font(fontSize: .semiLarge))
+                    .font(formatter.fontFloat(.bold, sizeFloat: 24))
                     .lineLimit(1)
+                    .offset(y: 1)
                 Spacer()
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     showInfoView.toggle()
                 } label: {
                     Image(systemName: showInfoView ? "info.circle.fill" : "info.circle")
-                        .font(.system(size: 18))
+                        .font(.system(size: 20))
                 }
             }
             // Progress bar
@@ -170,7 +171,7 @@ struct MobileContinueToFinalTrivioView: View {
                     gamesVM.finalTrivioStage = .makeWager
                 }, label: {
                     HStack (spacing: 15) {
-                        Text("Continue to Final Trivio!")
+                        Text("On to Final Clue")
                         Image(systemName: "arrow.right.circle.fill")
                             .font(formatter.iconFont(.mediumLarge))
                             .offset(x: finalTrivioLoading ? 15 : 0)

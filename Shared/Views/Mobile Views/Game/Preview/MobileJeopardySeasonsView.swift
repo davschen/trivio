@@ -111,7 +111,7 @@ struct MobileJeopardySeasonEpisodesView: View {
             .withBackground()
             .edgesIgnoringSafeArea(.bottom)
             
-            NavigationLink(destination: MobileGameSettingsView()
+            NavigationLink(destination: MobileGamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()

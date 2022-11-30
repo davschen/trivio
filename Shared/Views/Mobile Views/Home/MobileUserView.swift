@@ -104,7 +104,7 @@ struct MobileUserCustomSetCellView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(formatter.color(exploreVM.recentlyPlayedSets.contains(customSet) ? .primaryFG : .secondaryFG))
             
-            NavigationLink(destination: MobileGameSettingsView()
+            NavigationLink(destination: MobileGamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()
@@ -171,7 +171,7 @@ struct MobileUserDraftCellView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(formatter.color(.primaryFG))
             
-            NavigationLink(destination: MobileGameSettingsView()
+            NavigationLink(destination: MobileGamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()

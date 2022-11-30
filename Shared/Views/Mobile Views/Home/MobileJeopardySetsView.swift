@@ -15,7 +15,7 @@ struct MobileJeopardySetsView: View {
     @Binding var jeopardySeasonsViewActive: Bool
     
     var body: some View {
-        VStack (alignment: .leading, spacing: 10) {
+        VStack (alignment: .leading, spacing: 5) {
             HStack {
                 Text("Jeopardy! Sets")
                 Spacer()
@@ -80,7 +80,7 @@ struct MobileJeopardySetCellView: View {
                     .lineLimit(2)
             }
             
-            NavigationLink(destination: MobileGameSettingsView()
+            NavigationLink(destination: MobileGamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()

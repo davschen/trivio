@@ -1,5 +1,5 @@
 //
-//  MobileGamePreviewView.swift
+//  MobileCategoryPreviewView.swift
 //  Trivio!
 //
 //  Created by David Chen on 7/24/21.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct MobileGamePreviewView: View {
+struct MobileCategoryPreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel

@@ -27,6 +27,7 @@ struct MobileMyCustomSetsView: View {
                 VStack (alignment: .leading, spacing: 3) {
                     ForEach(customSets, id: \.self) { customSet in
                         MobileMyCustomSetCellView(expandedSetID: $expandedSetID, customSet: customSet)
+                            .animation(.easeInOut(duration: 0.2))
                     }
                 }
                 .onAppear {
@@ -39,7 +40,6 @@ struct MobileMyCustomSetsView: View {
             }
         }
         .keyboardAware()
-        .animation(.easeInOut(duration: 0.2))
     }
 }
 
@@ -112,7 +112,7 @@ struct MobileMyCustomSetCellView: View {
                                 .frame(width: 45, height: 45)
                                 .background(formatter.color(.highContrastWhite))
                                 .cornerRadius(5)
-                            NavigationLink(destination: MobileGameSettingsView()
+                            NavigationLink(destination: MobileGamePreviewView()
                                 .navigationBarTitle("Set Preview", displayMode: .inline),
                                            isActive: $setPreviewActive,
                                            label: { EmptyView() }).hidden()
@@ -159,6 +159,7 @@ struct MobileMyCustomSetCellView: View {
         .background(formatter.color(expandedSetID == setID ? .secondaryFG : .primaryFG))
         .contentShape(Rectangle())
         .onTapGesture {
+            formatter.hapticFeedback(style: .rigid, intensity: .weak)
             expandedSetID = setID
         }
     }

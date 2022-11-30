@@ -1,5 +1,5 @@
 //
-//  MobileGameSettingsView.swift
+//  MobileGamePreviewView.swift.swift
 //  Trivio!
 //
 //  Created by David Chen on 7/24/21.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct MobileGameSettingsView: View {
+struct MobileGamePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
@@ -24,7 +24,7 @@ struct MobileGameSettingsView: View {
     }
     
     var body: some View {
-        // Supa neat, supa tight, everyone be like MobileGameSettingsView
+        // Supa neat, supa tight, everyone be like MobileGamePreviewView
         ZStack {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
@@ -118,7 +118,7 @@ struct MobileGameSettingsCategoryPreviewView: View {
                     .font(formatter.font(.regularItalic, fontSize: .regular))
             }
             .padding(.horizontal)
-            MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
+            MobileCategoryPreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
                 .padding(.bottom, 5)
             if gamesVM.customSet.hasTwoRounds {
                 HStack {
@@ -127,7 +127,7 @@ struct MobileGameSettingsCategoryPreviewView: View {
                         .font(formatter.font(.regularItalic, fontSize: .regular))
                 }
                 .padding(.horizontal)
-                MobileGamePreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
+                MobileCategoryPreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
             }
         }
         .id(UUID().uuidString)

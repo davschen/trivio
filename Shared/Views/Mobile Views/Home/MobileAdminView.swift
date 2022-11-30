@@ -16,12 +16,13 @@ struct MobileAdminView: View {
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack (spacing: 15) {
+            VStack (spacing: 25) {
                 Spacer(minLength: 15)
-                MobileAdminVIPLookupView()
-                    .padding(.horizontal)
-                MobileAdminVIPStatusPanelView()
-                    .padding(.horizontal)
+                VStack (spacing: 5) {
+                    MobileAdminVIPLookupView()
+                    MobileAdminVIPStatusPanelView()
+                }
+                .padding(.horizontal)
                 MobileAdminActivityView()
             }
         }
@@ -100,7 +101,7 @@ struct MobileAdminVIPLookupView: View {
             }
         }
         .background(formatter.color(.primaryFG))
-        .cornerRadius(5)
+        .cornerRadius(10)
     }
 }
 
@@ -111,7 +112,7 @@ struct MobileAdminVIPStatusPanelView: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 25) {
             Text("VIP status panel")
-                .font(formatter.font(fontSize: .mediumLarge))
+                .font(formatter.font(fontSize: .medium))
             VStack (spacing: 7) {
                 HStack {
                     Text("Current VIP name")
@@ -127,9 +128,9 @@ struct MobileAdminVIPStatusPanelView: View {
                 ForEach(profileVM.currentVIPs.sorted(by: >), id: \.key) { username, name in
                     VStack {
                         HStack {
-                            Text(username)
-                            Spacer()
                             Text(name)
+                            Spacer()
+                            Text(username)
                         }
                         .font(formatter.font(.regular, fontSize: .regular))
                         .padding(.trailing)
@@ -143,7 +144,7 @@ struct MobileAdminVIPStatusPanelView: View {
         }
         .padding([.vertical, .leading])
         .background(formatter.color(.secondaryFG))
-        .cornerRadius(5)
+        .cornerRadius(10)
     }
 }
 
