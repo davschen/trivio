@@ -1,5 +1,5 @@
 //
-//  MobileSettingsView.swift
+//  MobileAccountSettingsView.swift
 //  Trivio!
 //
 //  Created by David Chen on 7/24/21.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct MobileSettingsView: View {
+struct MobileAccountSettingsView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var profileVM: ProfileViewModel
     
@@ -18,9 +18,9 @@ struct MobileSettingsView: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 0) {
             if isEditingAccountSettings {
-                MobileAccountSettingsView(usernameTaken: $usernameTaken)
+                MobileAccountSettingsEditView(usernameTaken: $usernameTaken)
             } else {
-                MobileAccountSettingsEditView()
+                MobileAccountSettingsDisplayView()
             }
             
             if !isEditingAccountSettings {
@@ -75,7 +75,7 @@ struct MobileSettingsView: View {
     }
 }
 
-struct MobileAccountSettingsView: View {
+struct MobileAccountSettingsEditView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var profileVM: ProfileViewModel
     
@@ -131,7 +131,7 @@ struct MobileAccountSettingsView: View {
     }
 }
 
-struct MobileAccountSettingsEditView: View {
+struct MobileAccountSettingsDisplayView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var profileVM: ProfileViewModel
     

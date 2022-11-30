@@ -50,7 +50,7 @@ struct MobileProfileView: View {
                         }
                         .padding(.horizontal)
                         if isShowingDraftsView {
-                            MobileDraftsView()
+                            MobileMyDraftsView()
                         }
                     }
                 }
@@ -103,7 +103,7 @@ struct MobileAccountInfoView: View {
                 }
                 .padding(.horizontal)
                 
-                NavigationLink(destination: MobileSettingsView(),
+                NavigationLink(destination: MobileAccountSettingsView(),
                                isActive: $profileVM.showingSettingsView,
                                label: { EmptyView() }).hidden()
             }

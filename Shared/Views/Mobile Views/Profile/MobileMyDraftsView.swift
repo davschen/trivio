@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct MobileDraftsView: View {
+struct MobileMyDraftsView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
