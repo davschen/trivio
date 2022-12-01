@@ -35,18 +35,21 @@ class ProfileViewModel: ObservableObject {
     
     func markAsPlayed(gameID: String) {
         guard let myUID = myUID else { return }
-        let playedRef = db.collection("users").document(myUID).collection("played").document(gameID)
-        playedRef.getDocument { (docSnap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let doc = docSnap else { return }
-            if !doc.exists {
-                playedRef.setData([
-                    "gameID" : gameID
-                ])
-            }
+        db.collection("users")
+            .document(myUID)
+            .collection("played").whereField(gameID, isEqualTo: gameID).getDocuments { (snap, error) in
+                if error != nil { return }
+                guard let firstDoc = snap?.documents.first else {
+                    self.db.collection("users").document(myUID).collection("played").addDocument(data: [
+                        "gameID" : gameID
+                    ])
+                    return
+                }
+                if !firstDoc.exists {
+                    self.db.collection("users").document(myUID).collection("played").addDocument(data: [
+                        "gameID" : gameID
+                    ])
+                }
         }
     }
     

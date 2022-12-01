@@ -26,7 +26,6 @@ struct MobileFinalTrivioPodiumView: View {
             Button(action: {
                 guard let customSetID = gamesVM.customSet.id else { return }
                 presentationMode.wrappedValue.dismiss()
-                gamesVM.gameSetupMode = .settings
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
                 participantsVM.progressGame()
                 profileVM.markAsPlayed(gameID: customSetID)

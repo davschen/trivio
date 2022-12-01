@@ -61,6 +61,7 @@ struct MobileFinalTrivioUserFlowView: View {
                                 .font(formatter.font(.bold, fontSize: .medium))
                             Text(gamesVM.customSet.finalClue)
                                 .font(formatter.font(.regular, fontSize: .regular))
+                                .multilineTextAlignment(.center)
                                 .lineSpacing(3)
                             Text(gamesVM.customSet.finalResponse)
                                 .font(formatter.font(.regular, fontSize: .regular))

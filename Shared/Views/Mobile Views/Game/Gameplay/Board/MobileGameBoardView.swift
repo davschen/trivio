@@ -123,7 +123,7 @@ struct MobileGameplayHeaderView: View {
                         ZStack (alignment: .leading) {
                             Capsule()
                                 .frame(width: geometry.size.width, height: 10)
-                                .foregroundColor(formatter.color(.secondaryFG))
+                                .foregroundColor(formatter.color(.primaryFG))
                             Capsule()
                                 .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
@@ -138,6 +138,7 @@ struct MobileGameplayHeaderView: View {
                         Button {
                             if gamesVM.gamePhase == .round1 && gamesVM.customSet.hasTwoRounds {
                                 gamesVM.moveOntoRound2()
+                                gamesVM.gameplayDisplay = .grid
                             } else {
                                 gamesVM.gamePhase = .finalRound
                             }
@@ -149,7 +150,6 @@ struct MobileGameplayHeaderView: View {
                 }
             } else if gamesVM.finalTrivioStage == .submitAnswer {
                 MobileFinalTrivioCountdownTimerView()
-                    .padding(.top, 10)
             }
         }
     }
@@ -168,6 +168,7 @@ struct MobileContinueToFinalTrivioView: View {
                 .opacity(0.7)
             HStack {
                 Button(action: {
+                    formatter.hapticFeedback(style: .light, intensity: .strong)
                     gamesVM.finalTrivioStage = .makeWager
                 }, label: {
                     HStack (spacing: 15) {

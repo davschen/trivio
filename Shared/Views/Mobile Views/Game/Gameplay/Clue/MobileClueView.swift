@@ -250,7 +250,7 @@ struct MobileModernClueResponseView: View {
                     .padding([.horizontal, .bottom])
                 }
             }
-            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
+            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .primaryFG : .primaryAccent))
             .cornerRadius(10)
         }
     }
@@ -339,7 +339,7 @@ struct MobileClassicClueResponseView: View {
                     .padding([.horizontal, .bottom])
                 }
             }
-            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .secondaryFG : .primaryAccent))
+            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .primaryFG : .primaryAccent))
             .cornerRadius(10)
         }
     }

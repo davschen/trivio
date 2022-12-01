@@ -15,13 +15,15 @@
 		8B0EFC3727EE7C45000BD2DF /* DailyTrivioGameSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0EFC3627EE7C43000BD2DF /* DailyTrivioGameSource.swift */; };
 		8B568DAC2937F4600061EB1A /* MobileGameInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568DAB2937F4600061EB1A /* MobileGameInfoView.swift */; };
 		8B568DAD2937F4600061EB1A /* MobileGameInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B568DAB2937F4600061EB1A /* MobileGameInfoView.swift */; };
+		8B5D7EA629384364004E7221 /* LaunchScreenImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B5D7EA529384364004E7221 /* LaunchScreenImage.png */; };
+		8B5D7EA8293843AA004E7221 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B5D7EA7293843AA004E7221 /* LaunchScreen.storyboard */; };
+		8B5D7EAA293868E1004E7221 /* MobileSignInInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D7EA9293868E1004E7221 /* MobileSignInInputView.swift */; };
+		8B5D7EAC2938691F004E7221 /* MobileAuthNameUsernameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D7EAB2938691F004E7221 /* MobileAuthNameUsernameView.swift */; };
 		8B7D95D928AE16C900A7D4E2 /* RoundedCorner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D95D828AE16C900A7D4E2 /* RoundedCorner.swift */; };
 		8B7D95DB28AF066300A7D4E2 /* Equatables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D95DA28AF066300A7D4E2 /* Equatables.swift */; };
-		8B80C7D52666E12100ED942A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B80C7D42666E12100ED942A /* LaunchScreen.storyboard */; };
-		8B80C7D62666E12100ED942A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B80C7D42666E12100ED942A /* LaunchScreen.storyboard */; };
 		8B80C7D82667072000ED942A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B80C7D72667072000ED942A /* GoogleService-Info.plist */; };
 		8B80C7D92667072000ED942A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B80C7D72667072000ED942A /* GoogleService-Info.plist */; };
-		8B88EA6226A7E32D001C5C2C /* MovingNumbersView in Frameworks */ = {isa = PBXBuildFile; productRef = 8B88EA6126A7E32D001C5C2C /* MovingNumbersView */; };
+		8B88EA6226A7E32D001C5C2C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8B88EA6126A7E32D001C5C2C /* SwiftPackageProductDependency */; };
 		8B88EA6526A89789001C5C2C /* GameSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EA6426A89789001C5C2C /* GameSettingsView.swift */; };
 		8B88EA6626A89789001C5C2C /* GameSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EA6426A89789001C5C2C /* GameSettingsView.swift */; };
 		8B88EA6826A8AEEF001C5C2C /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EA6726A8AEEF001C5C2C /* GameView.swift */; };
@@ -103,8 +105,8 @@
 		8B88EB0E26AD21A5001C5C2C /* MobileBuildCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0C26AD21A5001C5C2C /* MobileBuildCellView.swift */; };
 		8B88EB1026AD21BF001C5C2C /* MobileBuildHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0F26AD21BF001C5C2C /* MobileBuildHUDView.swift */; };
 		8B88EB1126AD21BF001C5C2C /* MobileBuildHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB0F26AD21BF001C5C2C /* MobileBuildHUDView.swift */; };
-		8B88EB1C26AD2238001C5C2C /* MobileFinalTrivioFillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1B26AD2238001C5C2C /* MobileFinalTrivioFillView.swift */; };
-		8B88EB1D26AD2238001C5C2C /* MobileFinalTrivioFillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1B26AD2238001C5C2C /* MobileFinalTrivioFillView.swift */; };
+		8B88EB1C26AD2238001C5C2C /* MobileBuildTrivioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1B26AD2238001C5C2C /* MobileBuildTrivioView.swift */; };
+		8B88EB1D26AD2238001C5C2C /* MobileBuildTrivioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1B26AD2238001C5C2C /* MobileBuildTrivioView.swift */; };
 		8B88EB1F26AD2256001C5C2C /* MobileBuildDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1E26AD2256001C5C2C /* MobileBuildDetailsView.swift */; };
 		8B88EB2026AD2256001C5C2C /* MobileBuildDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB1E26AD2256001C5C2C /* MobileBuildDetailsView.swift */; };
 		8B88EB2826AD22A0001C5C2C /* MobileAccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B88EB2726AD22A0001C5C2C /* MobileAccountSettingsView.swift */; };
@@ -204,17 +206,16 @@
 		8BEDCBE126A4AA0F00E89359 /* FinalTrivioSubmitAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBE026A4AA0F00E89359 /* FinalTrivioSubmitAnswerView.swift */; };
 		8BEDCBE326A4B21700E89359 /* FinalTrivioRevealResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBE226A4B21700E89359 /* FinalTrivioRevealResponseView.swift */; };
 		8BEDCBE526A4BBF900E89359 /* FinalTrivioPodiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBE426A4BBF900E89359 /* FinalTrivioPodiumView.swift */; };
-		8BEDCBE826A5269D00E89359 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBE726A5269D00E89359 /* ConfettiSwiftUI */; };
-		8BEDCBE926A5269D00E89359 /* ConfettiSwiftUI in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBE726A5269D00E89359 /* ConfettiSwiftUI */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8BEDCBE826A5269D00E89359 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBE726A5269D00E89359 /* SwiftPackageProductDependency */; };
+		8BEDCBE926A5269D00E89359 /* BuildFile in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBE726A5269D00E89359 /* SwiftPackageProductDependency */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8BEDCBED26A6139A00E89359 /* TeamBuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBEC26A6139A00E89359 /* TeamBuildView.swift */; };
 		8BEDCBF026A6912700E89359 /* GameGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBEF26A6912700E89359 /* GameGridView.swift */; };
 		8BEDCBF326A7984000E89359 /* DuplexWagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDCBF226A7983F00E89359 /* DuplexWagerView.swift */; };
-		8BEDCBF626A799BD00E89359 /* Shimmer in Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBF526A799BD00E89359 /* Shimmer */; };
+		8BEDCBF626A799BD00E89359 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8BEDCBF526A799BD00E89359 /* SwiftPackageProductDependency */; };
 		8BFBF1B329358A6B0024174F /* MobileJeopardySeasonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B229358A6B0024174F /* MobileJeopardySeasonsView.swift */; };
 		8BFBF1B62935A5D40024174F /* ExploreViewModel+Sort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B52935A5D40024174F /* ExploreViewModel+Sort.swift */; };
 		8BFBF1B82935A6080024174F /* ExploreViewModel+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1B72935A6080024174F /* ExploreViewModel+Search.swift */; };
 		8BFBF1BC2936FF270024174F /* MobileAdminView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFBF1BB2936FF270024174F /* MobileAdminView.swift */; };
-		8BFBF1BE2937820E0024174F /* Trivio Launch Screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */; };
 		8BFC125C26A152F100D3E513 /* MySetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125B26A152F100D3E513 /* MySetsView.swift */; };
 		8BFC126426A15A0A00D3E513 /* ReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125F26A1591F00D3E513 /* ReportViewModel.swift */; };
 		8BFC126526A15A0A00D3E513 /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFC125E26A1591F00D3E513 /* ExploreViewModel.swift */; };
@@ -255,7 +256,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				8BEDCBE926A5269D00E89359 /* ConfettiSwiftUI in Embed Frameworks */,
+				8BEDCBE926A5269D00E89359 /* BuildFile in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -270,10 +271,13 @@
 		8B0EFC3427EC67C8000BD2DF /* DailyTrivioSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTrivioSet.swift; sourceTree = "<group>"; };
 		8B0EFC3627EE7C43000BD2DF /* DailyTrivioGameSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyTrivioGameSource.swift; sourceTree = "<group>"; };
 		8B568DAB2937F4600061EB1A /* MobileGameInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileGameInfoView.swift; sourceTree = "<group>"; };
+		8B5D7EA529384364004E7221 /* LaunchScreenImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LaunchScreenImage.png; sourceTree = "<group>"; };
+		8B5D7EA7293843AA004E7221 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8B5D7EA9293868E1004E7221 /* MobileSignInInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileSignInInputView.swift; sourceTree = "<group>"; };
+		8B5D7EAB2938691F004E7221 /* MobileAuthNameUsernameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAuthNameUsernameView.swift; sourceTree = "<group>"; };
 		8B7D95D828AE16C900A7D4E2 /* RoundedCorner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCorner.swift; sourceTree = "<group>"; };
 		8B7D95DA28AF066300A7D4E2 /* Equatables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Equatables.swift; sourceTree = "<group>"; };
 		8B80C7D32666D27600ED942A /* Trivio!.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Trivio!.entitlements"; sourceTree = "<group>"; };
-		8B80C7D42666E12100ED942A /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8B80C7D72667072000ED942A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8B88EA6426A89789001C5C2C /* GameSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSettingsView.swift; sourceTree = "<group>"; };
 		8B88EA6726A8AEEF001C5C2C /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -316,7 +320,7 @@
 		8B88EB0926AD2192001C5C2C /* MobileBuildCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildCategoryView.swift; sourceTree = "<group>"; };
 		8B88EB0C26AD21A5001C5C2C /* MobileBuildCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildCellView.swift; sourceTree = "<group>"; };
 		8B88EB0F26AD21BF001C5C2C /* MobileBuildHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildHUDView.swift; sourceTree = "<group>"; };
-		8B88EB1B26AD2238001C5C2C /* MobileFinalTrivioFillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileFinalTrivioFillView.swift; sourceTree = "<group>"; };
+		8B88EB1B26AD2238001C5C2C /* MobileBuildTrivioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildTrivioView.swift; sourceTree = "<group>"; };
 		8B88EB1E26AD2256001C5C2C /* MobileBuildDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileBuildDetailsView.swift; sourceTree = "<group>"; };
 		8B88EB2726AD22A0001C5C2C /* MobileAccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAccountSettingsView.swift; sourceTree = "<group>"; };
 		8B88EB2D26AE213D001C5C2C /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
@@ -401,7 +405,6 @@
 		8BFBF1B52935A5D40024174F /* ExploreViewModel+Sort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExploreViewModel+Sort.swift"; sourceTree = "<group>"; };
 		8BFBF1B72935A6080024174F /* ExploreViewModel+Search.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExploreViewModel+Search.swift"; sourceTree = "<group>"; };
 		8BFBF1BB2936FF270024174F /* MobileAdminView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileAdminView.swift; sourceTree = "<group>"; };
-		8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Trivio Launch Screen.png"; sourceTree = "<group>"; };
 		8BFC125B26A152F100D3E513 /* MySetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySetsView.swift; sourceTree = "<group>"; };
 		8BFC125E26A1591F00D3E513 /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
 		8BFC125F26A1591F00D3E513 /* ReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportViewModel.swift; sourceTree = "<group>"; };
@@ -412,8 +415,8 @@
 		8BFC127126A15BAA00D3E513 /* GamesViewModel+CustomSets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GamesViewModel+CustomSets.swift"; sourceTree = "<group>"; };
 		A5A16B6E7299E29015DC5928 /* Pods-Trivio! (iOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (iOS).release.xcconfig"; path = "Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS).release.xcconfig"; sourceTree = "<group>"; };
 		E350FE4D2C3481EE95CB4020 /* Pods-Trivio! (macOS).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Trivio! (macOS).release.xcconfig"; path = "Target Support Files/Pods-Trivio! (macOS)/Pods-Trivio! (macOS).release.xcconfig"; sourceTree = "<group>"; };
-		E4874111A405031A5D98A046 /* Pods_Trivio___macOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_Trivio___macOS_.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E5591293519E0D8B8D5DA658 /* Pods_Trivio___iOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "Pods_Trivio___iOS_.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4874111A405031A5D98A046 /* Pods_Trivio___macOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Trivio___macOS_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5591293519E0D8B8D5DA658 /* Pods_Trivio___iOS_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Trivio___iOS_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -421,10 +424,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B88EA6226A7E32D001C5C2C /* MovingNumbersView in Frameworks */,
-				8BEDCBF626A799BD00E89359 /* Shimmer in Frameworks */,
+				8B88EA6226A7E32D001C5C2C /* BuildFile in Frameworks */,
+				8BEDCBF626A799BD00E89359 /* BuildFile in Frameworks */,
 				8BA62B8A2926272E0010835A /* StoreKit.framework in Frameworks */,
-				8BEDCBE826A5269D00E89359 /* ConfettiSwiftUI in Frameworks */,
+				8BEDCBE826A5269D00E89359 /* BuildFile in Frameworks */,
 				45BBBF2725A75151EDE1A93B /* Pods_Trivio___iOS_.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -637,7 +640,7 @@
 				8B88EB0926AD2192001C5C2C /* MobileBuildCategoryView.swift */,
 				8B88EB0C26AD21A5001C5C2C /* MobileBuildCellView.swift */,
 				8B88EB0F26AD21BF001C5C2C /* MobileBuildHUDView.swift */,
-				8B88EB1B26AD2238001C5C2C /* MobileFinalTrivioFillView.swift */,
+				8B88EB1B26AD2238001C5C2C /* MobileBuildTrivioView.swift */,
 				8BA3BAC7290CBF490086451B /* MobileBuildFooterView.swift */,
 			);
 			path = Build;
@@ -681,6 +684,8 @@
 			isa = PBXGroup;
 			children = (
 				8B88EAB126AD1972001C5C2C /* MobileSignInView.swift */,
+				8B5D7EA9293868E1004E7221 /* MobileSignInInputView.swift */,
+				8B5D7EAB2938691F004E7221 /* MobileAuthNameUsernameView.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -720,7 +725,7 @@
 			isa = PBXGroup;
 			children = (
 				8B80C7D32666D27600ED942A /* Trivio!.entitlements */,
-				8BFBF1BD2937820E0024174F /* Trivio Launch Screen.png */,
+				8B5D7EA529384364004E7221 /* LaunchScreenImage.png */,
 				8BC53835265B5DFA0099D05B /* Shared */,
 				8BC5383F265B5DFF0099D05B /* iOS */,
 				8BC53846265B5DFF0099D05B /* macOS */,
@@ -744,7 +749,7 @@
 				8B80C7D72667072000ED942A /* GoogleService-Info.plist */,
 				8BC53838265B5DFF0099D05B /* Assets.xcassets */,
 				8BC538CC265B723D0099D05B /* DataModel.xcdatamodeld */,
-				8B80C7D42666E12100ED942A /* LaunchScreen.storyboard */,
+				8B5D7EA7293843AA004E7221 /* LaunchScreen.storyboard */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -976,6 +981,7 @@
 				8BC5383B265B5DFF0099D05B /* Resources */,
 				036899656799B5E900E8C999 /* [CP] Embed Pods Frameworks */,
 				8BEDCBEA26A5269F00E89359 /* Embed Frameworks */,
+				0A7079CCF72CE404E19ECC68 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -983,9 +989,9 @@
 			);
 			name = "Trivio! (iOS)";
 			packageProductDependencies = (
-				8BEDCBE726A5269D00E89359 /* ConfettiSwiftUI */,
-				8BEDCBF526A799BD00E89359 /* Shimmer */,
-				8B88EA6126A7E32D001C5C2C /* MovingNumbersView */,
+				8BEDCBE726A5269D00E89359 /* SwiftPackageProductDependency */,
+				8BEDCBF526A799BD00E89359 /* SwiftPackageProductDependency */,
+				8B88EA6126A7E32D001C5C2C /* SwiftPackageProductDependency */,
 			);
 			productName = "Trivio! (iOS)";
 			productReference = 8BC5383D265B5DFF0099D05B /* Trivio!.app */;
@@ -1081,9 +1087,9 @@
 			);
 			mainGroup = 8BC53830265B5DFA0099D05B;
 			packageReferences = (
-				8BEDCBE626A5269C00E89359 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */,
-				8BEDCBF426A799BC00E89359 /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */,
-				8B88EA6026A7E32D001C5C2C /* XCRemoteSwiftPackageReference "MovingNumbersView" */,
+				8BEDCBE626A5269C00E89359 /* RemoteSwiftPackageReference */,
+				8BEDCBF426A799BC00E89359 /* RemoteSwiftPackageReference */,
+				8B88EA6026A7E32D001C5C2C /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = 8BC5383E265B5DFF0099D05B /* Products */;
 			projectDirPath = "";
@@ -1102,16 +1108,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B80C7D52666E12100ED942A /* LaunchScreen.storyboard in Resources */,
 				8BEAE4C32696744F00BF932C /* Metropolis-RegularItalic.otf in Resources */,
 				8BEAE4C62696744F00BF932C /* Metropolis-Regular.otf in Resources */,
 				8B80C7D82667072000ED942A /* GoogleService-Info.plist in Resources */,
+				8B5D7EA8293843AA004E7221 /* LaunchScreen.storyboard in Resources */,
 				8BEAE4F92697EF0800BF932C /* Metropolis-ExtraBoldItalic.otf in Resources */,
 				8BC53863265B5DFF0099D05B /* Assets.xcassets in Resources */,
 				8BEAE4C42696744F00BF932C /* Metropolis-Medium.otf in Resources */,
 				8BEAE4C52696744F00BF932C /* Metropolis-Bold.otf in Resources */,
 				8BEAE4C22696744F00BF932C /* Metropolis-ExtraBold.otf in Resources */,
-				8BFBF1BE2937820E0024174F /* Trivio Launch Screen.png in Resources */,
+				8B5D7EA629384364004E7221 /* LaunchScreenImage.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1119,7 +1125,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B80C7D62666E12100ED942A /* LaunchScreen.storyboard in Resources */,
 				8B80C7D92667072000ED942A /* GoogleService-Info.plist in Resources */,
 				8BC53864265B5DFF0099D05B /* Assets.xcassets in Resources */,
 				8BEAE4FA2697EF0800BF932C /* Metropolis-ExtraBoldItalic.otf in Resources */,
@@ -1158,6 +1163,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		0A7079CCF72CE404E19ECC68 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Trivio! (iOS)/Pods-Trivio! (iOS)-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4F351C514A4674F61998BFEF /* [CP] Check Pods Manifest.lock */ = {
@@ -1254,6 +1276,7 @@
 				8B88EB0426AD2137001C5C2C /* MobileBuildView.swift in Sources */,
 				8BA3BACB290CE6B30086451B /* MobileBuildAllView.swift in Sources */,
 				8BFC126926A15A0A00D3E513 /* BuildViewModel.swift in Sources */,
+				8B5D7EAC2938691F004E7221 /* MobileAuthNameUsernameView.swift in Sources */,
 				8BEDCBE126A4AA0F00E89359 /* FinalTrivioSubmitAnswerView.swift in Sources */,
 				8BEAE4DC2697A74000BF932C /* SignInView.swift in Sources */,
 				8BEAE4E62697A77300BF932C /* ParticipantsView.swift in Sources */,
@@ -1298,7 +1321,7 @@
 				8B88EB0A26AD2192001C5C2C /* MobileBuildCategoryView.swift in Sources */,
 				8BA3BAC2290BB12E0086451B /* MobileTrivioLivePreviewView.swift in Sources */,
 				8B88EA7626A9F230001C5C2C /* BuildCellView.swift in Sources */,
-				8B88EB1C26AD2238001C5C2C /* MobileFinalTrivioFillView.swift in Sources */,
+				8B88EB1C26AD2238001C5C2C /* MobileBuildTrivioView.swift in Sources */,
 				8BC53861265B5DFF0099D05B /* ContentView.swift in Sources */,
 				8B0EFC2A27EB9B77000BD2DF /* StringUtils.swift in Sources */,
 				8BFC126426A15A0A00D3E513 /* ReportViewModel.swift in Sources */,
@@ -1347,6 +1370,7 @@
 				8B88EB1F26AD2256001C5C2C /* MobileBuildDetailsView.swift in Sources */,
 				8B9B069F265FFC8700758036 /* AlertView.swift in Sources */,
 				8BC5385F265B5DFF0099D05B /* Trivio_App.swift in Sources */,
+				8B5D7EAA293868E1004E7221 /* MobileSignInInputView.swift in Sources */,
 				8B0EFC3327EC5BF2000BD2DF /* DailyTrivioGame.swift in Sources */,
 				8B88EA7F26A9F2D3001C5C2C /* SwapCellView.swift in Sources */,
 				8B88EB2826AD22A0001C5C2C /* MobileAccountSettingsView.swift in Sources */,
@@ -1362,7 +1386,7 @@
 				8B9B0699265CA2C700758036 /* HomePageView.swift in Sources */,
 				8B88EAE126AD1F12001C5C2C /* MobileClueView.swift in Sources */,
 				8BEAE4FE2698F7EB00BF932C /* PlayersView.swift in Sources */,
-				8B88EB1D26AD2238001C5C2C /* MobileFinalTrivioFillView.swift in Sources */,
+				8B88EB1D26AD2238001C5C2C /* MobileBuildTrivioView.swift in Sources */,
 				8B88EA6D26A91CFA001C5C2C /* UserView.swift in Sources */,
 				8B88EB2926AD22A0001C5C2C /* MobileAccountSettingsView.swift in Sources */,
 				8B88EAD226AD1BA6001C5C2C /* MobileGamePlayersView.swift in Sources */,
@@ -1830,7 +1854,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8B88EA6026A7E32D001C5C2C /* XCRemoteSwiftPackageReference "MovingNumbersView" */ = {
+		8B88EA6026A7E32D001C5C2C /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/aunnnn/MovingNumbersView.git";
 			requirement = {
@@ -1838,7 +1862,7 @@
 				minimumVersion = 0.1.0;
 			};
 		};
-		8BEDCBE626A5269C00E89359 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */ = {
+		8BEDCBE626A5269C00E89359 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/simibac/ConfettiSwiftUI";
 			requirement = {
@@ -1846,7 +1870,7 @@
 				kind = branch;
 			};
 		};
-		8BEDCBF426A799BC00E89359 /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */ = {
+		8BEDCBF426A799BC00E89359 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/markiv/SwiftUI-Shimmer";
 			requirement = {
@@ -1857,19 +1881,19 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8B88EA6126A7E32D001C5C2C /* MovingNumbersView */ = {
+		8B88EA6126A7E32D001C5C2C /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8B88EA6026A7E32D001C5C2C /* XCRemoteSwiftPackageReference "MovingNumbersView" */;
+			package = 8B88EA6026A7E32D001C5C2C /* RemoteSwiftPackageReference */;
 			productName = MovingNumbersView;
 		};
-		8BEDCBE726A5269D00E89359 /* ConfettiSwiftUI */ = {
+		8BEDCBE726A5269D00E89359 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8BEDCBE626A5269C00E89359 /* XCRemoteSwiftPackageReference "ConfettiSwiftUI" */;
+			package = 8BEDCBE626A5269C00E89359 /* RemoteSwiftPackageReference */;
 			productName = ConfettiSwiftUI;
 		};
-		8BEDCBF526A799BD00E89359 /* Shimmer */ = {
+		8BEDCBF526A799BD00E89359 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8BEDCBF426A799BC00E89359 /* XCRemoteSwiftPackageReference "SwiftUI-Shimmer" */;
+			package = 8BEDCBF426A799BC00E89359 /* RemoteSwiftPackageReference */;
 			productName = Shimmer;
 		};
 /* End XCSwiftPackageProductDependency section */

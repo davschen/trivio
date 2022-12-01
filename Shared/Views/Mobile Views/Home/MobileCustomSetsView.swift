@@ -82,7 +82,7 @@ struct MobileCustomSetCellView: View {
                     .lineLimit(1)
                     .frame(height: 20)
                     .padding(.bottom, 5)
-                HStack (spacing: 10) {
+                HStack (spacing: 8) {
                     ZStack {
                         Button {
                             exploreVM.pullAllFromUser(withID: customSet.userID)
@@ -90,7 +90,7 @@ struct MobileCustomSetCellView: View {
                         } label: {
                             Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
                                 .font(formatter.font(.boldItalic, fontSize: .small))
-                                .frame(width: 35, height: 35)
+                                .frame(width: 40, height: 40)
                                 .background(formatter.color(.primaryAccent))
                                 .clipShape(Circle())
                         }
@@ -100,7 +100,7 @@ struct MobileCustomSetCellView: View {
                                        isActive: $userViewActive,
                                        label: { EmptyView() }).hidden()
                     }
-                    VStack (alignment: .leading, spacing: 2) {
+                    VStack (alignment: .leading, spacing: 5) {
                         Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
                             .font(formatter.font(.regular))
                             .lineLimit(1)

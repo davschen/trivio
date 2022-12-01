@@ -32,7 +32,7 @@ class SearchViewModel: ObservableObject {
     }
     
     init() {
-        pullLastSearches()
+//        pullLastSearches()
     }
     
     func pullLastSearches() {

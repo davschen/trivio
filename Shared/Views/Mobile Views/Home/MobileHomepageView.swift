@@ -51,9 +51,10 @@ struct MobileHomepageView: View {
                                 allRecentSetsViewActive.toggle()
                             }
                                                           .padding(.top, 5)
-                            MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSets,
+                            MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSetsWithListener,
                                                           labelText: "Public sets",
                                                           promptText: "View all") {
+                                exploreVM.pullAllPublicSets()
                                 allPublicSetsViewActive.toggle()
                             }
                                                           .padding(.top, 5)

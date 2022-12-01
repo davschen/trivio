@@ -32,7 +32,7 @@ struct MobileBuildCategoryView: View {
             .foregroundColor(formatter.color(category.name.isEmpty ? .lowContrastWhite : .highContrastWhite))
             .multilineTextAlignment(.center)
             .minimumScaleFactor(0.1)
-            .padding(.horizontal, 10)
+            .padding(10)
             .frame(width: 165, height: 90)
             .background(formatter.color(.primaryAccent))
             .cornerRadius(10)

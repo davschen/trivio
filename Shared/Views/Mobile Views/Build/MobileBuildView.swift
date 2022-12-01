@@ -37,13 +37,13 @@ struct MobileBuildView: View {
                     case .buildAll:
                         MobileBuildAllView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryIndex: $categoryIndex)
                     case .finalTrivio:
-                        MobileFinalTrivioFillView()
+                        MobileBuildFinalTrivioView()
                             .padding(.horizontal)
                     default:
                         MobileBuildGridView(categoryIndex: $categoryIndex)
                     }
                 }
-                .padding(.bottom, 60)
+                .padding(.bottom, buildVM.currentDisplay != .buildAll ? 60 : 0)
                 if buildVM.currentDisplay != .buildAll {
                     MobileBuildFooterView()
                 }

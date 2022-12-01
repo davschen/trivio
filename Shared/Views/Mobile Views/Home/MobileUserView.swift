@@ -85,6 +85,7 @@ struct MobileUserCustomSetCellView: View {
                         .font(formatter.font(.regular))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .lineLimit(2)
+                        .lineSpacing(3)
                 }
                 Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
                     .font(formatter.font(.regular))

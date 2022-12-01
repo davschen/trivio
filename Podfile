@@ -12,6 +12,7 @@ target 'Trivio! (iOS)' do
   pod 'FirebaseFirestoreSwift', '~> 7.11.0-beta'
   pod 'Introspect'
   pod 'Purchases'
+  pod 'GoogleSignIn'
 
 end
 

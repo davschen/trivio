@@ -22,7 +22,6 @@ struct MobileGamePlayersView: View {
                     MobileIndividualPlayerView(team: team)
                 }
             }
-            .padding(.top, 5)
         } else {
             MobileSetupContestantsView()
         }

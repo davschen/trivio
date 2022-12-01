@@ -34,18 +34,21 @@ struct ContentView: View {
             if formatter.deviceType == .iPad {
                 if !isLoggedIn {
                     SignInView(isLoggedIn: $isLoggedIn)
-                        .foregroundColor(.white)
+                        .foregroundColor(formatter.color(.highContrastWhite))
                         .environmentObject(formatter)
                 } else {
                     HomePageView()
                 }
             } else if formatter.deviceType == .iPhone {
-                if !isLoggedIn {
-                    MobileSignInView(isLoggedIn: $isLoggedIn)
-                        .foregroundColor(.white)
-                        .environmentObject(formatter)
-                } else {
-                    MobileContentView()
+                ZStack {
+                    if !isLoggedIn {
+                        MobileSignInView(isLoggedIn: $isLoggedIn)
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .environmentObject(formatter)
+                    } else {
+                        MobileContentView()
+                            .transition(.identity)
+                    }
                 }
             }
         }

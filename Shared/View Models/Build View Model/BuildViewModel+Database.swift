@@ -11,6 +11,11 @@ extension BuildViewModel {
     func writeToFirestore() {
         guard let currCustomSetID = self.currCustomSet.id else { return }
 
+        if currCustomSet.isDraft {
+            // If i'm editing a draft and I've just published it for the first time
+            currCustomSet.dateCreated = Date()
+        }
+        
         currCustomSet.isDraft = !checkForSetIsComplete()
         currCustomSet.dateLastModified = Date()
         currCustomSet.userID = myUID
@@ -18,8 +23,8 @@ extension BuildViewModel {
         currCustomSet.round2CatIDs = djCategories[0..<currCustomSet.round2Len].compactMap { currCustomSet.hasTwoRounds ? $0.id : "" }
         currCustomSet.categoryNames = getCategoryNames()
         currCustomSet.numClues = getNumClues()
-        
-        let docRef = db.collection(self.currCustomSet.isDraft ? "drafts" : "userSets").document(currCustomSetID)
+
+        let docRef = db.collection(currCustomSet.isDraft ? "drafts" : "userSets").document(currCustomSetID)
         
         // TODO: find out why setData is dismissing BuildView only after `edit` is called
         try? docRef.setData(from: self.currCustomSet)

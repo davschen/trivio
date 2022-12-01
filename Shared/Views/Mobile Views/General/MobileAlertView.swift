@@ -67,6 +67,7 @@ struct MobileAlertView: View {
                             .padding(20)
                             Button {
                                 action()
+                                formatter.hapticFeedback(style: .soft, intensity: .strong)
                                 formatter.dismissAlert()
                             } label: {
                                 Text(actionLabel)

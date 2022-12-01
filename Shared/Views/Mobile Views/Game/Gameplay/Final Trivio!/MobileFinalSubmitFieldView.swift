@@ -110,7 +110,7 @@ struct MobileSubmitAnswerView: View {
     }
     
     var body: some View {
-        VStack (alignment: .leading) {
+        VStack (alignment: .leading, spacing: 5) {
             HStack (spacing: 5) {
                 Circle()
                     .frame(width: 6, height: 6)

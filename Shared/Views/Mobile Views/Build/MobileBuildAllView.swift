@@ -100,7 +100,10 @@ struct MobileBuildAllCategoryView: View {
                                     .font(formatter.font(.boldItalic, fontSize: .medium))
                                     .foregroundColor(formatter.color(.lowContrastWhite))
                             }
-                            TextField("", text: $categoryName) {
+                            TextField("", text: $categoryName, onEditingChanged: { didEditingChange in
+                                if category.name != categoryName { buildVM.incrementDirtyBit() }
+                                category.name = categoryName
+                            }) {
                                 formatter.resignKeyboard()
                                 category.name = categoryName
                             }
@@ -149,7 +152,6 @@ struct MobileBuildAllCategoryView: View {
         .onAppear {
             categoryName = category.name
         }
-        .keyboardAware()
     }
 }
 

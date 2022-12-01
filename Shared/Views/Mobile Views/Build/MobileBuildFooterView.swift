@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 struct MobileBuildFooterView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
@@ -38,6 +40,7 @@ struct MobileBuildFooterView: View {
                 if buildVM.nextPermitted() {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     if buildVM.buildStage == .finalTrivio {
+                        presentationMode.wrappedValue.dismiss()
                         gamesVM.readCustomData()
                     }
                     buildVM.nextButtonHandler()

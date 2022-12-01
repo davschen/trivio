@@ -26,7 +26,6 @@ struct MobileFinalTrivioView: View {
                 .transition(AnyTransition.move(edge: .leading))
         } else {
             MobileFinalTrivioPodiumView()
-                .transition(AnyTransition.move(edge: .leading))
         }
     }
 }
@@ -43,7 +42,7 @@ struct MobileFinalTrivioCountdownTimerView: View {
         GeometryReader { geometry in
             Capsule()
                 .frame(width: geometry.size.width)
-                .foregroundColor(formatter.color(.secondaryFG))
+                .foregroundColor(formatter.color(.primaryFG))
             Rectangle()
                 .frame(width: timeRemaining > 0 ? geometry.size.width * CGFloat(Double(timeRemaining) / 30) : 0)
                 .foregroundColor(formatter.color(.secondaryAccent))

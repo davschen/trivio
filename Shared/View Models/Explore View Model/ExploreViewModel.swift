@@ -18,6 +18,7 @@ class ExploreViewModel: ObservableObject {
     @Published var hasSearch = false
     @Published var capSplit = [String]()
     
+    @Published var allPublicSetsWithListener = [CustomSetCherry]()
     @Published var allPublicSets = [CustomSetCherry]()
     @Published var allPrivateSets = [CustomSetCherry]()
     @Published var recentlyPlayedSets = [CustomSetCherry]()
@@ -58,6 +59,7 @@ class ExploreViewModel: ObservableObject {
     }
     
     init() {
+        pullAllPublicSetsWithListener()
         pullAllPublicSets()
         pullAllPrivateSets()
         pullRecentlyPlayedSets()
@@ -98,15 +100,36 @@ class ExploreViewModel: ObservableObject {
         return initials.uppercased()
     }
     
-    public func pullAllPublicSets(isAppending: Bool = true) {
+    private func pullAllPublicSetsWithListener() {
+        db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: "dateCreated", descending: true).limit(to: 10).addSnapshotListener { (snap, error) in
+            if error != nil { return }
+            guard let data = snap?.documents else { return }
+            self.allPublicSetsWithListener = data.compactMap({ (queryDocSnap) -> CustomSetCherry? in
+                let customSet = try? queryDocSnap.data(as: CustomSet.self)
+                if let id = customSet?.userID {
+                    self.addUsernameNameToDict(userID: id)
+                }
+                if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
+                    // Custom set for version 3.0
+                    self.addUsernameNameToDict(userID: customSetCherry.userID)
+                    return customSetCherry
+                } else {
+                    // default
+                    return CustomSetCherry(customSet: customSet ?? CustomSet())
+                }
+            })
+        }
+    }
+    
+    public func pullAllPublicSets() {
         // Is it a bit janky to limit to 10,000? Yes. I will never have 10,000 sets on my app, however.
         // When I do, I will be rich and I will sell this app to Kahoot or whomever and be even richer
         var query: Query!
 
-        if allPublicSets.isEmpty || !isAppending {
-            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 10)
+        if allPublicSets.isEmpty {
+            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 5)
         } else {
-            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).start(afterDocument: latestPublicDoc!).limit(to: 10)
+            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).start(afterDocument: latestPublicDoc!).limit(to: 5)
         }
         
         query.getDocuments { (snap, error) in

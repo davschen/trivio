@@ -27,9 +27,9 @@ struct MobileGameGridView: View {
                                 .font(formatter.font(.bold, fontSize: .medium))
                                 .foregroundColor(formatter.color(.highContrastWhite))
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                                .frame(maxWidth: .infinity)
                                 .minimumScaleFactor(0.1)
+                                .padding(10)
+                                .frame(maxWidth: .infinity)
                                 .opacity(gamesVM.finishedCategories[i] ? 0 : 1)
                         }
                         .frame(width: 160, height: 110)

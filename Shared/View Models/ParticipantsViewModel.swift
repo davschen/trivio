@@ -114,7 +114,15 @@ class ParticipantsViewModel: ObservableObject {
                 guard let data = snap?.documents else { return }
                 DispatchQueue.main.async {
                     self.savedTeams = data.compactMap { (queryDocSnap) -> Team? in
-                        return try? queryDocSnap.data(as: Team.self)
+                        let updatedTeam = try? queryDocSnap.data(as: Team.self)
+                        if let updatedTeam = updatedTeam, self.teams.contains(updatedTeam) {
+                            for i in self.teams.indices {
+                                if self.teams[i].id == updatedTeam.id {
+                                    self.teams[i] = updatedTeam
+                                }
+                            }
+                        }
+                        return updatedTeam
                     }
                     var shouldAddSelf = true
                     for team in self.savedTeams {
