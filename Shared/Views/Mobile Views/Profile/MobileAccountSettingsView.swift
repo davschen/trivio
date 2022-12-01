@@ -164,25 +164,18 @@ struct MobileAccountSettingsDisplayView: View {
                 
                 if profileVM.myUserRecords.isAdmin {
                     VStack (alignment: .leading, spacing: 5) {
-                        Text("Showing admin UI features")
+                        Text("Admin UI features")
                             .font(formatter.font())
-                        HStack {
-                            Text("Yes")
+                        Button {
+                            formatter.hapticFeedback(style: .soft)
+                            profileVM.myUserRecords.isAdmin = false
+                        } label: {
+                            Text("Vanish")
+                                .font(formatter.font(fontSize: .mediumLarge))
                                 .frame(maxWidth: .infinity)
-                                .padding(20)
-                                .background(formatter.color(profileVM.myUserRecords.isAdmin ? .secondaryFG : .primaryFG))
-                                .cornerRadius(5)
-                                .onTapGesture {
-                                    profileVM.myUserRecords.isAdmin = true
-                                }
-                            Text("No")
-                                .frame(maxWidth: .infinity)
-                                .padding(20)
+                                .padding()
                                 .background(formatter.color(profileVM.myUserRecords.isAdmin ? .primaryFG : .secondaryFG))
                                 .cornerRadius(5)
-                                .onTapGesture {
-                                    profileVM.myUserRecords.isAdmin = false
-                                }
                         }
                     }
                 }

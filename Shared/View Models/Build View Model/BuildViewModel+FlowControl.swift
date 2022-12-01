@@ -51,13 +51,14 @@ extension BuildViewModel {
             round2FilledCount += (!category.name.isEmpty && !categoryEmpty(category: category)) ? 1 : 0
         }
         
+        let detailsCheck = true
         let trivioRoundCheck = !currCustomSet.tags.isEmpty && !currCustomSet.title.isEmpty
         let roundOneDailyCheck = round1FilledCount >= currCustomSet.round1Len
         let dtRoundCheck = !currCustomSet.roundOneDaily.isEmpty
         let roundTwoDailyCheck = round2FilledCount >= currCustomSet.round2Len
         let finalCheck = !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
         
-        let allBools = currCustomSet.hasTwoRounds ? [trivioRoundCheck, roundOneDailyCheck, dtRoundCheck, roundTwoDailyCheck, finalCheck] : [trivioRoundCheck, roundOneDailyCheck, dtRoundCheck]
+        let allBools = currCustomSet.hasTwoRounds ? [detailsCheck, trivioRoundCheck, roundOneDailyCheck, dtRoundCheck, roundTwoDailyCheck, finalCheck] : [detailsCheck, trivioRoundCheck, roundOneDailyCheck, dtRoundCheck]
 
         for i in allBools.indices {
             if allBools[i] {
@@ -143,19 +144,21 @@ extension BuildViewModel {
 
 struct MobileBuildStageIndexDict {
     var dict: [BuildStage:Int] = [
-        .trivioRound: 0,
-        .trivioRoundDD: 1,
-        .dtRound: 2,
-        .dtRoundDD: 3,
-        .finalTrivio: 4
+        .details: 0,
+        .trivioRound: 1,
+        .trivioRoundDD: 2,
+        .dtRound: 3,
+        .dtRoundDD: 4,
+        .finalTrivio: 5
     ]
     
     var reverseDict: [Int:BuildStage] = [
-        0 : .trivioRound,
-        1 : .trivioRoundDD,
-        2 : .dtRound,
-        3 : .dtRoundDD,
-        4 : .finalTrivio
+        0 : .details,
+        1 : .trivioRound,
+        2 : .trivioRoundDD,
+        3 : .dtRound,
+        4 : .dtRoundDD,
+        5 : .finalTrivio
     ]
     
     func getIndex(from buildStage: BuildStage) -> Int {

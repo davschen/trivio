@@ -21,6 +21,7 @@ struct MobileMyDraftsView: View {
             VStack (spacing: 3) {
                 ForEach(profileVM.drafts, id: \.self) { draft in
                     MobileDraftCellView(expandedSetID: $expandedSetID, draft: draft)
+                        .animation(.easeInOut(duration: 0.2))
                         .onAppear {
                             guard let firstSetID = profileVM.drafts.first?.id else { return }
                             expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
@@ -65,14 +66,14 @@ struct MobileDraftCellView: View {
             }
             Text("\(draft.hasTwoRounds ? "2 rounds" : "1 round"), \(draft.numClues) clues")
                 .font(formatter.font(.regular))
-            Text("Draft created on \(gamesVM.dateFormatter.string(from: draft.dateCreated))")
+            Text("Draft created on \(gamesVM.dateFormatter.string(from: draft.dateCreated)), last modified on \(gamesVM.dateFormatter.string(from: draft.dateLastModified))")
                 .foregroundColor(formatter.color(.lowContrastWhite))
-            .font(formatter.font(.regular))
-            .foregroundColor(formatter.color(.highContrastWhite))
+                .font(formatter.font(.regular))
             
             if expandedSetID == setID {
                 HStack (spacing: 5) {
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         isPresentingBuildView.toggle()
                         draft.isDraft = true
                         buildVM.edit(customSet: draft)
@@ -113,6 +114,7 @@ struct MobileDraftCellView: View {
         .background(formatter.color(expandedSetID == setID ? .secondaryFG : .primaryFG))
         .contentShape(Rectangle())
         .onTapGesture {
+            formatter.hapticFeedback(style: .rigid, intensity: .weak)
             expandedSetID = setID
         }
     }

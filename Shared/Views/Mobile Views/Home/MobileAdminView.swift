@@ -115,7 +115,7 @@ struct MobileAdminVIPStatusPanelView: View {
                 .font(formatter.font(fontSize: .medium))
             VStack (spacing: 7) {
                 HStack {
-                    Text("Current VIP name")
+                    Text("VIP name")
                     Spacer()
                     Text("Username")
                 }

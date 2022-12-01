@@ -282,6 +282,11 @@ class ProfileViewModel: ObservableObject {
         ], merge: true)
     }
     
+    func shouldRequestAppStoreReview() -> (Bool, String) {
+        let currentVersion = "Cherry"
+        return (myUserRecords.numTrackedSessions > 10 && !(myUserRecords.lastVersionReviewPrompt == currentVersion), currentVersion)
+    }
+    
     func getInitials(name: String) -> String {
         var initials = ""
         let nameSplit = name.split(separator: " ")

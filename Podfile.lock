@@ -353,6 +353,9 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (1.2.12)
+  - Purchases (3.14.2):
+    - PurchasesCoreSwift (= 3.14.2)
+  - PurchasesCoreSwift (3.14.2)
 
 DEPENDENCIES:
   - Firebase/Analytics
@@ -360,6 +363,7 @@ DEPENDENCIES:
   - Firebase/Firestore
   - FirebaseFirestoreSwift (~> 7.11.0-beta)
   - Introspect
+  - Purchases
 
 SPEC REPOS:
   trunk:
@@ -383,6 +387,8 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - Purchases
+    - PurchasesCoreSwift
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -405,7 +411,9 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
+  Purchases: 5af37054554583f973b0ad0b9653e412bb8649db
+  PurchasesCoreSwift: 588d3702282fb96222d7d5e05acd84f37e50a1ce
 
-PODFILE CHECKSUM: d15819cfc66f5ca9e621f39186d8d90399a13465
+PODFILE CHECKSUM: 804d34fead01ca682cef9694758669bc71dfb1f2
 
 COCOAPODS: 1.10.1

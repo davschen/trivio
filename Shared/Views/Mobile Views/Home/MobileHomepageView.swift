@@ -103,6 +103,7 @@ struct MobileHomepageView: View {
             .navigationBarHidden(true)
             .withBackground()
             .edgesIgnoringSafeArea(.bottom)
+            .animation(.easeInOut(duration: 0.2))
         }
     }
 }
@@ -181,6 +182,7 @@ struct MobileHomepageHeaderView: View {
                         .font(formatter.font(fontSize: .large))
                     Spacer()
                     Button {
+                        formatter.hapticFeedback(style: .heavy, intensity: .weak)
                         profileViewActive.toggle()
                     } label: {
                         Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
@@ -221,13 +223,13 @@ struct MobileExploreBuildPromptButtonView: View {
                 Button {
                     isPresentingBuildView.toggle()
                     buildVM.start()
-                    if profileVM.myUserRecords.numTrackedSessions > 10 && !profileVM.myUserRecords.hasShownRatingsPromptCherry {
-//                        if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
-//                            if UIApplication.shared.canOpenURL(url) {
-//                                UIApplication.shared.open(url, options: [:])
-//                            }
-//                        }
+                    
+                    // Request app store review if the conditions are right
+                    let shouldRequestAndCurrentVersion = profileVM.shouldRequestAppStoreReview()
+                    if shouldRequestAndCurrentVersion.0 {
                         if let windowScene = UIApplication.shared.windows.first?.windowScene { SKStoreReviewController.requestReview(in: windowScene) }
+                        profileVM.updateMyUserRecords(fieldName: "lastVersionReviewPrompt", newValue: shouldRequestAndCurrentVersion.1)
+                        profileVM.myUserRecords.lastVersionReviewPrompt = shouldRequestAndCurrentVersion.1
                     }
                 } label: {
                     HStack {

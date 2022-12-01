@@ -27,12 +27,12 @@ struct MobileGameGridView: View {
                                 .font(formatter.font(.bold, fontSize: .medium))
                                 .foregroundColor(formatter.color(.highContrastWhite))
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal, 10)
+                                .padding(.horizontal)
                                 .frame(maxWidth: .infinity)
                                 .minimumScaleFactor(0.1)
                                 .opacity(gamesVM.finishedCategories[i] ? 0 : 1)
                         }
-                        .frame(width: 160, height: 90)
+                        .frame(width: 160, height: 110)
                         .cornerRadius(10)
                     }
                 }

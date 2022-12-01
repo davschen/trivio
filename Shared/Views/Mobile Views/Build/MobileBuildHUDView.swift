@@ -135,6 +135,7 @@ struct MobileBuildHUDView: View {
                 }
         }
         .padding([.top, .horizontal])
+        .padding(.bottom, buildVM.currentDisplay == .grid ? 10 : 0)
     }
 }
 

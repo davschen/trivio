@@ -23,8 +23,8 @@ struct MobileBuildDetailsView: View {
         ScrollView (.vertical, showsIndicators: false) {
             VStack (alignment: .leading, spacing: 20) {
                 Text("Settings")
-                    .font(formatter.font(fontSize: .mediumLarge))
-                    .padding(.top, 20)
+                    .font(formatter.font(fontSize: .semiLarge))
+                    .padding(.top, 30)
                 VStack (alignment: .leading, spacing: 5) {
                     HStack (alignment: .top, spacing: 4) {
                         Text("Let's give your set a title")
@@ -268,7 +268,7 @@ struct MobileBuildDetailsView: View {
                     .font(formatter.font(.regularItalic, fontSize: .regular))
                     .padding(.bottom, 45)
             }
-            .keyboardAware()
+            .padding(.bottom, 45)
         }
         .resignKeyboardOnDragGesture()
         .onAppear {

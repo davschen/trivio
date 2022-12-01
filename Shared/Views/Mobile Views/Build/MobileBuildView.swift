@@ -24,32 +24,35 @@ struct MobileBuildView: View {
     }
     
     var body: some View {
-        VStack (alignment: .leading) {
+        VStack (alignment: .leading, spacing: 3) {
             if buildVM.currentDisplay != .buildAll {
                 MobileBuildHUDView()
             }
-            switch buildVM.currentDisplay {
-            case .settings:
-                MobileBuildDetailsView()
-                    .padding(.horizontal)
-            case .buildAll:
-                MobileBuildAllView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryIndex: $categoryIndex)
-            case .finalTrivio:
-                MobileFinalTrivioFillView()
-                    .padding(.horizontal)
-            default:
-                MobileBuildGridView(categoryIndex: $categoryIndex)
-            }
-            if buildVM.currentDisplay != .buildAll {
-                MobileBuildFooterView()
-                    .padding(.horizontal)
+            ZStack (alignment: .bottom) {
+                Group {
+                    switch buildVM.currentDisplay {
+                    case .settings:
+                        MobileBuildDetailsView()
+                            .padding(.horizontal)
+                    case .buildAll:
+                        MobileBuildAllView(category: isDJ ? $buildVM.djCategories[categoryIndex] : $buildVM.jCategories[categoryIndex], categoryIndex: $categoryIndex)
+                    case .finalTrivio:
+                        MobileFinalTrivioFillView()
+                            .padding(.horizontal)
+                    default:
+                        MobileBuildGridView(categoryIndex: $categoryIndex)
+                    }
+                }
+                .padding(.bottom, 60)
+                if buildVM.currentDisplay != .buildAll {
+                    MobileBuildFooterView()
+                }
             }
         }
         .withBackButton()
         .withBackground()
         .navigationTitle(buildVM.currCustomSet.title.isEmpty ? "Build set" : buildVM.currCustomSet.title)
         .navigationBarTitleDisplayMode(.inline)
-        .ignoresSafeArea(edges: .bottom)
         .toolbar {
             ToolbarItem {
                 Button(action: {
@@ -140,6 +143,7 @@ struct MobileBuildGridView: View {
                         Spacer()
                             .frame(width: 12)
                     }
+                    .padding(.bottom, 25)
                 }
                 .onAppear {
                     if buildVM.editingCategoryIndex != 0 {
@@ -195,7 +199,7 @@ struct MobileBuildGridEntryView: View {
             }
             .animation(Animation.easeIn(duration: 0.05))
         }
-        .padding(.horizontal).padding(.top, 7)
+        .padding(.horizontal)
     }
 }
 

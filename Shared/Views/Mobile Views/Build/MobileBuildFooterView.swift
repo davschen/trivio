@@ -14,10 +14,15 @@ struct MobileBuildFooterView: View {
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
     
+    var bgColor: Color {
+        return formatter.color(.primaryBG)
+    }
+    
     var body: some View {
         HStack {
             if buildVM.buildStage != .details {
                 Button {
+                    formatter.hapticFeedback(style: .soft, intensity: .weak)
                     buildVM.back()
                 } label: {
                     Text("Back")
@@ -29,6 +34,7 @@ struct MobileBuildFooterView: View {
             }
             
             Button {
+                formatter.resignKeyboard()
                 if buildVM.nextPermitted() {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     if buildVM.buildStage == .finalTrivio {
@@ -55,8 +61,21 @@ struct MobileBuildFooterView: View {
             .clipShape(Capsule())
             .opacity(buildVM.nextPermitted() ? 1 : 0.4)
         }
+        .padding(.top, buildVM.currentDisplay == .grid ? 0 : 15)
+        .padding([.horizontal, .bottom])
         .foregroundColor(formatter.color(.primaryBG))
-        .padding([.bottom])
-        .padding(.bottom, 15)
+        .background(maskedBackgroundView())
+        .animation(Animation.easeIn(duration: 0.2))
+    }
+    
+    func maskedBackgroundView() -> some View {
+        return Group {
+            if buildVM.currentDisplay == .grid {
+                formatter.color(.primaryBG)
+            } else {
+                formatter.color(.primaryBG)
+                    .mask(LinearGradient(gradient: Gradient(colors: [bgColor, bgColor, bgColor, bgColor, .clear]), startPoint: .bottom, endPoint: .top))
+            }
+        }
     }
 }

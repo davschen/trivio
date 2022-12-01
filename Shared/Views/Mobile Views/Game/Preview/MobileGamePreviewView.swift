@@ -95,6 +95,7 @@ struct MobileGameSettingsHeaderView: View {
                     Text(gamesVM.customSet.description)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(formatter.color(.mediumContrastWhite))
+                        .lineSpacing(3)
                 }
             }
             .font(formatter.font(.regular, fontSize: .regular))
@@ -177,17 +178,15 @@ struct MobileGameSettingsContestantsView: View {
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 if team.id == editingID { return }
+                                formatter.hapticFeedback(style: .rigid, intensity: .weak)
                                 if !participantsVM.teams.contains(team) {
-                                    formatter.hapticFeedback(style: .soft)
                                     participantsVM.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
                                 } else {
                                     if gamesVM.gameInProgress() {
                                         formatter.setAlertSettings(alertAction: {
-                                            formatter.hapticFeedback(style: .soft)
                                             participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                         }, alertTitle: "Remove \(team.name)?", alertSubtitle: "If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                                     } else {
-                                        formatter.hapticFeedback(style: .soft, intensity: .weak)
                                         participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                     }
                                 }
@@ -201,6 +200,7 @@ struct MobileGameSettingsContestantsView: View {
                             .foregroundColor(formatter.color(.lowContrastWhite))
                             .padding(.leading)
                     }
+                    .animation(.easeInOut(duration: 0.2))
                 }
             }
         }
@@ -467,7 +467,7 @@ struct MobileGameSettingsClueAppearancePickerView: View {
             }
             .onAppear {
                 NotificationCenter.default.addObserver(forName: NSNotification.Name("ClueAppearanceChange"), object: nil, queue: .main) { (_) in
-                    let selectedAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "modern") ?? .modern
+                    let selectedAppearance = ClueAppearance(rawValue: UserDefaults.standard.string(forKey: "clueAppearance") ?? "classic") ?? .classic
                     self.selectedAppearance = selectedAppearance
                 }
             }

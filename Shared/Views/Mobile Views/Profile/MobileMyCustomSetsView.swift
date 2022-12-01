@@ -120,6 +120,7 @@ struct MobileMyCustomSetCellView: View {
                     }
 
                     Button(action: {
+                        formatter.hapticFeedback(style: .soft, intensity: .strong)
                         isPresentingBuildView.toggle()
                         buildVM.edit(customSet: customSet)
                     }, label: {

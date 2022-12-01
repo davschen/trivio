@@ -87,6 +87,8 @@ struct MobileFinalTrivioFillView: View {
                         }
                         HStack {
                             TextField("", text: $finalResponse, onEditingChanged: { editingChanged in
+                                // insurance
+                                buildVM.currCustomSet.finalClue = finalClue
                                 buildVM.currCustomSet.finalResponse = finalResponse
                             })
                             .accentColor(formatter.color(.secondaryAccent))

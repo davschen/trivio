@@ -31,7 +31,7 @@ struct WithBackground: ViewModifier {
     func body(content: Content) -> some View {
         ZStack {
             formatter.color(.primaryBG)
-                .edgesIgnoringSafeArea(.top)
+                .ignoresSafeArea()
             content
                 .background(formatter.color(.primaryBG))
                 .animation(.easeInOut)

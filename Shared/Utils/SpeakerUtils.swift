@@ -124,8 +124,8 @@ enum SpeechLanguage: String {
 }
 
 enum ClueAppearance: String {
-    case classic = "britishEnglish"
-    case modern = "americanEnglish"
+    case classic = "classic"
+    case modern = "modern"
 }
 
 enum SpeechSpeed: Float {

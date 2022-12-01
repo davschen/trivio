@@ -22,25 +22,26 @@ extension GamesViewModel {
             if error != nil {
                 return
             } else {
-                guard let doc = snap else { return }
-                if doc.exists {
-                    // We don't want to overwrite a good thing going
-                    // Check if the live game is over 2hrs old (if so, overwrite) or if
-                    // the user wants to interrupt the existing game (existing
-                    // == hostHasJoined is true
-                    guard let liveGameSet = try? doc.data(as: LiveGameCustomSet.self) else { return }
-                    let diffComponents = Calendar.current.dateComponents([.hour], from: liveGameSet.dateInitiated, to: Date())
-                    if diffComponents.hour ?? 2 > 2 {
-                        // the live game is over 2 hours old
-                        try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-                    } else if liveGameSet.hostHasJoined {
-                        // This is a hard problem to solve. I am trying to signal the outside world that there is a game going on, and the alert shown should present the option to override the existing game (<game code>)
-                        // Potential solution: increment some int liveGameExistsTicker and onChange of this published variable, present the alert. Yeah!!
-                        return
-                    }
-                } else {
-                    try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-                }
+//                guard let doc = snap else { return }
+                try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
+//                if doc.exists {
+//                    // We don't want to overwrite a good thing going
+//                    // Check if the live game is over 2hrs old (if so, overwrite) or if
+//                    // the user wants to interrupt the existing game (existing
+//                    // == hostHasJoined is true
+//                    guard let liveGameSet = try? doc.data(as: LiveGameCustomSet.self) else { return }
+//                    let diffComponents = Calendar.current.dateComponents([.hour], from: liveGameSet.dateInitiated, to: Date())
+//                    if diffComponents.hour ?? 2 > 2 {
+//                        // the live game is over 2 hours old
+//                        try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
+//                    } else if liveGameSet.hostHasJoined {
+//                        // This is a hard problem to solve. I am trying to signal the outside world that there is a game going on, and the alert shown should present the option to override the existing game (<game code>)
+//                        // Potential solution: increment some int liveGameExistsTicker and onChange of this published variable, present the alert. Yeah!!
+//                        return
+//                    }
+//                } else {
+//                    try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
+//                }
             }
         }
     }

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import StoreKit
+import Purchases
 
 struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -97,8 +98,11 @@ struct MobileTrivioLiveCodeCardView: View {
                             .font(formatter.fontFloat(.bold, sizeFloat: 24.0))
                             .foregroundColor(formatter.color(.primaryBG))
                     }
-                    Text("Live games left this month")
-                        .font(formatter.font(.regular, fontSize: .medium))
+                    VStack (spacing: 5) {
+                        Text("Live games left this month")
+                        Text("(Tokens replenish each month)")
+                    }
+                    .font(formatter.font(.regular, fontSize: .medium))
                 }
                 Button {
                     isLoading = true
@@ -146,6 +150,7 @@ struct MobileTrivioLiveCodeCardView: View {
 
 struct MobileTrivioLiveSubscriptionView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var appStoreManager: AppStoreManager
     
     @State var isLoading = false
@@ -176,7 +181,7 @@ struct MobileTrivioLiveSubscriptionView: View {
             .lineSpacing(2.0)
             
             Button {
-                if UserDefaults.standard.bool(forKey: product.productIdentifier) {
+                if profileVM.myUserRecords.isSubscribed {
                     return
                 }
                 appStoreManager.purchaseProduct(product: product)
@@ -185,12 +190,12 @@ struct MobileTrivioLiveSubscriptionView: View {
                     if isLoading {
                         LoadingView()
                     } else {
-                        Text(UserDefaults.standard.bool(forKey: product.productIdentifier) ? "Subscribed!" : "Buy Now")
+                        Text(profileVM.myUserRecords.isSubscribed ? "Subscribed!" : "Buy Now")
                     }
                 }
                 .padding(.vertical, 15)
                 .frame(maxWidth: .infinity)
-                .background(formatter.color(UserDefaults.standard.bool(forKey: product.productIdentifier) ? .secondaryAccent : .primaryAccent))
+                .background(formatter.color(profileVM.myUserRecords.isSubscribed ? .secondaryAccent : .primaryAccent))
                 .cornerRadius(5)
             }
         }
@@ -198,6 +203,9 @@ struct MobileTrivioLiveSubscriptionView: View {
         .background(RoundedRectangle(cornerRadius: 10).stroke(formatter.color(.highContrastWhite), lineWidth: 1))
         .padding(1)
         .onChange(of: appStoreManager.transactionState) { newState in
+            if newState == .purchased {
+                profileVM.updateMyUserRecords(fieldName: "isSubscribed", newValue: true)
+            }
             isLoading = false
         }
     }

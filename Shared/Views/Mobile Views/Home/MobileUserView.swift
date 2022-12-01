@@ -41,6 +41,7 @@ struct MobileUserView: View {
                             .opacity(exploreVM.userDrafts.count > 0 ? 1 : 0)
                         ForEach(exploreVM.userDrafts, id: \.self) { draft in
                             MobileUserCustomSetCellView(customSet: draft)
+                                .disabled(true)
                         }
                     }
                 }

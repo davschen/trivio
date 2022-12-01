@@ -71,6 +71,7 @@ struct MobileAccountInfoView: View {
     
     var body: some View {
         Button {
+            formatter.hapticFeedback(style: .heavy, intensity: .weak)
             profileVM.showingSettingsView.toggle()
             profileVM.settingsMenuSelectedItem = "Account"
         } label: {

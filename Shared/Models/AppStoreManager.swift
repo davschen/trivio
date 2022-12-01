@@ -27,6 +27,7 @@ class AppStoreManager: NSObject, ObservableObject, SKProductsRequestDelegate, SK
     }
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        print(response.products)
         if !response.products.isEmpty {
             for fetchedProduct in response.products {
                 DispatchQueue.main.async {
@@ -70,15 +71,12 @@ class AppStoreManager: NSObject, ObservableObject, SKProductsRequestDelegate, SK
                 currentTransactionProductID = transaction.payment.productIdentifier
                 transactionState = .purchasing
             case .purchased:
-                UserDefaults.standard.setValue(true, forKey: transaction.payment.productIdentifier)
                 queue.finishTransaction(transaction)
                 transactionState = .purchased
             case .restored:
-                UserDefaults.standard.setValue(true, forKey: transaction.payment.productIdentifier)
                 queue.finishTransaction(transaction)
                 transactionState = .restored
             case .failed, .deferred:
-                print("Payment Queue Error: \(String(describing: transaction.error))")
                 queue.finishTransaction(transaction)
                 transactionState = .failed
             default:
