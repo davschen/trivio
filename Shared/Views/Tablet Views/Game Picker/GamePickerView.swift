@@ -201,7 +201,7 @@ struct JeopardyGamesView: View {
             GeometryReader { geometry in
                 VStack (alignment: .leading, spacing: 15) {
                     if gamesVM.previewViewShowing {
-                        GamePreviewView(searchQuery: searchVM.capSplit)
+                        GamePreviewView()
                     }
                     VStack (alignment: .leading, spacing: 0) {
                         ScrollView (.vertical) {

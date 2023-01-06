@@ -25,15 +25,15 @@ import FirebaseFirestore
   /// even when there is no associated value.
   @propertyWrapper
   public struct ExplicitNull<Value> {
-    var pointValueString: Value?
+    var value: Value?
 
-    public init(wrappedValue pointValueString: Value?) {
-      self.pointValueString = pointValueString
+    public init(wrappedValue value: Value?) {
+      self.value = value
     }
 
     public var wrappedValue: Value? {
-      get { pointValueString }
-      set { pointValueString = newValue }
+      get { value }
+      set { value = newValue }
     }
   }
 
@@ -44,8 +44,8 @@ import FirebaseFirestore
   extension ExplicitNull: Encodable where Value: Encodable {
     public func encode(to encoder: Encoder) throws {
       var container = encoder.singleValueContainer()
-      if let pointValueString = pointValueString {
-        try container.encode(pointValueString)
+      if let value = value {
+        try container.encode(value)
       } else {
         try container.encodeNil()
       }
@@ -56,9 +56,9 @@ import FirebaseFirestore
     public init(from decoder: Decoder) throws {
       let container = try decoder.singleValueContainer()
       if container.decodeNil() {
-        pointValueString = nil
+        value = nil
       } else {
-        pointValueString = try container.decode(Value.self)
+        value = try container.decode(Value.self)
       }
     }
   }

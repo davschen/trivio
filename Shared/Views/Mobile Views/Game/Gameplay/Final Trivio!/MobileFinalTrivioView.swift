@@ -51,7 +51,9 @@ struct MobileFinalTrivioCountdownTimerView: View {
         .frame(height: 8)
         .clipShape(Capsule())
         .onReceive(timer) { time in
-            self.timeRemaining -= 1
+            if !formatter.speaker.isSpeaking {
+                self.timeRemaining -= 1
+            }
         }
     }
 }

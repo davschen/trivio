@@ -122,6 +122,7 @@ struct MobileAuthEnterNumberView: View {
 
 struct MobileAuthVerifyNumberView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var authVM: AuthViewModel
     
     @Binding var isLoggedIn: Bool
     @Binding var signInStage: SignInStage
@@ -161,7 +162,7 @@ struct MobileAuthVerifyNumberView: View {
                     .foregroundColor(formatter.color(.secondaryAccent))
             }
             
-            Text("Enter the valid code that was sent to the number you inputted in the previous screen.")
+            Text("Enter the valid code that was sent to the number you just inputted. You may have to wait a few moments.")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(formatter.font(.regularItalic, fontSize: .regular))
                 .fixedSize(horizontal: false, vertical: true)
@@ -197,7 +198,7 @@ struct MobileAuthVerifyNumberView: View {
                                 } else {
                                     Auth.auth().addStateDidChangeListener { (auth, user) in
                                         if user?.uid == myUID {
-                                            self.checkUsernameExists(uid: myUID, completion: { complete in
+                                            self.authVM.checkUsernameExists(uid: myUID, completion: { complete in
                                                 UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
                                                 NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
                                             })
@@ -233,18 +234,5 @@ struct MobileAuthVerifyNumberView: View {
     
     func hasValidCode() -> Bool {
         return self.code.count == 6
-    }
-    
-    func checkUsernameExists(uid: String, completion: @escaping (Bool) -> Void) {
-        db.collection("users").document(uid).getDocument { (docSnap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let doc = docSnap else { return }
-            if let _ = doc.get("username") as? String {
-                completion(true)
-            }
-        }
     }
 }

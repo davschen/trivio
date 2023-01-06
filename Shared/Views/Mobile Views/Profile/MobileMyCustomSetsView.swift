@@ -36,7 +36,7 @@ struct MobileMyCustomSetsView: View {
                 }
             } else {
                 MobileEmptyListView(label: "You haven’t made any sets yet. Once you do, they’ll show up here.")
-                    .padding()
+                    .padding(.horizontal)
             }
         }
         .keyboardAware()
@@ -112,7 +112,7 @@ struct MobileMyCustomSetCellView: View {
                                 .frame(width: 45, height: 45)
                                 .background(formatter.color(.highContrastWhite))
                                 .cornerRadius(5)
-                            NavigationLink(destination: MobileGamePreviewView()
+                            NavigationLink(destination: GameBoardView()
                                 .navigationBarTitle("Set Preview", displayMode: .inline),
                                            isActive: $setPreviewActive,
                                            label: { EmptyView() }).hidden()

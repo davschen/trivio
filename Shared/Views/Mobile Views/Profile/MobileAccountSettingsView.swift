@@ -81,47 +81,85 @@ struct MobileAccountSettingsEditView: View {
     
     @Binding var usernameTaken: Bool
     
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         ScrollView (.vertical, showsIndicators: false) {
             VStack (alignment: .leading, spacing: 20) {
-                VStack (alignment: .leading, spacing: 5) {
-                    Text("Username")
-                        .font(formatter.font())
-                    TextField("Edit Username", text: $profileVM.username)
-                        .font(formatter.font(fontSize: .large))
-                        .padding()
-                        .background(formatter.color(.secondaryFG))
+                Spacer(minLength: 15)
+                VStack (alignment: .leading, spacing: 7) {
+                    VStack (spacing: 7) {
+                        HStack (spacing: 0) {
+                            Image(systemName: "at")
+                                .font(.system(size: 25))
+                                .foregroundColor(formatter.color(.lowContrastWhite))
+                                .frame(height: 35, alignment: .bottom)
+                                .offset(y: -3)
+                            Spacer(minLength: 15)
+                            TextField("Username", text: $profileVM.username)
+                                .font(formatter.fontFloat(profileVM.username.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
+                                .fixedSize(horizontal: false, vertical: true)
+                                .onChange(of: profileVM.username) { change in
+                                    profileVM.checkUsernameExists { (success) in
+                                        if success {
+                                            self.usernameTaken = false
+                                        } else {
+                                            self.usernameTaken = true
+                                        }
+                                    }
+                                }
+                        }
+                        .foregroundColor(formatter.color(.highContrastWhite))
                         .accentColor(formatter.color(.secondaryAccent))
                         .cornerRadius(5)
-                        .onChange(of: profileVM.username) { change in
-                            profileVM.checkUsernameExists { (success) in
-                                if success {
-                                    self.usernameTaken = false
-                                } else {
-                                    self.usernameTaken = true
-                                }
-                            }
-                        }
+                        Rectangle()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 2)
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                    }
+                    
                     if !profileVM.usernameError(usernameTaken: usernameTaken).isEmpty {
                         Text(profileVM.usernameError(usernameTaken: usernameTaken))
-                            .font(formatter.font(.boldItalic))
-                            .foregroundColor(formatter.color(.secondaryAccent))
+                            .font(formatter.font(.regularItalic))
                     }
                 }
+                .onReceive(timer) { time in
+                    if !profileVM.username.isEmpty {
+                        profileVM.checkUsernameExists { (success) in
+                            if success {
+                                self.usernameTaken = false
+                            } else {
+                                self.usernameTaken = true
+                            }
+                        }
+                    }
+                }
+                .padding(.bottom, 20)
                 
-                VStack (alignment: .leading, spacing: 5) {
-                    Text("Name")
-                        .font(formatter.font())
-                    TextField("Edit Name", text: $profileVM.name)
-                        .font(formatter.font(fontSize: .large))
-                        .padding()
-                        .background(formatter.color(.secondaryFG))
-                        .accentColor(formatter.color(.secondaryAccent))
-                        .cornerRadius(5)
+                VStack (spacing: 7) {
+                    HStack (spacing: 0) {
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 25))
+                            .foregroundColor(formatter.color(.lowContrastWhite))
+                            .frame(height: 30, alignment: .bottom)
+                            .offset(y: -3)
+                        Spacer(minLength: 15)
+                        TextField("Name", text: $profileVM.name)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .font(formatter.fontFloat(profileVM.name.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
+                    }
+                    .foregroundColor(formatter.color(.highContrastWhite))
+                    .accentColor(formatter.color(.secondaryAccent))
+                    .cornerRadius(5)
+                    Rectangle()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 2)
+                        .foregroundColor(formatter.color(.highContrastWhite))
                     if !profileVM.nameError().isEmpty {
                         Text(profileVM.nameError())
                             .font(formatter.font(.boldItalic))
                             .foregroundColor(formatter.color(.secondaryAccent))
+                            .padding(.top, 3)
                     }
                 }
             }
@@ -144,6 +182,7 @@ struct MobileAccountSettingsDisplayView: View {
                     Text(profileVM.username)
                         .font(formatter.font(fontSize: .semiLarge))
                 }
+                .padding(.top, 25)
                 
                 VStack (alignment: .leading, spacing: 5) {
                     Text("Name")
@@ -152,14 +191,16 @@ struct MobileAccountSettingsDisplayView: View {
                         .font(formatter.font(fontSize: .semiLarge))
                 }
                 
-                VStack (alignment: .leading, spacing: 5) {
-                    Text("Phone number")
-                        .font(formatter.font())
-                    Text(profileVM.getPhoneNumber())
-                        .font(formatter.font(fontSize: .semiLarge))
-                    Text("We want to remind you that Trivio! never looks at, sells, or distributes your personal data in any way. It is simply used for user verification.")
-                        .font(formatter.font(.regular, fontSize: .regular))
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if profileVM.getAuthProvider() == "Phone" {
+                    VStack (alignment: .leading, spacing: 5) {
+                        Text("Phone number")
+                            .font(formatter.font())
+                        Text(profileVM.getPhoneNumber())
+                            .font(formatter.font(fontSize: .semiLarge))
+                        Text("We want to remind you that Trivio! never looks at, sells, or distributes your personal data in any way. It is simply used for user verification.")
+                            .font(formatter.font(.regular, fontSize: .regular))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
                 
                 if profileVM.myUserRecords.isAdmin {

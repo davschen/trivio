@@ -13,13 +13,14 @@ import FirebaseFirestore
 struct ContentView: View {
     @State var isLoggedIn = UserDefaults.standard.value(forKey: "isLoggedIn") as? Bool ?? false
     @ObservedObject var formatter = MasterHandler()
+    @ObservedObject var authVM = AuthViewModel()
     
     init() {
         // NavigationBar UI
         UINavigationBar.appearance().tintColor = UIColor(formatter.color(.highContrastWhite))
         UINavigationBar.appearance().barTintColor = UIColor(formatter.color(.primaryFG))
         UINavigationBar.appearance().largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 24)!]
-        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: 16)!]
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedString.Key.foregroundColor:UIColor(formatter.color(.highContrastWhite)), NSAttributedString.Key.font: UIFont(name: "Metropolis-Bold", size: formatter.shrink(iPadSize: 30))!]
         UINavigationBar.appearance().backgroundColor = UIColor(formatter.color(.primaryFG))
         
         // TabBar UI
@@ -36,8 +37,10 @@ struct ContentView: View {
                     SignInView(isLoggedIn: $isLoggedIn)
                         .foregroundColor(formatter.color(.highContrastWhite))
                         .environmentObject(formatter)
+                        .environmentObject(authVM)
                 } else {
-                    HomePageView()
+                    TabletContentView()
+                        .transition(.identity)
                 }
             } else if formatter.deviceType == .iPhone {
                 ZStack {
@@ -45,6 +48,7 @@ struct ContentView: View {
                         MobileSignInView(isLoggedIn: $isLoggedIn)
                             .foregroundColor(formatter.color(.highContrastWhite))
                             .environmentObject(formatter)
+                            .environmentObject(authVM)
                     } else {
                         MobileContentView()
                             .transition(.identity)

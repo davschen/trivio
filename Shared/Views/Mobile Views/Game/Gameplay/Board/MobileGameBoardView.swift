@@ -32,7 +32,7 @@ struct MobileGameBoardView: View {
         .navigationBarTitle("")
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden()
-        .animation(.easeInOut(duration: 0.3))
+        .animation(.easeInOut(duration: 0.2))
     }
 }
 
@@ -140,6 +140,7 @@ struct MobileGameplayHeaderView: View {
                                 gamesVM.moveOntoRound2()
                                 gamesVM.gameplayDisplay = .grid
                             } else {
+                                gamesVM.finalTrivioStage = .makeWager
                                 gamesVM.gamePhase = .finalRound
                             }
                         } label: {

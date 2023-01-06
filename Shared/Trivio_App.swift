@@ -9,6 +9,8 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 import CoreData
+import FirebaseCore
+import GoogleSignIn
 
 @main
 struct Trivio_App: App {
@@ -28,6 +30,7 @@ class AppDelegate : NSObject, UIApplicationDelegate {
         FirebaseApp.configure()
         return true
     }
+    
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification notification: [AnyHashable : Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
@@ -37,6 +40,20 @@ class AppDelegate : NSObject, UIApplicationDelegate {
         }
         // This notification is not auth related, developer should handle it.
     }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return GIDSignIn.sharedInstance.handle(url)
+    }
+    
+//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+//        guard let myUID = Auth.auth().currentUser?.uid else { return }
+//        Purchases.logLevel = .debug
+//        Purchases.configure(
+//            with: Configuration.Builder(withAPIKey: Constants.apiKey)
+//                     .with(appUserID: myUID)
+//                     .build()
+//         )
+//    }
     
     lazy var persistentContainer: NSPersistentContainer = {
             /*

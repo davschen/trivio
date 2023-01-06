@@ -59,6 +59,7 @@ extension ExploreViewModel {
                             return CustomSetCherry(customSet: customSet ?? CustomSet())
                         }
                     })
+                    self.latestPublicDoc = data.last
                 }
             }
     }
@@ -87,6 +88,7 @@ extension ExploreViewModel {
                             return CustomSetCherry(customSet: customSet ?? CustomSet())
                         }
                     })
+                    self.latestPrivateDoc = data.last
                 }
             }
     }

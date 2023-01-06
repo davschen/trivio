@@ -106,7 +106,10 @@ extension GamesViewModel {
                 }
             }
             
-            if !customSet.hasTwoRounds { return }
+            if !customSet.hasTwoRounds {
+                self.tidyCustomSet.round2Cats.removeAll()
+                return
+            }
             
             for id in customSet.round2CatIDs {
                 self.db.collection("userCategories").document(id).getDocument { (doc, err) in

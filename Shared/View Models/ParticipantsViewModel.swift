@@ -114,15 +114,18 @@ class ParticipantsViewModel: ObservableObject {
                 guard let data = snap?.documents else { return }
                 DispatchQueue.main.async {
                     self.savedTeams = data.compactMap { (queryDocSnap) -> Team? in
-                        let updatedTeam = try? queryDocSnap.data(as: Team.self)
-                        if let updatedTeam = updatedTeam, self.teams.contains(updatedTeam) {
+                        var updatedTeamToAdd = try? queryDocSnap.data(as: Team.self)
+                        if let updatedTeam = updatedTeamToAdd, self.teams.contains(updatedTeam) {
                             for i in self.teams.indices {
                                 if self.teams[i].id == updatedTeam.id {
-                                    self.teams[i] = updatedTeam
+                                    updatedTeamToAdd?.editIndex(index: i)
+                                    if let updatedTeamToAdd = updatedTeamToAdd {
+                                        self.teams[i] = updatedTeamToAdd
+                                    }
                                 }
                             }
                         }
-                        return updatedTeam
+                        return updatedTeamToAdd
                     }
                     var shouldAddSelf = true
                     for team in self.savedTeams {
@@ -322,7 +325,12 @@ class ParticipantsViewModel: ObservableObject {
     }
     
     func answersValid() -> Bool {
-        for answer in finalJeopardyAnswers {
+        for i in 0..<teams.count {
+            let answer = finalJeopardyAnswers[i]
+            let score = teams[i].score
+            if score <= 0 {
+                continue
+            }
             if answer.isEmpty {
                 return false
             }
@@ -535,6 +543,10 @@ struct Team: Hashable, Identifiable, Decodable, Encodable {
     
     mutating func editName(name: String) {
         self.name = name
+    }
+    
+    mutating func editIndex(index: Int) {
+        self.index = index
     }
     
     mutating func editScore(amount: Int) {

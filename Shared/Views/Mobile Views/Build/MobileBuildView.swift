@@ -190,7 +190,7 @@ struct MobileBuildGridEntryView: View {
             ZStack(alignment: (isShowingPreview ? .trailing : .leading)) {
                 Capsule()
                     .frame(width: 30, height: 15)
-                    .foregroundColor(formatter.color(isShowingPreview ? .secondaryAccent : .primaryFG))
+                    .foregroundColor(formatter.color(isShowingPreview ? .secondaryAccent : .secondaryFG))
                 Circle()
                     .frame(width: 15, height: 15)
             }

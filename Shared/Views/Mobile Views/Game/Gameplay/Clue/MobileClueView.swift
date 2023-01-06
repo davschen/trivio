@@ -464,6 +464,7 @@ struct MobileIndividualCorrectSelectorView: View {
                 .padding(.horizontal)
                 .padding(.top, 5)
                 .frame(height: 40)
+                .multilineTextAlignment(.center)
             Rectangle()
                 .frame(maxWidth: .infinity)
                 .frame(height: 2)

@@ -26,11 +26,11 @@ extension MasterHandler {
         case .micro:
             sizeFloat = deviceType == .iPhone ? 8 : 10
         case .small:
-            sizeFloat = deviceType == .iPhone ? 12 : 14
+            sizeFloat = deviceType == .iPhone ? 12 : 16
         case .regular:
-            sizeFloat = deviceType == .iPhone ? 14 : 16
+            sizeFloat = deviceType == .iPhone ? 14 : 20
         case .medium:
-            sizeFloat = deviceType == .iPhone ? 16 : 20
+            sizeFloat = deviceType == .iPhone ? 16 : 22
         case .mediumLarge:
             sizeFloat = deviceType == .iPhone ? 20 : 25
         case .semiLarge:

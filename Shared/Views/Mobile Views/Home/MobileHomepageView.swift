@@ -44,18 +44,18 @@ struct MobileHomepageView: View {
                                 MobileHomepageAdminPanelView()
                                     .padding(.horizontal)
                             }
-                            MobileSetHorizontalScrollView(customSets: $exploreVM.recentlyPlayedSets,
-                                                          emptyLabelString: "You haven't played any games yet! When you do, you'll see them here.",
-                                                          labelText: "Recently played",
-                                                          promptText: "View all")  {
-                                allRecentSetsViewActive.toggle()
-                            }
-                                                          .padding(.top, 5)
                             MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSetsWithListener,
                                                           labelText: "Public sets",
                                                           promptText: "View all") {
                                 exploreVM.pullAllPublicSets()
                                 allPublicSetsViewActive.toggle()
+                            }
+                                                          .padding(.top, 5)
+                            MobileSetHorizontalScrollView(customSets: $exploreVM.recentlyPlayedSets,
+                                                          emptyLabelString: "You haven't played any games yet! When you do, you'll see them here.",
+                                                          labelText: "Recently played",
+                                                          promptText: "View all")  {
+                                allRecentSetsViewActive.toggle()
                             }
                                                           .padding(.top, 5)
                             if profileVM.myUserRecords.isAdmin {

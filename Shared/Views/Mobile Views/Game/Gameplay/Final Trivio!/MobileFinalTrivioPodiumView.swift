@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import ConfettiSwiftUI
 
 struct MobileFinalTrivioPodiumView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>

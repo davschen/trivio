@@ -142,12 +142,12 @@ struct ProgressTextDotView: View {
 
 struct BuildStageIndexDict {
     var dict: [BuildStage:Int] = [
-        .trivioRound: 0,
-        .trivioRoundDD: 1,
-        .dtRound: 2,
-        .dtRoundDD: 3,
-        .finalTrivio: 4,
-        .details: 5
+        .details: 0,
+        .trivioRound: 1,
+        .trivioRoundDD: 2,
+        .dtRound: 3,
+        .dtRoundDD: 4,
+        .finalTrivio: 5
     ]
     
     func getIndex(from buildStage: BuildStage) -> Int {

@@ -18,6 +18,7 @@ struct AlertView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var searchVM: SearchViewModel
     
+    var alertType: AlertType = .warning
     var alertStyle: AlertStyle
     var titleText = ""
     var subtitleText = ""
@@ -46,44 +47,68 @@ struct AlertView: View {
                     .cornerRadius(20)
                     .shadow(radius: 10)
                 default:
-                    VStack {
-                        VStack {
-                            VStack (spacing: 15) {
+                    VStack (spacing: 10) {
+                        VStack (spacing: 5) {
+                            VStack (spacing: 10) {
+                                Image(systemName: alertType == .warning ? "exclamationmark.triangle" : "sparkles")
+                                    .font(.system(size: 26))
+                                    .padding(.bottom, 5)
                                 Text(titleText)
-                                    .font(formatter.font(fontSize: .mediumLarge))
+                                    .font(formatter.fontFloat(sizeFloat: 17))
                                 Text(subtitleText)
-                                    .font(formatter.font(.regular, fontSize: .small))
+                                    .font(formatter.fontFloat(.regular, sizeFloat: 14))
+                                    .multilineTextAlignment(.center)
+                                    .lineSpacing(3)
                             }
-                            .padding(.bottom, 20)
-                            ActionButtonView(action: {
+                            .padding(20)
+                            Button {
                                 action()
+                                formatter.hapticFeedback(style: .soft, intensity: .strong)
                                 formatter.dismissAlert()
-                            }, label: actionLabel)
-                            if hasSecondaryAction {
-                                ActionButtonView(action: {
-                                    secondaryAction()
-                                    formatter.dismissAlert()
-                                }, label: secondaryActionLabel)
+                            } label: {
+                                Text(actionLabel)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(20)
+                                    .background(formatter.color(.primaryAccent))
+                                    .font(formatter.font(fontSize: .medium))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
                             }
                         }
-                        .padding(30)
-                        .background(formatter.color(.secondaryFG))
-                        .cornerRadius(20)
-                        .shadow(radius: 10)
+                        .background(formatter.color(.primaryFG))
+                        .cornerRadius(10)
+                        
+                        if hasSecondaryAction {
+                            Button {
+                                secondaryAction()
+                                formatter.dismissAlert()
+                            } label: {
+                                Text(secondaryActionLabel)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(20)
+                                    .background(formatter.color(.primaryAccent))
+                                    .font(formatter.font(fontSize: .medium))
+                                    .foregroundColor(formatter.color(.highContrastWhite))
+                            }
+                        }
+                        
+                        // Cancel button
                         if hasCancel {
                             Button {
                                 formatter.dismissAlert()
                             } label: {
                                 Text("Cancel")
-                                    .font(formatter.font(fontSize: .mediumLarge))
-                                    .foregroundColor(formatter.color(.highContrastWhite))
+                                    .padding(20)
+                                    .frame(maxWidth: .infinity)
+                                    .background(formatter.color(.primaryFG))
+                                    .cornerRadius(10)
                             }
-                            .padding()
                         }
                     }
                 }
             }
-            .frame(width: 350)
+            .padding()
+            .padding(.bottom)
+            .frame(width: 400)
             .offset(y: formatter.showingAlert ? 0 : UIScreen.main.bounds.height)
         }
     }

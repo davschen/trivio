@@ -34,6 +34,7 @@ struct MobileGamePreviewView: View {
                         // Settings header
                         MobileGameSettingsHeaderView()
                             .padding([.top, .horizontal])
+                            .padding(.top, 15)
                         
                         MobileGameSettingsCategoryPreviewView()
                         
@@ -155,6 +156,7 @@ struct MobileGameSettingsContestantsView: View {
                     participantsVM.teamToEdit = Empty().team
                     participantsVM.teamToEdit.index = participantsVM.savedTeams.count
                     editingName.removeAll()
+                    editingColor.removeAll()
                     
                     participantsVM.savedTeams.append(participantsVM.teamToEdit)
                     editingID = participantsVM.teamToEdit.id
@@ -172,35 +174,51 @@ struct MobileGameSettingsContestantsView: View {
                     .frame(height: 1)
                     .foregroundColor(formatter.color(.lowContrastWhite))
                     .padding(.leading)
+                // Contestants currently in the game float to the top
                 ForEach(participantsVM.savedTeams) { team in
-                    VStack (alignment: .leading) {
-                        MobileContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if team.id == editingID { return }
-                                formatter.hapticFeedback(style: .rigid, intensity: .weak)
-                                if !participantsVM.teams.contains(team) {
-                                    participantsVM.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
-                                } else {
-                                    if gamesVM.gameInProgress() {
+                    if participantsVM.teams.contains(team) {
+                        VStack (alignment: .leading, spacing: 10) {
+                            MobileContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if team.id == editingID { return }
+                                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                                    if gamesVM.gameInProgress() && team.score > 0 {
                                         formatter.setAlertSettings(alertAction: {
                                             participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                        }, alertTitle: "Remove \(team.name)?", alertSubtitle: "If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                                        }, alertTitle: "Remove \(team.name)?", alertSubtitle: "\(team.name) has \(team.score) points right now. If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                                     } else {
                                         participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                     }
                                 }
-                            }
-                        
-                        MobileEditContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
-                        
-                        Rectangle()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 1)
-                            .foregroundColor(formatter.color(.lowContrastWhite))
-                            .padding(.leading)
+                            
+                            Rectangle()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 1)
+                                .foregroundColor(formatter.color(.lowContrastWhite))
+                                .padding(.leading, 15)
+                        }
+                        .animation(.easeInOut(duration: 0.2))
                     }
-                    .animation(.easeInOut(duration: 0.2))
+                }
+                ForEach(participantsVM.savedTeams) { team in
+                    if !participantsVM.teams.contains(team) {
+                        VStack (alignment: .leading, spacing: 10) {
+                            MobileContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    if team.id == editingID { return }
+                                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                                    participantsVM.addTeam(id: team.id, name: team.name, members: team.members, score: 0, color: team.color)
+                                }
+                            Rectangle()
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 1)
+                                .foregroundColor(formatter.color(.lowContrastWhite))
+                                .padding(.leading, 15)
+                        }
+                        .animation(.easeInOut(duration: 0.2))
+                    }
                 }
             }
         }
@@ -220,21 +238,27 @@ struct MobileContestantsCellView: View {
     
     var body: some View {
         HStack {
-            HStack {
-                Image(systemName: participantsVM.teams.contains(team) ? "circle.inset.filled" : "circle")
-                HStack (spacing: 4) {
-                    Circle()
-                        .foregroundColor(ColorMap().getColor(color: team.color))
-                        .frame(width: 5, height: 5)
-                    Text(team.name)
-                        .font(formatter.font(participantsVM.teams.contains(team) ? .bold : .regular))
-                    if profileVM.myUID == team.id {
-                        Text("(me)")
-                            .font(formatter.font(.regularItalic)) 
+            ZStack (alignment: .leading) {
+                MobileEditContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
+                if team.id != editingID {
+                    HStack (spacing: 7) {
+                        Image(systemName: participantsVM.teams.contains(team) ? "circle.inset.filled" : "circle")
+                        Circle()
+                            .foregroundColor(ColorMap().getColor(color: team.color))
+                            .frame(width: 8, height: 8)
+                        HStack {
+                            Text(team.name)
+                                .font(formatter.font(participantsVM.teams.contains(team) ? .bold : .regular))
+                            if profileVM.myUID == team.id {
+                                Text("(me)")
+                                    .font(formatter.font(.regularItalic))
+                            }
+                        }
+                        .transition(.identity)
+                        .id(team.id)
                     }
                 }
             }
-            .opacity(team.id == editingID ? 0.4 : 1)
             Spacer()
             Button {
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
@@ -253,7 +277,7 @@ struct MobileContestantsCellView: View {
                     participantsVM.teamToEdit.name = editingName
                     participantsVM.teamToEdit.color = editingColor
                     participantsVM.editTeamInDB(team: participantsVM.teamToEdit)
-                    
+                    team.name.isEmpty ? participantsVM.addTeam(team: participantsVM.teamToEdit) : ()
                     editingID = nil
                     participantsVM.teamToEdit = Empty().team
                 } else {
@@ -263,7 +287,6 @@ struct MobileContestantsCellView: View {
                     editingColor = team.color
                     editingID = team.id
                 }
-                
             } label: {
                 Text(editingID == team.id ? "Done" : "Edit")
                     .font(formatter.font(.regular))
@@ -289,33 +312,7 @@ struct MobileEditContestantsCellView: View {
     
     var body: some View {
         if editingID == team.id {
-            HStack (alignment: .bottom) {
-                VStack (alignment: .leading, spacing: 2) {
-                    Text("Name")
-                        .font(formatter.font(.bold, fontSize: .small))
-                    TextField("Aa", text: $editingName)
-                        .font(formatter.font(.regular, fontSize: .medium))
-                        .frame(height: 25)
-                    Rectangle()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 2)
-                }
-                .frame(maxWidth: .infinity)
-                
-                VStack (alignment: .leading, spacing: 2) {
-                    Text("Color")
-                        .font(formatter.font(.bold, fontSize: .small))
-                    HStack (spacing: 2) {
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.blue), colorString: "blue")
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.purple), colorString: "purple")
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.green), colorString: "green")
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.yellow), colorString: "yellow")
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.orange), colorString: "orange")
-                        MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.red), colorString: "red")
-                    }
-                }
-                .frame(width: 190)
-                
+            HStack (spacing: 5) {
                 Button {
                     if team.name.isEmpty {
                         editingID = nil
@@ -333,10 +330,25 @@ struct MobileEditContestantsCellView: View {
                     Image(systemName: "trash")
                         .font(.system(size: 20))
                         .foregroundColor(formatter.color(.red))
-                        .padding(.leading, 5)
+                        .offset(y: -3)
                 }
+                Circle()
+                    .foregroundColor(ColorMap().getColor(color: editingColor))
+                    .frame(width: 8, height: 8)
+                TextField("Aa", text: $editingName)
+                    .font(formatter.font(.regular, fontSize: .medium))
+                    .frame(height: 25)
+                    .frame(maxWidth: 140)
+                HStack (spacing: 3) {
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.blue), colorString: "blue")
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.purple), colorString: "purple")
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.green), colorString: "green")
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.yellow), colorString: "yellow")
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.orange), colorString: "orange")
+                    MobileColorPickerView(teamColor: $editingColor, color: formatter.color(.red), colorString: "red")
+                }
+                .frame(width: 150)
             }
-            .padding(.horizontal)
         }
     }
 }
@@ -363,7 +375,7 @@ struct MobileColorPickerView: View {
                     teamColor = colorString
                 }
         }
-        .frame(height: 30)
+        .frame(height: 25)
     }
 }
 
@@ -699,7 +711,7 @@ struct MobileGameSettingsSpeedPickerView: View {
 struct MobileGameSettingsFooterView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @Binding var isPresentingGameView: Bool
@@ -726,24 +738,26 @@ struct MobileGameSettingsFooterView: View {
                 Text("\(gamesVM.gameInProgress() ? "Resume Game" : "Play Game")")
                     .font(formatter.font(.boldItalic, fontSize: .regular))
                     .foregroundColor(formatter.color(.primaryFG))
-                    .padding()
+                    .padding(20)
+                    .frame(maxWidth: .infinity)
                     .background(formatter.color(.highContrastWhite))
                     .opacity(gameIsPlayable ? 1 : 0.5)
                     .clipShape(Capsule())
             })
-            Button(action: {
-                isPresentingTrivioLiveView.toggle()
-                formatter.hapticFeedback(style: .soft, intensity: .strong)
-                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
-            }, label: {
-                Text("Host this game live!")
-                    .font(formatter.font(.boldItalic, fontSize: .regular))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(formatter.color(.primaryAccent))
-                    .clipShape(Capsule())
-            })
+            // So sad, gotta leave this for now (12/7/22); will come back to it later
+//            Button(action: {
+//                isPresentingTrivioLiveView.toggle()
+//                formatter.hapticFeedback(style: .soft, intensity: .strong)
+//                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
+//            }, label: {
+//                Text("Host this game live!")
+//                    .font(formatter.font(.boldItalic, fontSize: .regular))
+//                    .foregroundColor(formatter.color(.highContrastWhite))
+//                    .padding()
+//                    .frame(maxWidth: .infinity)
+//                    .background(formatter.color(.primaryAccent))
+//                    .clipShape(Capsule())
+//            })
         }
         .padding([.horizontal, .top])
         .background(formatter.color(.primaryBG).mask(LinearGradient(gradient: Gradient(colors: [bgColor, bgColor, bgColor, .clear]), startPoint: .bottom, endPoint: .top)))

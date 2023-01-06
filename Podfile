@@ -11,20 +11,19 @@ target 'Trivio! (iOS)' do
   pod 'Firebase/Auth'
   pod 'FirebaseFirestoreSwift', '~> 7.11.0-beta'
   pod 'Introspect'
-  pod 'Purchases'
-  pod 'GoogleSignIn'
+  pod 'GoogleSignIn', '~> 6.2'
 
 end
 
 target 'Trivio! (macOS)' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+  # use_frameworks!
 
   # Pods for Trivio! (macOS)
   # pod 'Firebase/Analytics'
-  pod 'Firebase/Firestore'
-  pod 'Firebase/Auth'
-  pod 'FirebaseFirestoreSwift', '~> 7.11.0-beta'
+  # pod 'Firebase/Firestore'
+  # pod 'Firebase/Auth'
+  # pod 'FirebaseFirestoreSwift', '~> 7.11.0-beta'
   
 end
 

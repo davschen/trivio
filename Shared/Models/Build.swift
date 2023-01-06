@@ -54,7 +54,7 @@ struct CustomSet: Decodable, Hashable, Identifiable, Encodable {
         hasher.combine(id)
     }
     
-    init(id: String? = nil, jCategoryIDs: [String] = [], djCategoryIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], fjCategory: String = "", fjClue: String = "", fjResponse: String = "", dateCreated: Date = Date(), jeopardyDailyDoubles: [Int] = [], djDailyDoubles1: [Int] = [], djDailyDoubles2: [Int] = [], userID: String = "", isPublic: Bool = true, tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numclues: Int = 0, averageScore: Double = 0.0, jRoundLen: Int = 6, djRoundLen: Int = 6) {
+    init(id: String? = nil, jCategoryIDs: [String] = [], djCategoryIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], fjCategory: String = "", fjClue: String = "", fjResponse: String = "", dateCreated: Date = Date(), jeopardyDailyDoubles: [Int] = [], djDailyDoubles1: [Int] = [], djDailyDoubles2: [Int] = [], userID: String = "", isPublic: Bool = false, tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numclues: Int = 0, averageScore: Double = 0.0, jRoundLen: Int = 6, djRoundLen: Int = 6) {
         self.id = id
         self.jCategoryIDs = jCategoryIDs
         self.djCategoryIDs = djCategoryIDs
@@ -144,7 +144,7 @@ struct CustomSetCherry: Decodable, Hashable, Identifiable, Encodable {
 }
 
 extension CustomSetCherry {
-    init(id: String? = UUID().uuidString, round1CatIDs: [String] = [], round2CatIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], description: String = "", finalCat: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), dateLastModified: Date = Date(), roundOneDaily: [Int] = [], roundTwoDaily1: [Int] = [], roundTwoDaily2: [Int] = [], userID: String = "", tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numClues: Int = 0, round1Len: Int = 6, round2Len: Int = 6, hasTwoRounds: Bool = false, isDraft: Bool = true, isPublic: Bool = true) {
+    init(id: String? = UUID().uuidString, round1CatIDs: [String] = [], round2CatIDs: [String] = [], categoryNames: [String] = [], title: String = "", titleKeywords: [String] = [], description: String = "", finalCat: String = "", finalClue: String = "", finalResponse: String = "", dateCreated: Date = Date(), dateLastModified: Date = Date(), roundOneDaily: [Int] = [], roundTwoDaily1: [Int] = [], roundTwoDaily2: [Int] = [], userID: String = "", tags: [String] = [], plays: Int = 0, rating: Double = 0.0, numRatings: Int = 0, numClues: Int = 0, round1Len: Int = 6, round2Len: Int = 6, hasTwoRounds: Bool = false, isDraft: Bool = true, isPublic: Bool = false) {
         self.id = id
         self.round1CatIDs = round1CatIDs
         self.round2CatIDs = round2CatIDs

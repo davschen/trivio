@@ -59,6 +59,7 @@ struct MobileFinalTrivioUserFlowView: View {
                         } else {
                             Text(gamesVM.customSet.finalCat.uppercased())
                                 .font(formatter.font(.bold, fontSize: .medium))
+                                .multilineTextAlignment(.center)
                             Text(gamesVM.customSet.finalClue)
                                 .font(formatter.font(.regular, fontSize: .regular))
                                 .multilineTextAlignment(.center)
@@ -99,13 +100,15 @@ struct MobileFinalTrivioUserFlowView: View {
                         VStack (spacing: 15) {
                             // Each player's textbox for entering wagers
                             ForEach(participantsVM.teams, id: \.self) { team in
-                                switch gamesVM.finalTrivioStage {
-                                case .makeWager:
-                                    MobileMakeWagerView(teamIndex: team.index)
-                                case .submitAnswer:
-                                    MobileSubmitAnswerView(teamIndex: team.index)
-                                default:
-                                    MobileRevealGradeView(teamIndex: team.index)
+                                if team.score > 0 {
+                                    switch gamesVM.finalTrivioStage {
+                                    case .makeWager:
+                                        MobileMakeWagerView(teamIndex: team.index)
+                                    case .submitAnswer:
+                                        MobileSubmitAnswerView(teamIndex: team.index)
+                                    default:
+                                        MobileRevealGradeView(teamIndex: team.index)
+                                    }
                                 }
                             }
                         }
@@ -122,6 +125,9 @@ struct MobileFinalTrivioUserFlowView: View {
                 if participantsVM.wagersValid() {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     gamesVM.finalTrivioFinishedAction()
+                    if gamesVM.finalTrivioStage == .submitAnswer {
+                        formatter.speaker.speak(gamesVM.customSet.finalClue)
+                    }
                 }
             }, label: {
                 Text("Continue")

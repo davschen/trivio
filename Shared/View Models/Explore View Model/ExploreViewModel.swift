@@ -11,6 +11,7 @@ import FirebaseFirestoreSwift
 import FirebaseFirestore
 
 class ExploreViewModel: ObservableObject {
+    @Published var homepageIsDisplaying: HomepageDisplayMode = .publicSets
     @Published var currentSearchBy: SearchByOption = .allrecents
     @Published var searchItem = ""
     @Published var gameIDs = [String]()
@@ -42,9 +43,8 @@ class ExploreViewModel: ObservableObject {
     @Published var queriedUserRecords = [MyUserRecords]()
     
     public var db = Firestore.firestore()
-    
-    private var latestPublicDoc: DocumentSnapshot? = nil
-    private var latestPrivateDoc: DocumentSnapshot? = nil
+    public var latestPublicDoc: DocumentSnapshot? = nil
+    public var latestPrivateDoc: DocumentSnapshot? = nil
     
     public var currentSort: String {
         if filterBy == "dateCreated" && isDescending == true {
@@ -121,13 +121,24 @@ class ExploreViewModel: ObservableObject {
         }
     }
     
+    public func shortenPublicSetsTo(_ newLength: Int, customSet: CustomSetCherry) {
+//        let newPublicSetsCopy = Array(allPublicSets.prefix(newLength))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            var ticker = 0
+            self.allPublicSets = self.allPublicSets.filter({ customPublicSet in
+                ticker += 1
+                return (customPublicSet.id == customSet.id || ticker <= 10)
+            })
+        }
+    }
+    
     public func pullAllPublicSets() {
         // Is it a bit janky to limit to 10,000? Yes. I will never have 10,000 sets on my app, however.
         // When I do, I will be rich and I will sell this app to Kahoot or whomever and be even richer
         var query: Query!
 
         if allPublicSets.isEmpty {
-            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 5)
+            query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).limit(to: 10)
         } else {
             query = db.collection("userSets").whereField("isPublic", isEqualTo: true).order(by: filterBy, descending: isDescending).start(afterDocument: latestPublicDoc!).limit(to: 5)
         }
@@ -343,4 +354,8 @@ class ExploreViewModel: ObservableObject {
 
 enum SearchByOption {
     case title, category, tags, allrecents
+}
+
+enum HomepageDisplayMode {
+    case publicSets, recentlyPlayed, myCustomSets, setPreview
 }

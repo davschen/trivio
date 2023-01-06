@@ -10,136 +10,105 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var formatter: MasterHandler
-    
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @EnvironmentObject var reportVM: ReportViewModel
-    @EnvironmentObject var searchVM: SearchViewModel
     
-    @State var isShowingMenu = true
-    @State var menuOffset: CGFloat = 0
+    @State var isShowingMyCustomSetsView = true
+    @State var isShowingDraftsView = true
     
     var body: some View {
-        ZStack {
-            if buildVM.showingBuildView {
-                BuildView()
-                    .transition(.move(edge: .bottom))
-            } else if profileVM.showingSettingsView {
-                SettingsView()
-                    .transition(.move(edge: .bottom))
-            } else {
-                ProfileMainView()
-            }
-        }
-    }
-}
-
-struct ProfileMainView: View {
-    @EnvironmentObject var buildVM: BuildViewModel
-    @EnvironmentObject var exploreVM: ExploreViewModel
-    @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
-    @EnvironmentObject var reportVM: ReportViewModel
-    @EnvironmentObject var searchVM: SearchViewModel
-    
-    var body: some View {
-        HStack (spacing: 30) {
-            // Menu
-            VStack {
+        ScrollView (showsIndicators: false) {
+            VStack (alignment: .leading, spacing: 15) {
                 AccountInfoView()
-                ProfileMenuSelectionView()
-                Spacer()
-                ProfileBottomButtonsView()
-            }
-            .frame(width: UIScreen.main.bounds.width * 0.25)
-            .padding([.leading, .vertical], 30)
-            ZStack {
-                switch profileVM.menuSelectedItem {
-                case "Summary":
-                    SummaryView()
-                case "My Drafts":
-                    DraftsView()
-                case "Past Games":
-                    ReportsView()
-                default:
-                    MySetsView()
+                Spacer(minLength: 10)
+                VStack (spacing: 20) {
+                    VStack (alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("My sets")
+                            Spacer()
+                            Button {
+                                isShowingMyCustomSetsView.toggle()
+                            } label: {
+                                Text(isShowingMyCustomSetsView ? "Hide" : "Show")
+                                    .foregroundColor(formatter.color(.secondaryAccent))
+                            }
+                        }
+                        .padding(.horizontal, 25)
+                        if isShowingMyCustomSetsView {
+                            MyCustomSetsView(customSets: $gamesVM.customSets)
+                        }
+                    }
+                    VStack (alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("My drafts")
+                            Spacer()
+                            Button {
+                                isShowingDraftsView.toggle()
+                            } label: {
+                                Text(isShowingDraftsView ? "Hide" : "Show")
+                                    .foregroundColor(formatter.color(.secondaryAccent))
+                            }
+                        }
+                        .padding(.horizontal)
+                        if isShowingDraftsView {
+                            MyDraftsView()
+                        }
+                    }
                 }
             }
-            .padding([.trailing, .top], 30)
+            .padding(.vertical)
+            .padding(.bottom, 25)
         }
+        .withBackground()
+        .withBackButton()
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
 struct AccountInfoView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
     var body: some View {
-        VStack (alignment: .leading) {
-            VStack (alignment: .leading) {
-                Text("\(profileVM.name)")
-                    .font(formatter.font(.bold, fontSize: .large))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                Text("@\(profileVM.username)")
-                    .font(formatter.font(.regular, fontSize: .medium))
-                    .foregroundColor(formatter.color(.highContrastWhite))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom)
-            
-            Button(action: {
-                profileVM.showingSettingsView.toggle()
-                profileVM.settingsMenuSelectedItem = "Account"
-            }, label: {
-                Text("Edit Info")
-                    .foregroundColor(formatter.color(.highContrastWhite))
-                    .font(formatter.font(.bold, fontSize: .medium))
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(formatter.color(.primaryAccent))
-                    .cornerRadius(5)
-            })
-        }
-        .padding()
-        .background(formatter.color(.primaryFG))
-        .cornerRadius(10)
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct ProfileMenuSelectionView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var profileVM: ProfileViewModel
-    
-    var body: some View {
-        ScrollView (.vertical, showsIndicators: false) {
-            VStack {
-                Spacer()
-                    .frame(height: 15)
-                menuSelectionView(label: "Summary")
-                menuSelectionView(label: "My Sets")
-                menuSelectionView(label: "My Drafts")
-                menuSelectionView(label: "Past Games")
+        Button {
+            formatter.hapticFeedback(style: .heavy, intensity: .weak)
+            profileVM.showingSettingsView.toggle()
+            profileVM.settingsMenuSelectedItem = "Account"
+        } label: {
+            ZStack {
+                HStack (spacing: 5) {
+                    Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
+                        .font(formatter.font(.boldItalic, fontSize: .small))
+                        .frame(width: 50, height: 50)
+                        .background(formatter.color(.primaryAccent))
+                        .clipShape(Circle())
+                        .overlay(
+                                Circle()
+                                    .stroke(formatter.color(.highContrastWhite), lineWidth: 2)
+                            )
+                    VStack (alignment: .leading, spacing: 7) {
+                        Text("\(profileVM.name)")
+                            .font(formatter.font(.bold, fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                        Text("@\(profileVM.username)")
+                            .font(formatter.font(.regular, fontSize: .medium))
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 10)
+                    
+                    Spacer(minLength: 0)
+                    
+                    Image(systemName: "chevron.right")
+                        .font(formatter.iconFont(.small))
+                }
+                .padding(.horizontal, 25)
+                
+                NavigationLink(destination: AccountSettingsView(),
+                               isActive: $profileVM.showingSettingsView,
+                               label: { EmptyView() }).hidden()
             }
         }
-    }
-    
-    func menuSelectionView(label: String) -> some View {
-        Text(label)
-            .font(formatter.font())
-            .foregroundColor(formatter.color(profileVM.menuSelectedItem == label ? .highContrastWhite : .mediumContrastWhite))
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(formatter.color(profileVM.menuSelectedItem == label ? .primaryAccent : .primaryBG))
-            .cornerRadius(5)
-            .animation(nil)
-            .onTapGesture {
-                profileVM.menuSelectedItem = label
-            }
     }
 }
 
@@ -152,6 +121,7 @@ struct ProfileBottomButtonsView: View {
     var body: some View {
         VStack (spacing: 10) {
             Button(action: {
+                formatter.hapticFeedback(style: .light)
                 buildVM.start()
             }, label: {
                 HStack {
@@ -168,6 +138,7 @@ struct ProfileBottomButtonsView: View {
             })
             
             Button(action: {
+                formatter.hapticFeedback(style: .light)
                 profileVM.showingSettingsView.toggle()
             }, label: {
                 HStack {
@@ -196,9 +167,14 @@ struct EmptyListView: View {
                 .font(formatter.font(.regularItalic))
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: 145)
         .padding()
-        .background(formatter.color(.primaryFG))
         .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(formatter.color(.lowContrastWhite), lineWidth: 2)
+        )
     }
 }
+

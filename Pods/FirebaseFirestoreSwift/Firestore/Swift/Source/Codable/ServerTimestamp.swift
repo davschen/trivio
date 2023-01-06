@@ -31,7 +31,7 @@ import FirebaseFirestore
     /// Converts this value into a Firestore `Timestamp`.
     ///
     /// - Returns: A `Timestamp` representation of this value.
-    static func unwrap(_ pointValueString: Self) throws -> Timestamp
+    static func unwrap(_ value: Self) throws -> Timestamp
   }
 
   extension Date: ServerTimestampWrappable {
@@ -39,8 +39,8 @@ import FirebaseFirestore
       return timestamp.dateValue()
     }
 
-    public static func unwrap(_ pointValueString: Self) throws -> Timestamp {
-      return Timestamp(date: pointValueString)
+    public static func unwrap(_ value: Self) throws -> Timestamp {
+      return Timestamp(date: value)
     }
   }
 
@@ -49,8 +49,8 @@ import FirebaseFirestore
       return timestamp as! Self
     }
 
-    public static func unwrap(_ pointValueString: Timestamp) throws -> Timestamp {
-      return pointValueString
+    public static func unwrap(_ value: Timestamp) throws -> Timestamp {
+      return value
     }
   }
 
@@ -71,15 +71,15 @@ import FirebaseFirestore
   @propertyWrapper
   public struct ServerTimestamp<Value>: Codable
     where Value: ServerTimestampWrappable & Codable {
-    var pointValueString: Value?
+    var value: Value?
 
-    public init(wrappedValue pointValueString: Value?) {
-      self.pointValueString = pointValueString
+    public init(wrappedValue value: Value?) {
+      self.value = value
     }
 
     public var wrappedValue: Value? {
-      get { pointValueString }
-      set { pointValueString = newValue }
+      get { value }
+      set { value = newValue }
     }
 
     // MARK: Codable
@@ -87,16 +87,16 @@ import FirebaseFirestore
     public init(from decoder: Decoder) throws {
       let container = try decoder.singleValueContainer()
       if container.decodeNil() {
-        pointValueString = nil
+        value = nil
       } else {
-        pointValueString = try Value.wrap(try container.decode(Timestamp.self))
+        value = try Value.wrap(try container.decode(Timestamp.self))
       }
     }
 
     public func encode(to encoder: Encoder) throws {
       var container = encoder.singleValueContainer()
-      if let pointValueString = pointValueString {
-        try container.encode(Value.unwrap(pointValueString))
+      if let value = value {
+        try container.encode(Value.unwrap(value))
       } else {
         try container.encode(FieldValue.serverTimestamp())
       }

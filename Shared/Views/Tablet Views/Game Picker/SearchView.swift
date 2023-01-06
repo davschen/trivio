@@ -39,7 +39,7 @@ struct SearchView: View {
                                 JeopardyGamesView(showingGames: true, games: searchVM.games)
                             } else {
                                 if gamesVM.previewViewShowing {
-                                    GamePreviewView(searchQuery: searchVM.capSplit)
+                                    GamePreviewView()
                                 } else {
                                     JeopardyGamesView(showingGames: true, games: searchVM.games)
                                 }

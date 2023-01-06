@@ -120,6 +120,7 @@ struct MobileUserCustomSetCellView: View {
     
     func selectSet(customSet: CustomSetCherry) {
         formatter.hapticFeedback(style: .light)
+        exploreVM.shortenPublicSetsTo(10, customSet: customSet)
         gamesVM.reset()
         gamesVM.getCustomData(setID: setID)
         participantsVM.resetScores()

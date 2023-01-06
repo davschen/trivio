@@ -267,6 +267,7 @@ struct MobileBuildDetailsView: View {
                 Text("Tip: Each category is considered complete when it has one or more clues. So, if you’re stuck on a category, just finish one clue and move on. You can always come back to it later!")
                     .font(formatter.font(.regularItalic, fontSize: .regular))
                     .padding(.bottom, 45)
+                    .lineSpacing(2)
             }
             .padding(.bottom, 45)
         }

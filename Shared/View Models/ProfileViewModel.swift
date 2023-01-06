@@ -204,7 +204,8 @@ class ProfileViewModel: ObservableObject {
                     guard let myUserRecordCherry = try? docSnap?.data(as: MyUserRecordsCherry.self) else { return }
                     var userRecord = MyUserRecords()
                     userRecord.assignFromMURCherry(myUserRecordsCherry: myUserRecordCherry)
-                    self.allUserRecords.append(userRecord)
+                    let insertionIndex = self.allUserRecords.insertionIndexOf(userRecord) { $0.mostRecentSession > $1.mostRecentSession }
+                    self.allUserRecords.insert(userRecord, at: insertionIndex)
                 }
             }
         }
@@ -241,6 +242,9 @@ class ProfileViewModel: ObservableObject {
                 self.name = name
                 self.username = username
             }
+            self.db.document("users/\(myUID)/myUserRecords/myUserRecordsCherry").setData([
+                "username" : username,
+            ], merge: true)
         }
         db.collection("drafts")
             .whereField("userID", isEqualTo: myUID)
@@ -300,6 +304,19 @@ class ProfileViewModel: ObservableObject {
             }
         }
         return initials
+    }
+    
+    func getAuthProvider() -> String {
+        let providerData = Auth.auth().currentUser?.providerData
+        var provider = ""
+        providerData?.forEach({ userInfo in
+            if userInfo.phoneNumber != nil {
+                provider = "Phone"
+            } else {
+                provider = "Google"
+            }
+        })
+        return provider
     }
     
     func editAccountInfo() {

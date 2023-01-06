@@ -59,7 +59,7 @@ extension BuildViewModel {
         let finalCheck = !currCustomSet.roundTwoDaily1.isEmpty && !currCustomSet.roundTwoDaily2.isEmpty
         
         let allBools = currCustomSet.hasTwoRounds ? [detailsCheck, trivioRoundCheck, roundOneDailyCheck, dtRoundCheck, roundTwoDailyCheck, finalCheck] : [detailsCheck, trivioRoundCheck, roundOneDailyCheck, dtRoundCheck]
-
+        
         for i in allBools.indices {
             if allBools[i] {
                 guard let stageAtIndex = MobileBuildStageIndexDict().reverseDict[i] else { return }

@@ -86,10 +86,10 @@ class BuildViewModel: ObservableObject {
         
         buildStage = .details
         currentDisplay = .settings
-        determineMostAdvancedStage()
     }
     
     func incrementDirtyBit() {
+        if MasterHandler().deviceType == .iPad { determineMostAdvancedStage() }
         dirtyBit += 1
     }
     
@@ -100,6 +100,7 @@ class BuildViewModel: ObservableObject {
     func start() {
         clearAll()
         showingBuildView.toggle()
+        mostAdvancedStage = .details
     }
     
     func getNumClues() -> Int {

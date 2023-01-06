@@ -30,7 +30,7 @@ struct MobileMyDraftsView: View {
             }
         } else {
             MobileEmptyListView(label: "No drafts! Come back here when you save a draft.")
-                .padding(.vertical)
+                .padding(.horizontal)
         }
     }
 }

@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import StoreKit
-import Purchases
 
 struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler

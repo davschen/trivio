@@ -25,14 +25,14 @@ struct MobileBuildHUDView: View {
     var body: some View {
         HStack (spacing: 3) {
             Image(systemName: "gear")
-                .foregroundColor(formatter.color(.primaryBG))
+                .foregroundColor(formatter.color(.highContrastWhite))
                 .font(formatter.iconFont(.medium))
-                .frame(width: 50, height: 50)
-                .background(formatter.color(.highContrastWhite))
+                .frame(width: 80, height: 50)
+                .background(formatter.color(.primaryFG))
                 .cornerRadius(5)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .details ? 2 : 0)
+                        .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .details ? 2 : 0)
                 )
                 .onTapGesture {
                     formatter.hapticFeedback(style: .rigid)
@@ -47,7 +47,7 @@ struct MobileBuildHUDView: View {
                 .cornerRadius(5)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .trivioRound ? 2 : 0)
+                        .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .trivioRound ? 2 : 0)
                 )
                 .opacity(getBuildStageIndex(.trivioRound) <= mostAdvancedStageIndex ? 1 : 0.4)
                 .onTapGesture {
@@ -66,7 +66,7 @@ struct MobileBuildHUDView: View {
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .trivioRoundDD ? 2 : 0)
+                        .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .trivioRoundDD ? 2 : 0)
                 )
                 .opacity(getBuildStageIndex(.trivioRoundDD) <= mostAdvancedStageIndex ? 1 : 0.4)
                 .onTapGesture {
@@ -86,7 +86,7 @@ struct MobileBuildHUDView: View {
                     .cornerRadius(5)
                     .overlay(
                         RoundedRectangle(cornerRadius: 5)
-                            .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .dtRound ? 2 : 0)
+                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .dtRound ? 2 : 0)
                     )
                     .opacity(getBuildStageIndex(.dtRound) <= mostAdvancedStageIndex ? 1 : 0.4)
                     .onTapGesture {
@@ -103,7 +103,7 @@ struct MobileBuildHUDView: View {
                     .cornerRadius(10)
                     .overlay(
                         RoundedRectangle(cornerRadius: 5)
-                            .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .dtRoundDD ? 2 : 0)
+                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .dtRoundDD ? 2 : 0)
                     )
                     .opacity(getBuildStageIndex(.dtRoundDD) <= mostAdvancedStageIndex ? 1 : 0.4)
                     .onTapGesture {
@@ -123,7 +123,7 @@ struct MobileBuildHUDView: View {
                 .cornerRadius(5)
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
-                        .strokeBorder(formatter.color(.secondaryAccent), lineWidth: buildVM.buildStage == .finalTrivio ? 2 : 0)
+                        .strokeBorder(formatter.color(.highContrastWhite), lineWidth: buildVM.buildStage == .finalTrivio ? 2 : 0)
                 )
                 .opacity(getBuildStageIndex(.finalTrivio) <= mostAdvancedStageIndex ? 1 : 0.4)
                 .onTapGesture {
