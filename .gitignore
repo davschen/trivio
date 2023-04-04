@@ -1,0 +1,7 @@
+*
+!/.gitignore
+!/Shared
+/Shared/*
+!/Shared/Views
+!/Shared/View Models
+!/Shared/Models

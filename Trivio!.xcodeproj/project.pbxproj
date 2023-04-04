@@ -78,6 +78,7 @@
 		8B9B788D29DA60130006BA12 /* MobileTrivioLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B788C29DA60130006BA12 /* MobileTrivioLiveView.swift */; };
 		8B9B789029DCB2C90006BA12 /* MobileLiveGameBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B788F29DCB2C90006BA12 /* MobileLiveGameBoardView.swift */; };
 		8B9B789229DCB2FE0006BA12 /* MobileLiveGameSideRailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B789129DCB2FE0006BA12 /* MobileLiveGameSideRailView.swift */; };
+		8B9B789429DCBFEE0006BA12 /* MobileLiveClueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B789329DCBFEE0006BA12 /* MobileLiveClueView.swift */; };
 		8BA3BAC0290A08BD0086451B /* Gameplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BABF290A08BD0086451B /* Gameplay.swift */; };
 		8BA3BAC2290BB12E0086451B /* MobileTrivioLivePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BAC1290BB12E0086451B /* MobileTrivioLivePreviewView.swift */; };
 		8BA3BAC5290CBD050086451B /* Build.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BAC4290CBD050086451B /* Build.swift */; };
@@ -261,6 +262,7 @@
 		8B9B788C29DA60130006BA12 /* MobileTrivioLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileTrivioLiveView.swift; sourceTree = "<group>"; };
 		8B9B788F29DCB2C90006BA12 /* MobileLiveGameBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileLiveGameBoardView.swift; sourceTree = "<group>"; };
 		8B9B789129DCB2FE0006BA12 /* MobileLiveGameSideRailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileLiveGameSideRailView.swift; sourceTree = "<group>"; };
+		8B9B789329DCBFEE0006BA12 /* MobileLiveClueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileLiveClueView.swift; sourceTree = "<group>"; };
 		8BA3BABF290A08BD0086451B /* Gameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gameplay.swift; sourceTree = "<group>"; };
 		8BA3BAC1290BB12E0086451B /* MobileTrivioLivePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileTrivioLivePreviewView.swift; sourceTree = "<group>"; };
 		8BA3BAC4290CBD050086451B /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
@@ -675,6 +677,7 @@
 			isa = PBXGroup;
 			children = (
 				8B9B788F29DCB2C90006BA12 /* MobileLiveGameBoardView.swift */,
+				8B9B789329DCBFEE0006BA12 /* MobileLiveClueView.swift */,
 			);
 			path = "Variable Game Display";
 			sourceTree = "<group>";
@@ -1260,6 +1263,7 @@
 				8BAA42DE29416CD60077DEA0 /* GameGridView.swift in Sources */,
 				8BA62B9E292702090010835A /* Persistence.swift in Sources */,
 				8BFC126526A15A0A00D3E513 /* ExploreViewModel.swift in Sources */,
+				8B9B789429DCBFEE0006BA12 /* MobileLiveClueView.swift in Sources */,
 				8B88EAE626AD1F96001C5C2C /* MobileFinalTrivioView.swift in Sources */,
 				8B0EFC3527EC67C8000BD2DF /* DailyTrivioSet.swift in Sources */,
 				8BA62B9A292701B70010835A /* SortDictionary.swift in Sources */,

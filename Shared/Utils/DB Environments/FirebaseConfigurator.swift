@@ -22,7 +22,7 @@ class FirebaseConfigurator {
         } else {
             options = FirebaseOptions(contentsOfFile: Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist")!)!
         }
-
+        FirebaseConfiguration.shared.setLoggerLevel(.max)
         FirebaseApp.configure(options: options)
     }
 

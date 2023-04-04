@@ -134,9 +134,6 @@ class GamesViewModel: ObservableObject {
     }
     
     func generateFinishedClues2D() -> [[ClueCompletionStatus]] {
-        // finished clues dict will take the following form: [Int:[Bool]]
-        // where key = category index and value (boolean array) represents
-        // whether or not that clue is finished
         let cluesNestedArray = gamePhase == .round1 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
         var finishedClues2D = [[ClueCompletionStatus]]()
         cluesNestedArray.forEach { cluesArray in

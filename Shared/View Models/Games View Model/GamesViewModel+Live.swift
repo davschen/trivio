@@ -11,6 +11,13 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 extension GamesViewModel {
+    public func startLiveGame(hostUsername: String, hostName: String) {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        createLiveGameDocument(hostUsername: hostUsername, hostName: hostName)
+        listenToLiveGameDocument(liveGameCustomSetId: myUID)
+        listenToLiveGamePlayers(liveGameCustomSetId: myUID)
+    }
+    
     public func createLiveGameDocument(hostUsername: String, hostName: String) {
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         guard let customSetID = self.customSet.id else { return }
@@ -18,14 +25,11 @@ extension GamesViewModel {
         let playerCode = String(randomNumberWith(digits: 6))
         self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: customSetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet)
         // the document ID is myUID because I don't want one user to be making multiple live games
-        db.collection("liveGames").document(myUID).addSnapshotListener { (snap, error) in
-            if error != nil {
-                return
-            } else {
-                try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-            }
+        do {
+            try self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
+        } catch let error {
+            print("Error writing live game custom set: \(error.localizedDescription)")
         }
-        listenToLiveGamePlayers(liveGameCustomSetId: myUID)
     }
 
     public func randomNumberWith(digits:Int) -> Int {
@@ -34,8 +38,24 @@ extension GamesViewModel {
         return Int(Range(uncheckedBounds: (min, max)))
     }
     
+    func listenToLiveGameDocument(liveGameCustomSetId: String) {
+        let liveGameRef = db.collection("liveGames").document(liveGameCustomSetId)
+
+        listener = liveGameRef.addSnapshotListener { [weak self] snapshot, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                print("Error listening for live game document updates: \(error.localizedDescription)")
+                return
+            }
+
+            if let snapshot = snapshot {
+                self.liveGameCustomSet = try! snapshot.data(as: LiveGameCustomSet.self)!
+            }
+        }
+    }
+    
     func listenToLiveGamePlayers(liveGameCustomSetId: String) {
-        let db = Firestore.firestore()
         let playersRef = db.collection("liveGames")
             .document(liveGameCustomSetId)
             .collection("players")
@@ -50,7 +70,7 @@ extension GamesViewModel {
             }
 
             self.liveGamePlayers = snapshot?.documents.compactMap { document in
-                try? document.data(as: LiveGamePlayer.self)
+                return try? document.data(as: LiveGamePlayer.self)
             } ?? []
         }
     }
@@ -60,22 +80,51 @@ extension GamesViewModel {
         listener = nil
     }
     
-    func startGame() {
+    func setLiveCurrentSelectedClue(categoryIndex: Int, clueIndex: Int) {
+        liveGameCustomSet.currentCategoryIndex = categoryIndex
+        liveGameCustomSet.currentClueIndex = clueIndex
+        liveGameCustomSet.currentGameDisplay = "clue"
+        
+        modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex)
+        currentCategoryIndex = categoryIndex
+    }
+
+    func getRandomIncompleteClue() -> (categoryIndex: Int, clueIndex: Int)? {
+        var n = 0
+        var selected: (categoryIndex: Int, clueIndex: Int)? = nil
+        
+        for categoryIndex in 0..<finishedClues2D.count {
+            for clueIndex in 0..<finishedClues2D[categoryIndex].count {
+                if finishedClues2D[categoryIndex][clueIndex] == .incomplete {
+                    n += 1
+                    if Int.random(in: 0..<n) == 0 {
+                        selected = (categoryIndex, clueIndex)
+                    }
+                }
+            }
+        }
+        return selected
+    }
+    
+    func updateLiveGameCustomSet() {
         guard let liveGameCustomSetID = self.liveGameCustomSet.id else {
+            print("Error: liveGameCustomSet ID not found")
             return
         }
 
         let documentReference = db.collection("liveGames").document(liveGameCustomSetID)
 
-        documentReference.updateData([
-            "gameHasBegun": true
-        ]) { error in
-            if let error = error {
-                print("Error updating document: \(error)")
-            } else {
-                print("Document successfully updated")
-                self.liveGameCustomSet.gameHasBegun = true
+        do {
+            let data = try Firestore.Encoder().encode(liveGameCustomSet)
+            documentReference.updateData(data) { error in
+                if let error = error {
+                    print("Error updating liveGameCustomSet: \(error)")
+                } else {
+                    print("liveGameCustomSet successfully updated")
+                }
             }
+        } catch let error {
+            print("Error encoding liveGameCustomSet: \(error)")
         }
     }
 }

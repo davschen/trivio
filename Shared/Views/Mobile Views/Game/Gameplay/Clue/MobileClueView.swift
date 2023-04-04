@@ -261,8 +261,8 @@ struct MobileClueRevealedSubView: View {
 
 struct MobileClueHeaderView: View {
     @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @State var isSpeakerMuted = false
     

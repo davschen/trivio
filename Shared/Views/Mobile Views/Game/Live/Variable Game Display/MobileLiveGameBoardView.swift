@@ -63,9 +63,10 @@ struct MobileLiveGameBoardView: View {
     func gameCellTapped(categoryIndex: Int, clueIndex: Int) {
         if gamesVM.finishedClues2D[categoryIndex][clueIndex] == .incomplete {
             formatter.hapticFeedback(style: .rigid)
-            gamesVM.setCurrentSelectedClue(categoryIndex: categoryIndex, clueIndex: clueIndex)
             
-            if !gamesVM.currentSelectedClue.isWVC {
+            gamesVM.setLiveCurrentSelectedClue(categoryIndex: categoryIndex, clueIndex: clueIndex)
+            
+            if !Clue(liveGameCustomSet: gamesVM.liveGameCustomSet).isWVC {
                 formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
             }
         }

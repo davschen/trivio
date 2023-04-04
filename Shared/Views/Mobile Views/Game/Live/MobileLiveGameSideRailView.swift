@@ -35,7 +35,10 @@ struct MobileLiveGameSideRailView: View {
         case .finalClue: newLiveGameDisplay = "finalResponse"
         case .finalResponse: newLiveGameDisplay = "response"
         default:
-            newLiveGameDisplay = "clue"
+            if let randomClueCoords = gamesVM.getRandomIncompleteClue() {
+                gamesVM.setLiveCurrentSelectedClue(categoryIndex: randomClueCoords.categoryIndex, clueIndex: randomClueCoords.clueIndex)
+                newLiveGameDisplay = "clue"
+            }
         }
 
         gamesVM.liveGameCustomSet.currentGameDisplay = newLiveGameDisplay
@@ -73,9 +76,7 @@ struct MobileLiveGameSideRailView: View {
                 }
             }
             Button {
-                if LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) == .clue {
-                    gamesVM.liveGameCustomSet.currentGameDisplay = "response"
-                }
+                variableButtonAction()
             } label: {
                 Text("\(variableButtonLabel)")
                     .font(formatter.font(fontSize: .regular))

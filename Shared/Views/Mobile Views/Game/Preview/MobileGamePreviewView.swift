@@ -822,7 +822,7 @@ struct MobileGameSettingsFooterView: View {
             Button(action: {
                 isPresentingTrivioLiveView.toggle()
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
-                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
+                gamesVM.startLiveGame(hostUsername: profileVM.username, hostName: profileVM.name)
                 AppDelegate.orientationLock = .landscapeRight
                 UINavigationController.attemptRotationToDeviceOrientation()
                 currOrientation = .landscapeRight
