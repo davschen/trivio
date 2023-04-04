@@ -11,6 +11,89 @@ import SwiftUI
 struct GamePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @State var playingMode: PlayingMode = .game
+    @State var headerString = "Set Preview"
+    
+    init() {
+        Theme.navigationBarColors(
+            background: UIColor(MasterHandler().color(.primaryFG)),
+            titleColor: UIColor(MasterHandler().color(.highContrastWhite))
+        )
+    }
+    
+    var body: some View {
+        ZStack {
+            formatter.color(.primaryBG)
+                .edgesIgnoringSafeArea(.all)
+            VStack {
+                GamePlayingModeSelectorView(playingMode: $playingMode, headerString: $headerString)
+                if playingMode == .game {
+                    GameGameshowPreviewView()
+                } else {
+                    GameFlashcardsCategoriesView()
+                }
+            }
+        }
+        .withBackButton()
+        .navigationBarTitle(headerString, displayMode: .inline)
+    }
+}
+
+struct GamePlayingModeSelectorView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var playingMode: PlayingMode
+    @Binding var headerString: String
+    
+    var body: some View {
+        HStack (spacing: 7) {
+            Button {
+                formatter.hapticFeedback(style: .medium, intensity: .weak)
+                headerString = "Set Preview"
+                playingMode = .game
+            } label: {
+                HStack {
+                    Image(systemName: "gamecontroller.fill")
+                        .font(formatter.iconFont(.small))
+                    Text("Game")
+                        .font(formatter.font())
+                }
+                .padding(.horizontal, 20)
+                .frame(height: 40)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(5)
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: playingMode == .game ? 1 : 0))
+            }
+            
+            Button {
+                formatter.hapticFeedback(style: .medium, intensity: .weak)
+                playingMode = .flashcards
+                headerString = gamesVM.customSet.title
+                gamesVM.flashcardClues2D = gamesVM.generateFlashcards2D()
+            } label: {
+                HStack {
+                    Image(systemName: "rectangle.portrait.on.rectangle.portrait.fill")
+                        .font(formatter.iconFont(.small))
+                    Text("Flashcards")
+                        .font(formatter.font())
+                }
+                .padding(.horizontal, 20)
+                .frame(height: 40)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(5)
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: playingMode == .flashcards ? 1 : 0))
+            }
+            Spacer()
+        }
+        .padding([.top, .horizontal])
+    }
+}
+
+struct GameGameshowPreviewView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     
@@ -59,21 +142,10 @@ struct GamePreviewView: View {
                             .padding(.horizontal, 25)
                     }
                 }
-                .padding(.bottom, 60)
-                
-                if !isSetMine {
-                    GameSettingsPromptButtonsView(isPresentingGameView: $isPresentingGameView, isPresentingTrivioLiveView: $isPresentingTrivioLiveView, isPresentingBuildView: $isPresentingBuildView)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(formatter.color(.primaryBG).mask(LinearGradient(gradient: Gradient(colors: [bgColor, bgColor, bgColor, .clear]), startPoint: .bottom, endPoint: .top)))
-                }
             }
-            
-            NavigationLink(isActive: $isPresentingGameView, destination: {
+            .fullScreenCover(isPresented: $isPresentingGameView) {
                 GameBoardView()
-            }, label: { EmptyView() })
-            .isDetailLink(false)
-            .hidden()
+            }
             
             NavigationLink(isActive: $isPresentingBuildView, destination: {
                 BuildView()
@@ -132,9 +204,7 @@ struct GameSettingsHeaderView: View {
                         .foregroundColor(formatter.color(.mediumContrastWhite))
                         .lineSpacing(3)
                 }
-                if isSetMine {
-                    GameSettingsPromptButtonsView(isPresentingGameView: $isPresentingGameView, isPresentingTrivioLiveView: $trivioLiveViewActive, isPresentingBuildView: $isPresentingBuildView)
-                }
+                GameSettingsPromptButtonsView(isPresentingGameView: $isPresentingGameView, isPresentingTrivioLiveView: $trivioLiveViewActive, isPresentingBuildView: $isPresentingBuildView)
             }
             .font(formatter.font(.regular, fontSize: .medium))
             NavigationLink(destination: UserView()
@@ -211,31 +281,29 @@ struct GameSettingsContestantsView: View {
                     .foregroundColor(formatter.color(.lowContrastWhite))
                     .padding(.leading, 25)
                 // Contestants currently in the game float to the top
-                ForEach(participantsVM.savedTeams) { team in
-                    if participantsVM.teams.contains(team) {
-                        VStack (alignment: .leading, spacing: 14) {
-                            ContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    if team.id == editingID { return }
-                                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
-                                    if gamesVM.gameInProgress() && team.score > 0 {
-                                        formatter.setAlertSettings(alertAction: {
-                                            participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                        }, alertTitle: "Remove \(team.name)?", alertSubtitle: "\(team.name) has \(team.score) points right now. If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
-                                    } else {
+                ForEach(participantsVM.teams) { team in
+                    VStack (alignment: .leading, spacing: 14) {
+                        ContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if team.id == editingID { return }
+                                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                                if gamesVM.gameInProgress() && team.score > 0 {
+                                    formatter.setAlertSettings(alertAction: {
                                         participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                    }
+                                    }, alertTitle: "Remove \(team.name)?", alertSubtitle: "\(team.name) has \(team.score) points right now. If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                                } else {
+                                    participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                 }
-                            
-                            Rectangle()
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 1)
-                                .foregroundColor(formatter.color(.lowContrastWhite))
-                                .padding(.leading, 25)
-                        }
-                        .animation(.easeInOut(duration: 0.2))
+                            }
+                        
+                        Rectangle()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 1)
+                            .foregroundColor(formatter.color(.lowContrastWhite))
+                            .padding(.leading, 25)
                     }
+                    .animation(.easeInOut(duration: 0.2))
                 }
                 ForEach(participantsVM.savedTeams) { team in
                     if !participantsVM.teams.contains(team) {
@@ -278,7 +346,7 @@ struct ContestantsCellView: View {
                 EditContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
                 if team.id != editingID {
                     HStack (spacing: 7) {
-                        Image(systemName: participantsVM.teams.contains(team) ? "circle.inset.filled" : "circle")
+                        Image(systemName: participantsVM.teams.contains(team) ? "circle.fill" : "circle")
                         Circle()
                             .foregroundColor(ColorMap().getColor(color: team.color))
                             .frame(width: 8, height: 8)
@@ -784,7 +852,7 @@ struct GameSettingsPromptButtonsView: View {
                     .font(formatter.font(.boldItalic, fontSize: .regular))
                     .foregroundColor(formatter.color(.primaryFG))
                     .frame(height: 60)
-                    .frame(maxWidth: isSetMine ? 180 : .infinity)
+                    .frame(maxWidth: 180)
                     .padding(.horizontal, 30)
                     .background(formatter.color(.highContrastWhite))
                     .opacity(gameIsPlayable ? 1 : 0.5)

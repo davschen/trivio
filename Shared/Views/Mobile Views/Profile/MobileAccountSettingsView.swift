@@ -24,20 +24,35 @@ struct MobileAccountSettingsView: View {
             }
             
             if !isEditingAccountSettings {
-                Button {
-                    formatter.setAlertSettings(alertAction: {
-                        profileVM.logOut()
-                    }, alertTitle: "Log out?", alertSubtitle: "You're about to log out of your account.", hasCancel: true, actionLabel: "Confirm Log Out")
-                } label: {
-                    Text("Log Out")
-                        .font(formatter.font(fontSize: .mediumLarge))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical)
-                        .background(formatter.color(.secondaryFG))
-                        .cornerRadius(10)
-                        .padding(.bottom, 15)
+                VStack (spacing: 10) {
+                    Button {
+                        formatter.setAlertSettings(alertAction: {
+                            profileVM.logOut()
+                        }, alertTitle: "Log out?", alertSubtitle: "You're about to log out of your account.", hasCancel: true, actionLabel: "Confirm Log Out")
+                    } label: {
+                        Text("Log Out")
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical)
+                            .background(formatter.color(.secondaryFG))
+                            .cornerRadius(10)
+                    }
+                    Button {
+                        formatter.setAlertSettings(alertAction: {
+                            profileVM.deleteCurrentUserFromDB()
+                        }, alertTitle: "Are you sure?", alertSubtitle: "Deleting your account will permanently delete all of your user data associated with this app.", hasCancel: true, actionLabel: "Yes, delete my account")
+                    } label: {
+                        Text("Delete my account")
+                            .font(formatter.font(fontSize: .mediumLarge))
+                            .foregroundColor(formatter.color(.red))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical)
+                            .background(formatter.color(.primaryFG))
+                            .cornerRadius(10)
+                            .padding(.bottom, 15)
+                    }
                 }
-                .padding()
+                .padding([.horizontal, .bottom])
             }
         }
         .withBackground()

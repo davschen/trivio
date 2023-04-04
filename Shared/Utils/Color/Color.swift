@@ -10,8 +10,10 @@ import SwiftUI
 
 extension MasterHandler {
     func color(_ colorType: ColorType) -> Color {
+        // this is stupid i should be using raw values wtf
         var colorString = ""
         switch colorType {
+        case .black: return Color.black
         case .blue: colorString = "Blue"
         case .green: colorString = "Green"
         case .highContrastWhite: colorString = "High Contrast White"
@@ -55,5 +57,5 @@ struct ColorMap {
 }
 
 enum ColorType {
-    case blue, green, highContrastWhite, lowContrastWhite, mediumContrastWhite, orange, primaryAccent, primaryBG, primaryFG, purple, red, secondaryAccent, secondaryFG, yellow
+    case blue, green, highContrastWhite, lowContrastWhite, mediumContrastWhite, orange, primaryAccent, primaryBG, primaryFG, purple, red, secondaryAccent, secondaryFG, yellow, black
 }

@@ -73,6 +73,10 @@ class MasterHandler: ObservableObject {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
+    func stopSpeaker() {
+        speaker.isSpeaking ? speaker.stop() : ()
+    }
+    
     func padding(size: CGFloat = 15) -> CGFloat {
         if deviceType == .iPhone {
             if size == 15 {

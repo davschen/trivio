@@ -12,10 +12,15 @@ import StoreKit
 struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var appStoreManager: AppStoreManager
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @State var isPresentingTrivioLiveView: Bool = false
     
     var hasSubscribed: Bool {
         return UserDefaults.standard.bool(forKey: "iOS.Trivio.3.0.Cherry.OTLHT")
     }
+    
+    var numMonthlyGamesLeft = 1
     
     init() {
         Theme.navigationBarColors(
@@ -28,30 +33,115 @@ struct MobileTrivioLivePreviewView: View {
         ZStack {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
-            
-            ScrollView (.vertical, showsIndicators: false) {
+            HStack (spacing: 15) {
                 VStack (alignment: .leading, spacing: 15) {
-                    MobileGameSettingsHeaderView()
-                        .padding(.top)
+                    // Banner
+                    HStack {
+                        VStack (alignment: .leading, spacing: 5) {
+                            Text("\(numMonthlyGamesLeft) free live game left this month")
+                                .font(formatter.font(fontSize: .regular))
+                            Text("Effective once game starts. Tap to find out more.")
+                                .font(formatter.font(.regularItalic, fontSize: .small))
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "xmark")
+                    }
+                    .padding()
+                    .background(formatter.color(.red))
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: 2)
+                    )
                     
-                    VStack (alignment: .leading, spacing: 5) {
-                        ForEach(appStoreManager.myProducts, id: \.self) { product in
-                            ZStack {
-                                if product.productIdentifier == "iOS.Trivio.3.0.Cherry.OTLHT" {
-                                    MobileTrivioLiveCodeCardView(product: product)
-                                } else {
-                                    MobileTrivioLiveSubscriptionView(product: product)
+                    MobileTrivioLivePreviewHeaderView()
+                    
+                    VStack (spacing: 10) {
+                        Image(systemName: "iphone")
+                            .font(.system(size: 25))
+                        Text("\(gamesVM.liveGameCustomSet.playerCode)")
+                            .font(formatter.font(fontSize: .extraLarge))
+                        Text("Enter Code at www.trivio.live in a mobile browser to join the game.")
+                            .multilineTextAlignment(.center)
+                            .font(formatter.font(.regular, fontSize: .small))
+                            .frame(maxWidth: 170)
+                            .padding(.top, -5)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(formatter.color(.primaryFG))
+                    .cornerRadius(10)
+                }
+                .frame(width: 350)
+                VStack (spacing: 15) {
+                    Text("\(gamesVM.liveGamePlayers.count) Contestants")
+                        .font(formatter.font(fontSize: .mediumLarge))
+                    if gamesVM.liveGamePlayers.isEmpty {
+                        VStack (spacing: 20) {
+                            LoadingView()
+                            Text("Waiting for people to join")
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(formatter.color(.secondaryFG))
+                    } else {
+                        ScrollView (showsIndicators: false) {
+                            VStack {
+                                Rectangle()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 1)
+                                    .foregroundColor(formatter.color(.lowContrastWhite))
+                                ForEach(gamesVM.liveGamePlayers) { player in
+                                    VStack (spacing: 15) {
+                                        HStack {
+                                            Text("\(player.nickname)")
+                                            Spacer()
+                                            Text("Rename")
+                                                .font(formatter.font(.regular))
+                                            Button {
+                                                
+                                            } label: {
+                                                Image(systemName: "xmark")
+                                                    .font(.system(size: 14, weight: .regular))
+                                            }
+                                        }
+                                        .padding(.horizontal)
+                                        .padding(.top, 7)
+                                        Rectangle()
+                                            .frame(maxWidth: .infinity)
+                                            .frame(height: 1)
+                                            .foregroundColor(formatter.color(.lowContrastWhite))
+                                    }
                                 }
                             }
                         }
                     }
+                    
+                    Button {
+                        isPresentingTrivioLiveView.toggle()
+                    } label: {
+                        Text("Start Game")
+                            .font(formatter.font(.boldItalic, fontSize: .regular))
+                            .foregroundColor(formatter.color(.primaryFG))
+                            .padding(20)
+                            .frame(maxWidth: .infinity)
+                            .background(formatter.color(.highContrastWhite))
+                            .clipShape(Capsule())
+                            .padding(.horizontal)
+                    }
                 }
+                .padding(.vertical)
+                .frame(maxHeight: .infinity)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(10)
             }
-            .padding(.horizontal)
-            .font(formatter.font())
+            .padding()
+            
+            NavigationLink(isActive: $isPresentingTrivioLiveView, destination: {
+                MobileTrivioLiveView()
+            }, label: { EmptyView() })
+            .isDetailLink(false)
+            .hidden()
         }
-        .frame(maxWidth: .infinity)
-        .navigationTitle("Live Game")
+        .navigationTitle("Waiting Room")
         .withBackButton()
     }
 }
@@ -70,7 +160,7 @@ struct MobileTrivioLiveCodeCardView: View {
     var body: some View {
         VStack (spacing: 0) {
             VStack (spacing: 5) {
-                Text("\(gamesVM.liveGameCustomSet.hostCode)")
+                Text("\(gamesVM.liveGameCustomSet.playerCode)")
                     .font(formatter.fontFloat(.bold, sizeFloat: 45.0))
                 Text("Enter Code at www.trivio.live into a computer’s browser to host your game")
                     .font(formatter.font(.regular, fontSize: .regular))
@@ -206,6 +296,38 @@ struct MobileTrivioLiveSubscriptionView: View {
                 profileVM.updateMyUserRecords(fieldName: "isSubscribed", newValue: true)
             }
             isLoading = false
+        }
+    }
+}
+
+struct MobileTrivioLivePreviewHeaderView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    
+    @State var userViewActive = false
+    
+    var isShowingDescription: Bool = true
+    
+    var body: some View {
+        ZStack {
+            VStack (alignment: .leading, spacing: 5) {
+                Text("\(gamesVM.customSet.title)")
+                    .font(formatter.font(fontSize: .semiLarge))
+                HStack (spacing: 0) {
+                    Text("Created by ")
+                    Text(exploreVM.getUsernameFromUserID(userID: gamesVM.customSet.userID))
+                    Text(" on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
+                }
+                if !gamesVM.customSet.description.isEmpty && isShowingDescription {
+                    Text(gamesVM.customSet.description)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(formatter.color(.mediumContrastWhite))
+                        .lineSpacing(3)
+                        .padding(.top, 2)
+                }
+            }
+            .font(formatter.font(.regular, fontSize: .regular))
         }
     }
 }

@@ -26,15 +26,20 @@ struct Trivio_App: App {
 }
 
 class AppDelegate : NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        FirebaseApp.configure()
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         return true
+    }
+    
+    static var orientationLock = UIInterfaceOrientationMask.portrait
+
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return AppDelegate.orientationLock
     }
     
     func application(_ application: UIApplication,
                      didReceiveRemoteNotification notification: [AnyHashable : Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if Auth.auth().canHandleNotification(notification) {
+        if FirebaseConfigurator.shared.auth.canHandleNotification(notification) {
             completionHandler(.noData)
             return
         }
@@ -44,16 +49,6 @@ class AppDelegate : NSObject, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         return GIDSignIn.sharedInstance.handle(url)
     }
-    
-//    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-//        guard let myUID = Auth.auth().currentUser?.uid else { return }
-//        Purchases.logLevel = .debug
-//        Purchases.configure(
-//            with: Configuration.Builder(withAPIKey: Constants.apiKey)
-//                     .with(appUserID: myUID)
-//                     .build()
-//         )
-//    }
     
     lazy var persistentContainer: NSPersistentContainer = {
             /*
@@ -112,7 +107,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
   for urlContext in URLContexts {
       let url = urlContext.url
-      Auth.auth().canHandle(url)
+      FirebaseConfigurator.shared.auth.canHandle(url)
   }
   // URL not auth related, developer should handle it.
 }

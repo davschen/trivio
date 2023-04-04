@@ -27,7 +27,7 @@ struct BuildFooterView: View {
                 buildVM.back()
             } label: {
                 Image(systemName: "chevron.left")
-                    .frame(width: 80, height: 80)
+                    .frame(width: 60, height: 60)
                     .background(formatter.color(.highContrastWhite))
                     .cornerRadius(5)
             }
@@ -46,7 +46,7 @@ struct BuildFooterView: View {
             } label: {
                 if buildVM.buildStage != .finalTrivio {
                     Image(systemName: "chevron.right")
-                        .frame(width: 80, height: 80)
+                        .frame(width: 60, height: 60)
                         .background(formatter.color(.highContrastWhite))
                         .cornerRadius(5)
                 } else {
@@ -55,7 +55,7 @@ struct BuildFooterView: View {
                         Text("Publish")
                             .font(formatter.font(fontSize: .small))
                     }
-                    .frame(width: 80, height: 80)
+                    .frame(width: 80, height: 60)
                     .background(formatter.color(.secondaryAccent))
                     .cornerRadius(5)
                 }

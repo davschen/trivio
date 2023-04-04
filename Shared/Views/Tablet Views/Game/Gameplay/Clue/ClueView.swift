@@ -20,7 +20,7 @@ struct ClueView: View {
     @State var isTutorialAnimating = false
     
     var body: some View {
-        if gamesVM.currentSelectedClue.isDailyDouble && !ddWagerMade {
+        if gamesVM.currentSelectedClue.isWVC && !ddWagerMade {
             DuplexWagerView(ddWagerMade: $ddWagerMade, wager: $wager) 
         } else {
             DraggableClueResponseView(wager: $wager, ddWagerMade: $ddWagerMade)
@@ -61,7 +61,7 @@ struct DraggableClueResponseView: View {
                 .gesture(
                     DragGesture()
                         .onChanged { gesture in
-                            if gamesVM.currentSelectedClue.isDailyDouble {
+                            if gamesVM.currentSelectedClue.isWVC {
                                 return
                             }
                             if gesture.translation.height > 0 {
@@ -69,7 +69,7 @@ struct DraggableClueResponseView: View {
                             }
                             if yOffset >= 20 && hapticWillTrigger {
                                 formatter.hapticFeedback(style: .soft, intensity: .strong)
-                                formatter.speaker.stop()
+                                formatter.stopSpeaker()
                                 hapticWillTrigger.toggle()
                             }
                         }
@@ -85,7 +85,7 @@ struct DraggableClueResponseView: View {
     }
     
     func progressGame() {
-        formatter.speaker.stop()
+        formatter.stopSpeaker()
         gamesVM.gameplayDisplay = .grid
         if !teamCorrect.id.isEmpty {
             participantsVM.addSolved()
@@ -104,7 +104,7 @@ struct DraggableClueResponseView: View {
                 profileVM.myUserRecords.hasShownHeldClueCell = true
             }, alertType: .tip, alertTitle: "Some advice", alertSubtitle: "If you'd like to bring back a clue, just hold down on the empty grid cell for a few seconds", hasCancel: false, actionLabel: "Got it")
         }
-        participantsVM.progressGame()
+        participantsVM.progressGame(gameHasTwoRounds: gamesVM.customSet.hasTwoRounds)
         showResponse = false
         ddWagerMade = false
         wager = 0
@@ -136,7 +136,7 @@ struct ClueResponseView: View {
         ClassicClueResponseView(wager: $wager, showResponse: $showResponse, teamCorrect: $teamCorrect, usedBlocks: $usedBlocks, timeElapsed: $timeElapsed, progressGame: progressGame)
             .onReceive(timer) { time in
                 if !formatter.speaker.isSpeaking
-                    && timeElapsed < gamesVM.timeRemaining {
+                    && timeElapsed < gamesVM.clueMechanics.numCountdownSeconds {
                     timeElapsed += 1
                     let elapsed = gamesVM.getCountdown(second: Int(timeElapsed))
                     usedBlocks.append(contentsOf: [elapsed.upper, elapsed.lower])
@@ -159,25 +159,34 @@ struct ClassicClueResponseView: View {
     var progressGame: () -> Void
     
     var body: some View {
-        VStack (spacing: 20) {
+        VStack (spacing: 15) {
             ClueCountdownTimerView(usedBlocks: $usedBlocks)
-                .padding(.top, 10)
+                .padding(.top, 5)
             VStack (alignment: .leading, spacing: 0) {
-                VStack (alignment: .center, spacing: 5) {
-                    if gamesVM.currentSelectedClue.isDailyDouble {
-                        Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Wager-value clue)")
-                        Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
-                            .font(formatter.font(.regularItalic, fontSize: .mediumLarge))
-                    } else {
-                        Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) for \(gamesVM.currentSelectedClue.pointValueInt)")
+                ZStack {
+                    VStack (alignment: .center, spacing: 5) {
+                        if gamesVM.currentSelectedClue.isWVC {
+                            Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) (Wager-value clue)")
+                            Text("\(participantsVM.selectedTeam.name)'s wager: \(String(format: "%.0f", wager))")
+                                .font(formatter.font(.regularItalic, fontSize: .mediumLarge))
+                        } else {
+                            Text("\(gamesVM.currentSelectedClue.categoryString.uppercased()) for \(gamesVM.currentSelectedClue.pointValueInt)")
+                        }
+                    }
+                    HStack {
+                        Spacer()
+                        Button {
+                            progressGame()
+                        } label: {
+                            Image(systemName: "chevron.down")
+                        }
                     }
                 }
-                .font(formatter.font(.regular, fontSize: .mediumLarge))
+                .font(formatter.font(.bold, fontSize: .mediumLarge))
                 .id(gamesVM.currentSelectedClue.categoryString)
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
                 .padding(30)
-                .background(formatter.color(.mediumContrastWhite).opacity(0.7))
                 Spacer(minLength: 15)
                 VStack {
                     Text(gamesVM.currentSelectedClue.clueString.uppercased())
@@ -185,7 +194,7 @@ struct ClassicClueResponseView: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                         .multilineTextAlignment(.center)
                         .id(gamesVM.currentSelectedClue.clueString)
-                        .lineSpacing(3)
+                        .lineSpacing(5)
                         .padding(.horizontal, 45)
                         .padding(.bottom, showResponse ? 5 : 0)
                     if showResponse {
@@ -200,7 +209,7 @@ struct ClassicClueResponseView: View {
                 }
                 Spacer(minLength: 0)
                 HStack (alignment: .bottom) {
-                    if gamesVM.currentSelectedClue.isDailyDouble {
+                    if gamesVM.currentSelectedClue.isWVC {
                         if participantsVM.teams.count > 0 && showResponse {
                             DailyTrivioGraderView(wager: $wager) {
                                 progressGame()
@@ -212,6 +221,7 @@ struct ClassicClueResponseView: View {
                     }
                     Button {
                         formatter.hapticFeedback(style: .light, intensity: .normal)
+                        formatter.stopSpeaker()
                         showResponse.toggle()
                     } label: {
                         Text(showResponse ? "Hide Response" : "Show Response")
@@ -231,7 +241,7 @@ struct ClassicClueResponseView: View {
                 }
                 .padding(.vertical)
             }
-            .background(formatter.color(self.timeElapsed == self.gamesVM.timeRemaining ? .primaryFG : .primaryAccent))
+            .background(formatter.color(timeElapsed == gamesVM.clueMechanics.numCountdownSeconds ? .primaryFG : .primaryAccent))
             .cornerRadius(20)
         }
     }
@@ -246,7 +256,7 @@ struct ClueCountdownTimerView: View {
     var body: some View {
         // Countdown timer blocks
         HStack (spacing: 4) {
-            ForEach(0..<Int(self.gamesVM.timeRemaining * 2 - 1)) { i in
+            ForEach(0..<9) { i in
                 Rectangle()
                     .foregroundColor(formatter.color(self.usedBlocks.contains(i + 1) ? .primaryFG : .secondaryAccent))
                     .frame(maxWidth: .infinity)

@@ -233,51 +233,6 @@ struct MobileRevealGradeView: View {
                 participantsVM.fjReveals[teamIndex].toggle()
                 participantsVM.setSelectedTeam(index: teamIndex)
             }
-//
-//            // View and grade answer
-//            VStack (spacing: 10) {
-//
-//                // Grade answer
-//                HStack {
-//                    Button(action: {
-//                        formatter.hapticFeedback(style: .soft, intensity: .strong)
-//                        if self.participantsVM.fjCorrects[teamIndex] {
-//                            self.participantsVM.addFJCorrect(index: teamIndex)
-//                        }
-//                        self.participantsVM.addFJIncorrect(index: teamIndex)
-//                    }, label: {
-//                        Image(systemName: "xmark")
-//                            .font(.system(size: 20, weight: .bold))
-//                            .foregroundColor(formatter.color(incorrect ? .highContrastWhite : .lowContrastWhite))
-//                            .frame(maxWidth: .infinity)
-//                    })
-//                    Text(participantsVM.teams[teamIndex].name)
-//                        .font(formatter.font(fontSize: .mediumLarge))
-//                    Button(action: {
-//                        formatter.hapticFeedback(style: .heavy, intensity: .strong)
-//                        if self.participantsVM.toSubtracts[teamIndex] {
-//                            self.participantsVM.addFJIncorrect(index: teamIndex)
-//                        }
-//                        self.participantsVM.addFJCorrect(index: teamIndex)
-//                    }, label: {
-//                        Image(systemName: "checkmark")
-//                            .font(.system(size: 20, weight: .bold))
-//                            .foregroundColor(formatter.color(correct ? .highContrastWhite : .lowContrastWhite))
-//                            .frame(maxWidth: .infinity)
-//                    })
-//                }
-//
-//                // View wager if not hidden
-//                Text(!participantsVM.fjReveals[teamIndex] ? "" : ("Wager: $" + participantsVM.wagers[teamIndex]))
-//                    .font(formatter.font())
-//                    .padding()
-//                    .frame(maxWidth: .infinity)
-//                    .background(formatter.color(!participantsVM.fjReveals[teamIndex] ? .secondaryFG : (correct ? .green : (incorrect ? .red : .secondaryFG))))
-//                    .cornerRadius(5)
-//            }
-//            .padding()
-//            .background(formatter.color(.primaryFG))
-//            .cornerRadius(5)
         }
         .frame(maxWidth: .infinity)
     }

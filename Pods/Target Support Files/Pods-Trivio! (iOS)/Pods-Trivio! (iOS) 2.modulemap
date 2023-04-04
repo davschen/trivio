@@ -1,6 +1,0 @@
-framework module Pods_Trivio___iOS_ {
-  umbrella header "Pods-Trivio! (iOS)-umbrella.h"
-
-  export *
-  module * { export * }
-}

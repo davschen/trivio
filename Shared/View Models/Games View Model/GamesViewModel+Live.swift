@@ -12,44 +12,71 @@ import FirebaseFirestoreSwift
 
 extension GamesViewModel {
     public func createLiveGameDocument(hostUsername: String, hostName: String) {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         guard let customSetID = self.customSet.id else { return }
         let hostCode = String(randomNumberWith(digits: 6))
         let playerCode = String(randomNumberWith(digits: 6))
         self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: customSetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet)
         // the document ID is myUID because I don't want one user to be making multiple live games
-        db.collection("liveGames").document(myUID).getDocument { (snap, error) in
+        db.collection("liveGames").document(myUID).addSnapshotListener { (snap, error) in
             if error != nil {
                 return
             } else {
-//                guard let doc = snap else { return }
                 try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-//                if doc.exists {
-//                    // We don't want to overwrite a good thing going
-//                    // Check if the live game is over 2hrs old (if so, overwrite) or if
-//                    // the user wants to interrupt the existing game (existing
-//                    // == hostHasJoined is true
-//                    guard let liveGameSet = try? doc.data(as: LiveGameCustomSet.self) else { return }
-//                    let diffComponents = Calendar.current.dateComponents([.hour], from: liveGameSet.dateInitiated, to: Date())
-//                    if diffComponents.hour ?? 2 > 2 {
-//                        // the live game is over 2 hours old
-//                        try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-//                    } else if liveGameSet.hostHasJoined {
-//                        // This is a hard problem to solve. I am trying to signal the outside world that there is a game going on, and the alert shown should present the option to override the existing game (<game code>)
-//                        // Potential solution: increment some int liveGameExistsTicker and onChange of this published variable, present the alert. Yeah!!
-//                        return
-//                    }
-//                } else {
-//                    try? self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
-//                }
             }
         }
+        listenToLiveGamePlayers(liveGameCustomSetId: myUID)
     }
 
     public func randomNumberWith(digits:Int) -> Int {
         let min = Int(pow(Double(10), Double(digits-1))) - 1
         let max = Int(pow(Double(10), Double(digits))) - 1
         return Int(Range(uncheckedBounds: (min, max)))
+    }
+    
+    func listenToLiveGamePlayers(liveGameCustomSetId: String) {
+        let db = Firestore.firestore()
+        let playersRef = db.collection("liveGames")
+            .document(liveGameCustomSetId)
+            .collection("players")
+            .order(by: "currentScore", descending: true)
+
+        listener = playersRef.addSnapshotListener { [weak self] snapshot, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                print("Error listening for live game players updates: \(error.localizedDescription)")
+                return
+            }
+
+            self.liveGamePlayers = snapshot?.documents.compactMap { document in
+                try? document.data(as: LiveGamePlayer.self)
+            } ?? []
+        }
+    }
+
+    func stopListening() {
+        listener?.remove()
+        listener = nil
+    }
+    
+    func startGame() {
+        guard let liveGameCustomSetID = self.liveGameCustomSet.id else {
+            return
+        }
+
+        let documentReference = db.collection("liveGames").document(liveGameCustomSetID)
+
+        documentReference.updateData([
+            "gameHasBegun": true
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            } else {
+                print("Document successfully updated")
+                self.liveGameCustomSet.gameHasBegun = true
+            }
+        }
     }
 }
 

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import StoreKit
+import UniformTypeIdentifiers
 
 struct MobileHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -70,6 +71,20 @@ struct MobileHomepageView: View {
                                 MobileJeopardySetsView(jeopardySeasonsViewActive: $jeopardySeasonsViewActive)
                                     .padding(.top, 5)
                             }
+                            Button {
+                                formatter.setAlertSettings(alertAction: {}, alertType: .greeting, alertTitle: "Hi! I'm David", alertSubtitle: "I made this app so my friends in college could play Jeopardy with all the right rules, but it grew from there and I'm happy it did! I'm recently out of a job and thought that maybe my free app could pay its dividends by helping me find a Software Engineering job. So, if you know of any opportunities for iOS Engineers, or if you'd simply like to contact me for any reason, do reach out to me via the second button below. All the best, and enjoy Trivio!", hasCancel: false, actionLabel: "Done", hasSecondaryAction: true, secondaryAction: {
+                                    UIPasteboard.general.setValue("devdavidchen@gmail.com",
+                                                forPasteboardType: UTType.plainText.identifier)
+                                }, secondaryActionLabel: "Copy my email")
+                            } label: {
+                                Text("About the Developer")
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 50)
+                                    .background(formatter.color(.primaryFG))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 15)
+                            }
+
                         }
                         .padding(.bottom, 100)
                     }
@@ -222,9 +237,9 @@ struct MobileExploreBuildPromptButtonView: View {
         ZStack {
             VStack {
                 Button {
+                    formatter.hapticFeedback(style: .medium)
                     isPresentingBuildView.toggle()
                     buildVM.start()
-                    
                     // Request app store review if the conditions are right
                     let shouldRequestAndCurrentVersion = profileVM.shouldRequestAppStoreReview()
                     if shouldRequestAndCurrentVersion.0 {

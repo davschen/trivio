@@ -41,8 +41,8 @@ class BuildViewModel: ObservableObject {
     public var moneySectionsJ = ["200", "400", "600", "800", "1000"]
     public var moneySectionsDJ = ["400", "800", "1200", "1600", "2000"]
     public var emptyStrings = ["", "", "", "", ""]
-    public var myUID = Auth.auth().currentUser?.uid ?? "noUID"
-    public var db = Firestore.firestore()
+    public var myUID = FirebaseConfigurator.shared.auth.currentUser?.uid ?? "noUID"
+    public var db = FirebaseConfigurator.shared.getFirestore()
     
     init() {
         self.fillBlanks()

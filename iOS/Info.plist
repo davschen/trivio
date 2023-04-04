@@ -33,7 +33,8 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.430656125256-8mu14rncra26e7iatunfc7ol09kats7k</string>
+				<string>com.googleusercontent.apps.430656125256-cgm3va033i5skk0igcmnq4a43ve5gll7</string>
+				<string>com.googleusercontent.apps.151680417370-7hmbfq43li3epn87gnad064ncgqn188b</string>
 			</array>
 		</dict>
 	</array>
@@ -43,6 +44,8 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Swiss911-Compressed.otf</string>
+		<string>Korinna-Regular.otf</string>
 		<string>Metropolis-Bold.otf</string>
 		<string>Metropolis-ExtraBoldItalic.otf</string>
 		<string>Metropolis-RegularItalic.otf</string>
@@ -68,10 +71,14 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>

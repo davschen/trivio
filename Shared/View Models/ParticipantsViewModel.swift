@@ -21,19 +21,20 @@ class ParticipantsViewModel: ObservableObject {
     @Published var toSubtracts = [Bool]()
     @Published var fjCorrects = [Bool]()
     @Published var fjReveals = [Bool]()
-    @Published var selectedTeam: Team = Team(id: "", index: 0, name: "", members: [], score: 0, color: "")
+    @Published var selectedTeam = Team()
+    @Published var teamCorrect = Team()
     
     @Published var scores: [[Int]] = []
     @Published var solved = 0
-    @Published var myTeam = Empty().team
-    @Published var teamToEdit = Empty().team
+    @Published var myTeam = Team()
+    @Published var teamToEdit = Team()
     
-    private var db = Firestore.firestore()
+    private var db = FirebaseConfigurator.shared.getFirestore()
     private static let suffix = ["", "K", "M", "B", "T", "P", "E"]
     var defaultIndex = 0
     
     private var myUID: String? {
-        return Auth.auth().currentUser?.uid
+        return FirebaseConfigurator.shared.auth.currentUser?.uid
     }
     
     init() {
@@ -146,6 +147,9 @@ class ParticipantsViewModel: ObservableObject {
     }
     
     func removeTeamFromFirestore(id: String) {
+        for team in teams {
+            team.id == id ? removeTeam(index: team.index) : ()
+        }
         guard let uid = myUID else { return }
         let docRef = self.db.collection("users").document(uid).collection("contestants")
         docRef.whereField("id", isEqualTo: id).getDocuments { (snap, err) in
@@ -189,6 +193,36 @@ class ParticipantsViewModel: ObservableObject {
         
         if !teams.indices.contains(selectedTeam.index) {
             setSelectedTeam(index: teams.count - 1)
+        }
+    }
+    
+    func didTapXmark(teamIndex: Int, pointValueInt: Int) {
+        let team = teams[teamIndex]
+        if team == teamCorrect {
+            teamCorrect = Team()
+            editScore(index: team.index, pointValueInt: -pointValueInt)
+        }
+        toSubtracts[team.index].toggle()
+        let pointValueInt = toSubtracts[team.index] ? -pointValueInt : pointValueInt
+        editScore(index: teamIndex, pointValueInt: pointValueInt)
+    }
+    
+    func didTapCheckmark(teamIndex: Int, pointValueInt: Int) {
+        let team = teams[teamIndex]
+        resetToLastIncrement(pointValueInt: pointValueInt)
+        // if the contestant is marked wrong, unmark them wrong
+        if toSubtracts[team.index] {
+            toSubtracts[team.index].toggle()
+            editScore(index: team.index, pointValueInt: pointValueInt)
+        }
+        if team == teamCorrect {
+            // reset teamCorrect
+            teamCorrect = Team()
+            setSelectedTeam(index: defaultIndex)
+        } else {
+            editScore(index: team.index, pointValueInt: pointValueInt)
+            teamCorrect = team
+            setSelectedTeam(index: team.index)
         }
     }
     
@@ -270,11 +304,17 @@ class ParticipantsViewModel: ObservableObject {
     }
     
     func addSolved() {
-        self.solved += 1
+        solved += 1
     }
     
-    func progressGame() {
-        for team in self.teams {
+    func progressGame(gameHasTwoRounds: Bool = false) {
+        if gameHasTwoRounds {
+            changeDJTeam()
+        }
+        if !teamCorrect.id.isEmpty {
+            addSolved()
+        }
+        for team in teams {
             scores[team.index].append(team.score)
             if team.members.count > 0 {
                 spokespeople[team.index] = team.members[questionTicker % team.members.count]
@@ -282,8 +322,8 @@ class ParticipantsViewModel: ObservableObject {
         }
         questionTicker += 1
         resetSubtracts()
+        teamCorrect = Team()
     }
-
     
     func getIDMap() -> [String : String] {
         var idMap = [String : String]()
@@ -343,7 +383,7 @@ class ParticipantsViewModel: ObservableObject {
     }
     
     func writeToFirestore(gameID: String, myRating: Int = 0) {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         if teams.isEmpty { return }
         let gameRef = db.collection("users").document(myUID).collection("games").document()
         let userSetRef = db.collection("userSets").document(gameID)

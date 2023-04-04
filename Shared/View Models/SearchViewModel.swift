@@ -26,9 +26,9 @@ class SearchViewModel: ObservableObject {
         return self.gameIDs.count == self.games.count
     }
     
-    private var db = Firestore.firestore()
+    private var db = FirebaseConfigurator.shared.getFirestore()
     private var myUID: String? {
-        return Auth.auth().currentUser?.uid
+        return FirebaseConfigurator.shared.auth.currentUser?.uid
     }
     
     init() {

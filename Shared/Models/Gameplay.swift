@@ -132,16 +132,33 @@ struct JeopardyCategory: Decodable, Hashable, Identifiable, Encodable {
 
 struct Clue {
     var categoryString, clueString, responseString: String
-    var isDailyDouble, isTripleStumper: Bool
+    var isWVC, isTripleStumper: Bool
     var pointValueInt: Int
     
     init(categoryString: String = "", clueString: String = "", responseString: String = "", isDailyDouble: Bool = false, isTripleStumper: Bool = false, pointValueInt: Int = 200) {
         self.categoryString = categoryString
         self.clueString = clueString
         self.responseString = responseString
-        self.isDailyDouble = isDailyDouble
+        self.isWVC = isDailyDouble
         self.isTripleStumper = isTripleStumper
         self.pointValueInt = pointValueInt
+    }
+    
+    init(liveGameCustomSet: LiveGameCustomSet) {
+        var round1PointValues = [200, 400, 600, 800, 1000]
+        var clues = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Clues : liveGameCustomSet.round2Clues
+        var responses = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Responses : liveGameCustomSet.round2Responses
+        var categoryNames = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1CategoryNames : liveGameCustomSet.round2CategoryNames
+        var categoryIndex = liveGameCustomSet.currentCategoryIndex
+        var clueIndex = liveGameCustomSet.currentClueIndex
+        var coordsToCheckWVC = [categoryIndex, clueIndex]
+        
+        self.categoryString = categoryNames[categoryIndex]
+        self.clueString = clues[categoryIndex]?[clueIndex] ?? ""
+        self.responseString = responses[categoryIndex]?[clueIndex] ?? ""
+        self.isWVC = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.roundOneDaily == coordsToCheckWVC : (liveGameCustomSet.roundTwoDaily1 == coordsToCheckWVC || liveGameCustomSet.roundTwoDaily2 == coordsToCheckWVC)
+        self.isTripleStumper = false
+        self.pointValueInt = (liveGameCustomSet.currentRound == "round1" ? 1 : 2) * round1PointValues[clueIndex]
     }
 }
 

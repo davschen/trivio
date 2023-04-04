@@ -116,8 +116,7 @@ struct MobileCustomSetCellView: View {
                 }
             }
             
-            NavigationLink(destination: MobileGamePreviewView()
-                .navigationBarTitle("Set Preview", displayMode: .inline),
+            NavigationLink(destination: MobileGamePreviewView(),
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()
         }

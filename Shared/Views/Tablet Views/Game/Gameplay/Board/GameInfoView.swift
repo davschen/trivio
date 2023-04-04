@@ -60,7 +60,7 @@ struct GameInfoView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .font(formatter.font(.regular))
                         }
-                        MobileGameSettingsCardView()
+                        GameSettingsCardView()
                             .padding(.top)
                     }
                     .padding(.top)

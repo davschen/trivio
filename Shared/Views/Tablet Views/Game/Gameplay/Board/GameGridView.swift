@@ -14,16 +14,16 @@ struct GameGridView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     var body: some View {
-        VStack (spacing: 10) {
+        VStack (spacing: 7) {
             // Horizontal arrangement of category names
-            HStack (spacing: 7) {
+            HStack (spacing: 5) {
                 ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
                     let category: String = gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats[i] : gamesVM.tidyCustomSet.round2Cats[i]
                     
                     ZStack {
                         formatter.color(gamesVM.finishedCategories[i] ? .primaryFG : .primaryAccent)
                         Text(category.uppercased())
-                            .font(formatter.fontFloat(sizeFloat: 22))
+                            .font(formatter.fontFloat(sizeFloat: 20))
                             .foregroundColor(formatter.color(.highContrastWhite))
                             .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.1)
@@ -38,9 +38,9 @@ struct GameGridView: View {
             .padding(.horizontal, 25)
 
             // Clues grid
-            HStack (spacing: 7) {
+            HStack (spacing: 5) {
                 ForEach(gamesVM.categories.indices, id: \.self) { categoryIndex in
-                    VStack (spacing: 7) {
+                    VStack (spacing: 5) {
                         ForEach(0..<gamesVM.pointValueArray.count, id: \.self) { clueIndex in
                             GameCellView(categoryIndex: categoryIndex, clueIndex: clueIndex)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -65,7 +65,7 @@ struct GameGridView: View {
             gamesVM.setCurrentSelectedClue(categoryIndex: categoryIndex, clueIndex: clueIndex)
             participantsVM.setDefaultIndex()
             
-            if !gamesVM.currentSelectedClue.isDailyDouble {
+            if !gamesVM.currentSelectedClue.isWVC {
                 formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
             }
         }
@@ -83,7 +83,7 @@ struct GameCellView: View {
         ZStack {
             formatter.color(isIncomplete() ? .primaryAccent : .primaryFG)
             Text("\(gamesVM.pointValueArray[clueIndex])")
-                .font(formatter.fontFloat(.bold, sizeFloat: 65))
+                .font(formatter.fontFloat(.bold, sizeFloat: 50))
                 .foregroundColor(formatter.color(.secondaryAccent))
                 .shadow(color: Color.black.opacity(0.2), radius: 5)
                 .multilineTextAlignment(.center)

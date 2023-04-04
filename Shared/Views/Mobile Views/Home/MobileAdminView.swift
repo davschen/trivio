@@ -24,6 +24,7 @@ struct MobileAdminView: View {
                 }
                 .padding(.horizontal)
                 MobileAdminActivityView()
+                    .padding(.bottom, 30)
             }
         }
         .withBackButton()
@@ -161,20 +162,30 @@ struct MobileAdminActivityView: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 25) {
             HStack {
-                Text("Recent activity")
-                    .font(formatter.font(fontSize: .mediumLarge))
+                VStack (alignment: .leading, spacing: 3) {
+                    Text("Recent activity")
+                        .font(formatter.font(fontSize: .mediumLarge))
+                    Text("Limited to 50")
+                        .font(formatter.font(.regular, fontSize: .medium))
+                }
                 Spacer()
-                Text("Limit to 50")
-                    .font(formatter.font(fontSize: .medium))
+                Button {
+                    profileVM.purgeAndPullAllUserRecords()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .font(Font.system(size: 20))
+                }
             }
             .padding(.horizontal)
             VStack {
                 HStack {
                     Text("Username")
-                        .frame(width: 120, alignment: .leading)
+                        .frame(width: 140, alignment: .leading)
+                        .lineLimit(1)
                     Text("Last logged in")
-                    Text("Total sessions")
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("Revisits")
+                        .multilineTextAlignment(.trailing)
                         .padding(.trailing)
                 }
                 .font(formatter.font(fontSize: .small))
@@ -186,11 +197,13 @@ struct MobileAdminActivityView: View {
                     VStack {
                         HStack {
                             Text(myUserRecord.username)
-                                .frame(width: 120, alignment: .leading)
+                                .frame(width: 140, alignment: .leading)
                                 .font(formatter.font(.bold, fontSize: .regular))
+                                .lineLimit(1)
                             Text(dateFormatter.string(from: myUserRecord.mostRecentSession))
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             Text("\(myUserRecord.numTrackedSessions)")
-                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .multilineTextAlignment(.trailing)
                                 .padding(.trailing)
                         }
                         .font(formatter.font(.regular, fontSize: .regular))
@@ -216,7 +229,7 @@ struct MobileHomepageAdminPanelView: View {
     
     var dateFormatter: DateFormatter {
         let df = DateFormatter()
-        df.dateFormat = "MM-dd-yyyy HH:mm"
+        df.dateFormat = "MM-dd-yy HH:mm"
         return df
     }
     
@@ -239,7 +252,7 @@ struct MobileHomepageAdminPanelView: View {
                             .font(.system(size: 18))
                             .frame(width: 35, height: 35)
                             .background(formatter.color(.secondaryFG))
-                            .cornerRadius(3)
+                            .cornerRadius(5)
                     }
                 }
                 .padding([.top, .horizontal])
@@ -254,9 +267,9 @@ struct MobileHomepageAdminPanelView: View {
                     VStack {
                         HStack {
                             Text("Username")
-                                .frame(width: 100, alignment: .leading)
+                                .frame(width: 140, alignment: .leading)
                             Text("Last logged in")
-                            Text("Total sessions")
+                            Text("Revisits")
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .padding(.trailing)
                         }
@@ -269,9 +282,11 @@ struct MobileHomepageAdminPanelView: View {
                             VStack {
                                 HStack {
                                     Text(myUserRecord.username)
-                                        .frame(width: 100, alignment: .leading)
+                                        .frame(width: 140, alignment: .leading)
                                         .font(formatter.font(.bold, fontSize: .regular))
+                                        .lineLimit(1)
                                     Text(dateFormatter.string(from: myUserRecord.mostRecentSession))
+                                        .lineLimit(1)
                                     Text("\(myUserRecord.numTrackedSessions)")
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                         .padding(.trailing)

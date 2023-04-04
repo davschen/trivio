@@ -137,19 +137,12 @@
 			<key>orderHint</key>
 			<integer>25</integer>
 		</dict>
-		<key>Pods-Trivio! (macOS).xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-			<key>orderHint</key>
-			<integer>26</integer>
-		</dict>
 		<key>PromisesObjC.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>27</integer>
+			<integer>26</integer>
 		</dict>
 		<key>abseil.xcscheme</key>
 		<dict>

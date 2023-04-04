@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import SwiftUI
 
 struct WithHeader: ViewModifier {
@@ -92,3 +93,41 @@ class Theme {
         UINavigationBar.appearance().tintColor = tintColor ?? titleColor ?? .black
     }
 }
+
+class CustomNavigationController: UINavigationController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+}
+
+struct CustomNavigationControllerRepresentable: UIViewControllerRepresentable {
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let navigationController = CustomNavigationController()
+        navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
+        return navigationController
+    }
+    
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
+    
+    class Coordinator: NSObject, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
+        var parent: CustomNavigationControllerRepresentable
+        
+        init(_ parent: CustomNavigationControllerRepresentable) {
+            self.parent = parent
+        }
+        
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            return gestureRecognizer.view?.gestureRecognizers?.count ?? 0 > 1
+        }
+    }
+}
+

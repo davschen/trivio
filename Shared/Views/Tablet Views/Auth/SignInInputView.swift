@@ -135,7 +135,7 @@ struct AuthVerifyNumberView: View {
     
     @State var isLoading = false
     
-    var db = Firestore.firestore()
+    var db = FirebaseConfigurator.shared.getFirestore()
     
     var body: some View {
         VStack (spacing: 15) {
@@ -176,7 +176,7 @@ struct AuthVerifyNumberView: View {
                 if hasValidCode() {
                     formatter.resignKeyboard()
                     let credential = PhoneAuthProvider.provider().credential(withVerificationID: self.ID, verificationCode: self.code)
-                    Auth.auth().signIn(with: credential) { (result, error) in
+                    FirebaseConfigurator.shared.auth.signIn(with: credential) { (result, error) in
                         if error != nil {
                             formatter.setAlertSettings(alertAction: {
                                 formatter.resignKeyboard()
@@ -184,7 +184,7 @@ struct AuthVerifyNumberView: View {
                             }, alertTitle: "Oops!", alertSubtitle: (error?.localizedDescription)!, hasCancel: false, actionLabel: "Got it")
                             return
                         }
-                        guard let myUID = Auth.auth().currentUser?.uid else { return }
+                        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
                         let docref = self.db.collection("users").document(myUID)
                         docref.getDocument { (doc, error) in
                             if error != nil {
@@ -196,7 +196,7 @@ struct AuthVerifyNumberView: View {
                                 if !doc.exists {
                                     signInStage = .nameUsername
                                 } else {
-                                    Auth.auth().addStateDidChangeListener { (auth, user) in
+                                    FirebaseConfigurator.shared.auth.addStateDidChangeListener { (auth, user) in
                                         if user?.uid == myUID {
                                             self.authVM.checkUsernameExists(uid: myUID, completion: { complete in
                                                 UserDefaults.standard.setValue(true, forKey: "isLoggedIn")

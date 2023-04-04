@@ -23,7 +23,7 @@ class ReportViewModel: ObservableObject {
     @Published var yAxis = [Int]()
     @Published var selectedGameID = ""
     @Published var gameIDNameDict = [String:String]()
-    private var db = Firestore.firestore()
+    private var db = FirebaseConfigurator.shared.getFirestore()
     
     init() {
         getAllData()
@@ -59,7 +59,7 @@ class ReportViewModel: ObservableObject {
     }
     
     func getAllData() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let docRef = db.collection("users").document(myUID).collection("games").order(by: "date", descending: true)
         docRef.addSnapshotListener { (snap, err) in
             if let err = err {
@@ -81,7 +81,7 @@ class ReportViewModel: ObservableObject {
     }
     
     func delete(id: String) {
-        let docRef = db.collection("users").document(Auth.auth().currentUser?.uid ?? "hello").collection("games").document(id)
+        let docRef = db.collection("users").document(FirebaseConfigurator.shared.auth.currentUser?.uid ?? "hello").collection("games").document(id)
         docRef.addSnapshotListener { (doc, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -104,7 +104,7 @@ class ReportViewModel: ObservableObject {
     
     func getGameInfo(id: String) {
         self.scores.removeAll()
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let docRef = db.collection("users").document(myUID).collection("games").document(id)
         docRef.addSnapshotListener { (doc, err) in
             if err != nil {

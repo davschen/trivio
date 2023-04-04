@@ -45,7 +45,7 @@ struct MyUserRecords: Decodable, Hashable, Identifiable, Encodable {
     }
 }
 
-// As of December 2022, this struct is basically identical to MyUserRecords.
+// As of January 2023, this struct is basically identical to MyUserRecords.
 // However, after version Cherry, MyUserRecords will continue to update and MyUserRecordsCherry will remain
 // as it is forever.
 struct MyUserRecordsCherry: Decodable, Hashable, Identifiable, Encodable {

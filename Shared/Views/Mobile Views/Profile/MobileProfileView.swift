@@ -164,17 +164,17 @@ struct MobileEmptyListView: View {
     var body: some View {
         VStack {
             Text(label)
-                .font(formatter.font(.regularItalic))
+                .font(formatter.font(.boldItalic))
+                .foregroundColor(formatter.color(.lowContrastWhite))
                 .multilineTextAlignment(.center)
+                .lineSpacing(5)
+                .padding(.horizontal, 30)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 145)
         .padding()
+        .background(formatter.color(.primaryFG))
         .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(formatter.color(.lowContrastWhite), lineWidth: 2)
-        )
     }
 }
 

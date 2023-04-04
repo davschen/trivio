@@ -19,7 +19,7 @@ struct BuildGridCategoryView: View {
     @State var index: Int
     
     var body: some View {
-        VStack (spacing: 10) {
+        VStack (spacing: 7) {
             ZStack {
                 if isShowingPreview && category.name.isEmpty {
                     Text("")
@@ -55,7 +55,7 @@ struct BuildGridCategoryView: View {
                 
                 categoryIndex = index
             }
-            VStack (spacing: 7) {
+            VStack (spacing: 5) {
                 ForEach(0..<category.clues.count, id: \.self) { i in
                     let amount = buildVM.moneySections[i]
                     let clue = category.clues[i]

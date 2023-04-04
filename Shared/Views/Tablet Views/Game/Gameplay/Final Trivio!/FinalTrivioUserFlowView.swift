@@ -15,6 +15,17 @@ struct FinalTrivioView: View {
     
     @State var isShowingInstructions = false
     
+    var submissionsAllValid: Bool {
+        switch gamesVM.finalTrivioStage {
+        case .makeWager:
+            return participantsVM.wagersValid()
+        case .revealResponse:
+            return true
+        default:
+            return participantsVM.answersValid()
+        }
+    }
+    
     var headingLabelText: String {
         switch gamesVM.finalTrivioStage {
         case .makeWager:
@@ -53,35 +64,37 @@ struct FinalTrivioView: View {
             VStack (spacing: 10) {
                 if gamesVM.finalTrivioStage == .makeWager {
                     Text("FINAL CLUE CATEGORY")
-                        .font(formatter.font(.regular, fontSize: .mediumLarge))
+                        .font(formatter.font(.bold, fontSize: .mediumLarge))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
-                        .padding(45)
-                        .background(formatter.color(.mediumContrastWhite).opacity(0.7))
+                        .padding([.horizontal, .top], 45)
                     Spacer()
                     Text(gamesVM.customSet.finalCat.uppercased())
                         .font(formatter.font(.bold, fontSize: .extraLarge))
                         .multilineTextAlignment(.center)
+                        .lineSpacing(7)
                         .padding()
+                        .padding(.bottom, 30)
                     Spacer()
                 } else {
                     Text(gamesVM.customSet.finalCat.uppercased())
-                        .font(formatter.font(.regular, fontSize: .mediumLarge))
+                        .font(formatter.font(.bold, fontSize: .mediumLarge))
                         .frame(maxWidth: .infinity)
                         .multilineTextAlignment(.center)
-                        .padding(45)
-                        .background(formatter.color(.mediumContrastWhite).opacity(0.7))
+                        .padding([.horizontal, .top], 45)
                     Spacer()
                     Text(gamesVM.customSet.finalClue.uppercased())
                         .font(formatter.font(.bold, fontSize: .large))
                         .multilineTextAlignment(.center)
                         .lineSpacing(3)
-                        .padding()
-                    Text(gamesVM.customSet.finalResponse.uppercased())
-                        .font(formatter.font(.bold, fontSize: .large))
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(formatter.color((gamesVM.finalTrivioStage == .revealResponse || gamesVM.finalTrivioStage == .podium) ? .secondaryAccent : .primaryAccent))
-                        .padding()
+                        .padding(25)
+                    if (gamesVM.finalTrivioStage == .revealResponse || gamesVM.finalTrivioStage == .podium) {
+                        Text(gamesVM.customSet.finalResponse.uppercased())
+                            .font(formatter.font(.bold, fontSize: .large))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(formatter.color(.secondaryAccent))
+                            .padding()
+                    }
                     Spacer()
                 }
             }
@@ -139,16 +152,9 @@ struct FinalTrivioView: View {
                 .resignKeyboardOnDragGesture()
                 
                 if gamesVM.finalTrivioStage != .podium {
-                    var submissionIsValid = true
                     // Continue button
                     Button(action: {
-                        switch gamesVM.finalTrivioStage {
-                        case .makeWager:
-                            submissionIsValid = participantsVM.wagersValid()
-                        default:
-                            submissionIsValid = participantsVM.answersValid()
-                        }
-                        if submissionIsValid {
+                        if submissionsAllValid {
                             formatter.hapticFeedback(style: .soft, intensity: .strong)
                             gamesVM.finalTrivioFinishedAction()
                             if gamesVM.finalTrivioStage == .submitAnswer {
@@ -165,7 +171,7 @@ struct FinalTrivioView: View {
                             .background(formatter.color(.highContrastWhite))
                             .clipShape(Capsule())
                             .contentShape(Capsule())
-                            .opacity((gamesVM.finalTrivioStage == .makeWager ? participantsVM.wagersValid() : participantsVM.answersValid()) ? 1 : 0.4)
+                            .opacity(submissionsAllValid ? 1 : 0.4)
                     })
                 }
             }
@@ -173,7 +179,7 @@ struct FinalTrivioView: View {
             .onAppear {
                 var hasPositiveScores = false
                 participantsVM.teams.forEach { team in
-                    team.score > 0 ? hasPositiveScores.toggle() : ()
+                    team.score > 0 ? (hasPositiveScores = true) : ()
                 }
                 hasPositiveScores ? () : (gamesVM.finalTrivioStage = .podium)
             }

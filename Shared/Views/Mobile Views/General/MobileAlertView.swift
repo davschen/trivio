@@ -29,6 +29,19 @@ struct MobileAlertView: View {
     var secondaryAction: () -> () = { print("secondary alert") }
     var secondaryActionLabel = ""
     
+    var alertImageSystemName: String {
+        switch alertType {
+        case .settings:
+            return "gear"
+        case .tip:
+            return "sparkles"
+        case .greeting:
+            return "hand.wave.fill"
+        default:
+            return "exclamationmark.triangle"
+        }
+    }
+    
     var body: some View {
         ZStack {
             formatter.color(.primaryBG)
@@ -54,7 +67,7 @@ struct MobileAlertView: View {
                         
                         VStack (spacing: 5) {
                             VStack (spacing: 10) {
-                                Image(systemName: alertType == .warning ? "exclamationmark.triangle" : "sparkles")
+                                Image(systemName: alertImageSystemName)
                                     .font(.system(size: 26))
                                     .padding(.bottom, 5)
                                 Text(titleText)
@@ -85,13 +98,15 @@ struct MobileAlertView: View {
                             Button {
                                 secondaryAction()
                                 formatter.dismissAlert()
+                                formatter.hapticFeedback(style: .soft, intensity: .normal)
                             } label: {
                                 Text(secondaryActionLabel)
                                     .frame(maxWidth: .infinity)
                                     .padding(20)
-                                    .background(formatter.color(.primaryAccent))
+                                    .background(formatter.color(.primaryFG))
                                     .font(formatter.font(fontSize: .medium))
                                     .foregroundColor(formatter.color(.highContrastWhite))
+                                    .cornerRadius(10)
                             }
                         }
                         
@@ -118,5 +133,5 @@ struct MobileAlertView: View {
 }
 
 enum AlertType {
-    case warning, tip
+    case warning, tip, greeting, settings
 }

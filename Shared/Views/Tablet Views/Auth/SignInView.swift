@@ -32,7 +32,7 @@ struct SignInView: View {
     @State var username = ""
     @State var showGame = false
     
-    var db = Firestore.firestore()
+    var db = FirebaseConfigurator.shared.getFirestore()
     
     var body: some View {
         ZStack {
@@ -107,7 +107,7 @@ struct SignInAuthFlowView: View {
     @State var username = ""
     @State var showGame = false
     
-    var db = Firestore.firestore()
+    var db = FirebaseConfigurator.shared.getFirestore()
     
     var body: some View {
         VStack (alignment: .leading, spacing: formatter.padding()) {
@@ -151,9 +151,10 @@ struct ChooseSignInMethodView: View {
     @Binding var signInMethod: SignInMethod
     @Binding var signInStage: SignInStage
     
-    @State var isLoading = false
+    @State var isGoogleLoading = false
+    @State var isAppleLoading = false
     
-    var db = Firestore.firestore()
+    var db = FirebaseConfigurator.shared.getFirestore()
     
     var body: some View {
         VStack (spacing: 20) {
@@ -180,10 +181,30 @@ struct ChooseSignInMethodView: View {
             Spacer(minLength: 45)
             VStack (spacing: 20) {
                 Button {
+                    signInMethod = .phone
+                    signInStage = .enterNumber
+                } label: {
+                    HStack {
+                        Image(systemName: "phone.fill")
+                            .font(.system(size: 20))
+                            .frame(height: 30, alignment: .bottom)
+                            .foregroundColor(formatter.color(.highContrastWhite))
+                            .offset(y: -6)
+                        Text("Sign in with SMS")
+                            .font(formatter.font(fontSize: .mediumLarge))
+                    }
+                    .foregroundColor(formatter.color(.highContrastWhite))
+                    .frame(maxWidth: .infinity)
+                    .frame(minHeight: 80)
+                    .background(formatter.color(.secondaryFG))
+                    .clipShape(Capsule())
+                }
+                // Sign in with Google button
+                Button {
                     googleSignIn()
                 } label: {
                     HStack (spacing: 8) {
-                        if isLoading {
+                        if isGoogleLoading {
                             LoadingView(color: .primaryBG)
                         } else {
                             Image("google")
@@ -198,20 +219,32 @@ struct ChooseSignInMethodView: View {
                     .foregroundColor(formatter.color(.primaryBG))
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 80)
-                    .background(formatter.color(.highContrastWhite))
+                    .background(Color.white)
                     .clipShape(Capsule())
                 }
-                Button {
-                    signInMethod = .phone
-                    signInStage = .enterNumber
-                } label: {
-                    Text("Sign in with Phone")
-                        .font(formatter.font(fontSize: .mediumLarge))
-                        .foregroundColor(formatter.color(.highContrastWhite))
-                        .frame(maxWidth: .infinity)
-                        .frame(minHeight: 80)
-                        .background(formatter.color(.primaryBG))
-                        .clipShape(Capsule())
+                // Sign in with Apple button
+                HStack (spacing: 8) {
+                    if isAppleLoading {
+                        LoadingView(color: .primaryBG)
+                    } else {
+                        QuickSignInWithApple()
+                            .onTapGesture {
+                                authVM.startSignInWithAppleFlow()
+                                isGoogleLoading = false
+                                isAppleLoading = true
+                            }
+                    }
+                }
+                .font(formatter.font(fontSize: .mediumLarge))
+                .foregroundColor(formatter.color(.primaryBG))
+                .frame(maxWidth: .infinity, minHeight: 80)
+                .background(Color.white)
+                .clipShape(Capsule())
+                .onChange(of: authVM.appleSignInResult) { newValue in
+                    if newValue == .success {
+                        handleUserSignIn()
+                    }
+                    isAppleLoading = false
                 }
             }
             .padding(.horizontal, 30)
@@ -228,7 +261,7 @@ struct ChooseSignInMethodView: View {
     }
     
     func googleSignIn() {
-        isLoading = true
+        isGoogleLoading = true
         
         guard let clientID = FirebaseApp.app()?.options.clientID else { return }
         
@@ -253,38 +286,42 @@ struct ChooseSignInMethodView: View {
                                                            accessToken: authentication.accessToken)
             
             // Authenticate with Firebase using the credential object
-            Auth.auth().signIn(with: credential) { (authResult, error) in
+            FirebaseConfigurator.shared.auth.signIn(with: credential) { (authResult, error) in
                 if error != nil {
                     formatter.setAlertSettings(alertAction: {
                         formatter.resignKeyboard()
-                        isLoading = false
+                        isGoogleLoading = false
                     }, alertTitle: "Oops!", alertSubtitle: (error?.localizedDescription)!, hasCancel: false, actionLabel: "Got it")
                     return
                 }
-                guard let myUID = Auth.auth().currentUser?.uid else { return }
-                let docref = self.db.collection("users").document(myUID)
-                docref.getDocument { (doc, error) in
-                    if error != nil {
-                        print(error!)
-                        return
-                    }
-                    if let doc = doc {
-                        NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
-                        if !doc.exists {
-                            signInStage = .nameUsername
-                        } else {
-                            Auth.auth().addStateDidChangeListener { (auth, user) in
-                                if user?.uid == myUID {
-                                    self.authVM.checkUsernameExists(uid: myUID, completion: { complete in
-                                        UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
-                                        NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
-                                    })
-                                }
-                            }
+                handleUserSignIn()
+                isGoogleLoading = false
+            }
+        }
+    }
+    
+    private func handleUserSignIn() {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        let docref = self.db.collection("users").document(myUID)
+        docref.getDocument { (doc, error) in
+            if error != nil {
+                print(error!)
+                return
+            }
+            if let doc = doc {
+                NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
+                if !doc.exists {
+                    signInStage = .nameUsername
+                } else {
+                    FirebaseConfigurator.shared.auth.addStateDidChangeListener { (auth, user) in
+                        if user?.uid == myUID {
+                            self.authVM.checkUsernameExists(uid: myUID, completion: { complete in
+                                UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
+                                NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
+                            })
                         }
                     }
                 }
-                isLoading = false
             }
         }
     }
@@ -366,6 +403,27 @@ struct LoadingView: View {
         .animation(Animation.easeInOut(duration: 0.25))
         .onReceive(timer) { time in
             timeElapsed += 1
+        }
+    }
+}
+
+struct SpinningLoaderView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
+    @State private var isAnimating = false
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .trim(from: 0.2, to: 1)
+                .stroke(formatter.color(.highContrastWhite), lineWidth: 5)
+                .frame(width: 30, height: 30)
+                .rotationEffect(Angle(degrees: isAnimating ? 0 : 360))
+        }
+        .onAppear {
+            withAnimation(Animation.easeInOut(duration: 1).repeatForever(autoreverses: false)) {
+                isAnimating = true
+            }
         }
     }
 }

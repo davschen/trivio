@@ -42,7 +42,7 @@ class ExploreViewModel: ObservableObject {
     @Published var nameIDDict = [String:String]()
     @Published var queriedUserRecords = [MyUserRecords]()
     
-    public var db = Firestore.firestore()
+    public var db = FirebaseConfigurator.shared.getFirestore()
     public var latestPublicDoc: DocumentSnapshot? = nil
     public var latestPrivateDoc: DocumentSnapshot? = nil
     
@@ -203,7 +203,7 @@ class ExploreViewModel: ObservableObject {
     }
     
     private func pullRecentlyPlayedSets() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         self.addUsernameNameToDict(userID: uid)
         db.collection("users").document(uid).collection("played").addSnapshotListener { (snap, error) in
             if error != nil {

@@ -25,8 +25,8 @@ class ProfileViewModel: ObservableObject {
     
     @Published var currentVIPs = [String:String]()
     
-    private var db = Firestore.firestore()
-    public var myUID = Auth.auth().currentUser?.uid
+    private var db = FirebaseConfigurator.shared.getFirestore()
+    public var myUID = FirebaseConfigurator.shared.auth.currentUser?.uid
     
     init() {
         getUserInfo()
@@ -40,9 +40,6 @@ class ProfileViewModel: ObservableObject {
             .collection("played").whereField(gameID, isEqualTo: gameID).getDocuments { (snap, error) in
                 if error != nil { return }
                 guard let firstDoc = snap?.documents.first else {
-                    self.db.collection("users").document(myUID).collection("played").addDocument(data: [
-                        "gameID" : gameID
-                    ])
                     return
                 }
                 if !firstDoc.exists {
@@ -153,7 +150,8 @@ class ProfileViewModel: ObservableObject {
                 return
             }
             guard let doc = docSnap else { return }
-            if !doc.exists {
+            // Ideally, I'd check if the doc is of the type MyUserRecordsCherry, but not today.
+            if !doc.exists || doc.get("mostRecentSession") == nil {
                 self.db.collection("users").document(myUID).getDocument(completion: { (docSnap, error) in
                     if error != nil { return }
                     guard let doc = docSnap else { return }
@@ -187,6 +185,11 @@ class ProfileViewModel: ObservableObject {
                 }
             }
         })
+    }
+    
+    public func purgeAndPullAllUserRecords() {
+        allUserRecords.removeAll()
+        pullAllUserRecords()
     }
     
     private func pullAllUserRecords() {
@@ -231,7 +234,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     private func getUserInfo() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let myProfileDocRef = db.collection("users").document(myUID)
         myProfileDocRef.getDocument { (docSnap, error) in
             if error != nil { return }
@@ -263,10 +266,22 @@ class ProfileViewModel: ObservableObject {
                     }
                 }
         }
+        if UserDefaults.standard.string(forKey: "clueAppearance") == nil {
+            UserDefaults.standard.set("classic", forKey: "clueAppearance")
+        }
+        if UserDefaults.standard.string(forKey: "speechLanguage") == nil {
+            UserDefaults.standard.set("americanEnglish", forKey: "speechLanguage")
+        }
+        if UserDefaults.standard.string(forKey: "speechSpeed") == nil {
+            UserDefaults.standard.set(0.5, forKey: "speechSpeed")
+        }
+        if UserDefaults.standard.string(forKey: "speechGender") == nil {
+            UserDefaults.standard.set("male", forKey: "speechGender")
+        }
     }
     
     public func incrementNumTokens() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let usersRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
         usersRef.setData([
             "numLiveTokens" : FieldValue.increment(Int64(1)),
@@ -275,7 +290,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     public func incrementNumSessions() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let usersRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
         usersRef.setData([
             "numTrackedSessions" : FieldValue.increment(Int64(1)),
@@ -284,7 +299,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func writeKeyValueToFirestore(key: String, value: Any) {
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "NID").setData([
+        db.collection("users").document(FirebaseConfigurator.shared.auth.currentUser?.uid ?? "NID").setData([
             key : value
         ], merge: true)
     }
@@ -307,7 +322,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func getAuthProvider() -> String {
-        let providerData = Auth.auth().currentUser?.providerData
+        let providerData = FirebaseConfigurator.shared.auth.currentUser?.providerData
         var provider = ""
         providerData?.forEach({ userInfo in
             if userInfo.phoneNumber != nil {
@@ -329,7 +344,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     func getPhoneNumber() -> String {
-        return Auth.auth().currentUser?.phoneNumber ?? ""
+        return FirebaseConfigurator.shared.auth.currentUser?.phoneNumber ?? ""
     }
     
     func updatePhoneNumber(newPhoneNumber: String) {
@@ -363,7 +378,14 @@ class ProfileViewModel: ObservableObject {
     func logOut() {
         UserDefaults.standard.set(false, forKey: "isLoggedIn")
         NotificationCenter.default.post(name: NSNotification.Name("LogInStatusChange"), object: nil)
-        try? Auth.auth().signOut()
+        try? FirebaseConfigurator.shared.auth.signOut()
+    }
+    
+    func deleteCurrentUserFromDB() {
+        guard let uid = myUID else { return }
+        let docRef = self.db.collection("users").document(uid)
+        docRef.delete()
+        logOut()
     }
 }
 

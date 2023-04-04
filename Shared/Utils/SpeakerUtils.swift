@@ -12,6 +12,7 @@ import SwiftUI
 internal class Speaker: NSObject, ObservableObject {
     internal var errorDescription: String? = nil
     private let synthesizer: AVSpeechSynthesizer = AVSpeechSynthesizer()
+    
     @Published var isSpeaking: Bool = false
     @Published var isShowingSpeakingErrorAlert: Bool = false
     @Published var audioPlayer: AVAudioPlayer?
@@ -32,6 +33,10 @@ internal class Speaker: NSObject, ObservableObject {
     override init() {
         super.init()
         self.synthesizer.delegate = self
+    }
+    
+    public func toggleNarrationOn() {
+        volume = volume == 0 ? 50 : 0
     }
 
     internal func speak(_ text: String) {
@@ -68,13 +73,16 @@ internal class Speaker: NSObject, ObservableObject {
     }
     
     internal func stop() {
-        do {
-            try AVAudioSession.sharedInstance().setActive(false)
-        } catch let error {
-            print(error.localizedDescription)
-            return
+        synthesizer.pauseSpeaking(at: .immediate)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            do {
+                try AVAudioSession.sharedInstance().setActive(false)
+            } catch let error {
+                print(error.localizedDescription)
+                return
+            }
+            self.synthesizer.stopSpeaking(at: .immediate)
         }
-        self.synthesizer.stopSpeaking(at: .immediate)
     }
     
     internal func updateVolume(value: Float) {

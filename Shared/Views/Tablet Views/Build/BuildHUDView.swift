@@ -26,8 +26,8 @@ struct BuildHUDView: View {
         HStack (spacing: 0) {
             Image(systemName: "gear")
                 .foregroundColor(formatter.color(.highContrastWhite))
-                .font(formatter.iconFont(.large))
-                .frame(width: 110, height: 80)
+                .font(formatter.iconFont(.mediumLarge))
+                .frame(width: 110, height: 60)
                 .background(formatter.color(.primaryFG))
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
@@ -39,9 +39,9 @@ struct BuildHUDView: View {
                     buildVM.currentDisplay = .settings
                 }
             Text("Round 1")
-                .font(formatter.font(fontSize: .mediumLarge))
+                .font(formatter.font(fontSize: .medium))
                 .frame(maxWidth: .infinity)
-                .frame(height: 80)
+                .frame(height: 60)
                 .background(formatter.color(.secondaryFG))
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)
@@ -59,9 +59,9 @@ struct BuildHUDView: View {
                     }
                 }
             Text("SELECT 1 \n WAGER-VALUE \n CLUE")
-                .font(formatter.font(fontSize: .regular))
+                .font(formatter.font(fontSize: .small))
                 .padding(.horizontal, 10)
-                .frame(height: 80)
+                .frame(height: 60)
                 .multilineTextAlignment(.center)
                 .background(formatter.color(.primaryAccent))
                 .overlay(
@@ -79,9 +79,9 @@ struct BuildHUDView: View {
                 }
             if buildVM.currCustomSet.hasTwoRounds {
                 Text("Round 2")
-                    .font(formatter.font(fontSize: .mediumLarge))
+                    .font(formatter.font(fontSize: .medium))
                     .frame(maxWidth: .infinity)
-                    .frame(height: 80)
+                    .frame(height: 60)
                     .background(formatter.color(.secondaryFG))
                     .overlay(
                         RoundedRectangle(cornerRadius: 5)
@@ -97,10 +97,10 @@ struct BuildHUDView: View {
                         }
                     }
                 Text("SELECT 2 \n WAGER-VALUE \n CLUES")
-                    .font(formatter.font(fontSize: .regular))
+                    .font(formatter.font(fontSize: .small))
                     .padding(.horizontal, 10)
                     .multilineTextAlignment(.center)
-                    .frame(height: 80)
+                    .frame(height: 60)
                     .background(formatter.color(.primaryAccent))
                     .overlay(
                         RoundedRectangle(cornerRadius: 5)
@@ -117,9 +117,9 @@ struct BuildHUDView: View {
                     }
             }
             Text("Final Clue")
-                .font(formatter.font(fontSize: .mediumLarge))
+                .font(formatter.font(fontSize: .medium))
                 .frame(maxWidth: .infinity)
-                .frame(height: 80)
+                .frame(height: 60)
                 .background(formatter.color(.secondaryFG))
                 .overlay(
                     RoundedRectangle(cornerRadius: 5)

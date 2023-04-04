@@ -15,7 +15,7 @@ target 'Trivio! (iOS)' do
 
 end
 
-target 'Trivio! (macOS)' do
+# target 'Trivio! (macOS)' do
   # Comment the next line if you don't want to use dynamic frameworks
   # use_frameworks!
 
@@ -25,5 +25,5 @@ target 'Trivio! (macOS)' do
   # pod 'Firebase/Auth'
   # pod 'FirebaseFirestoreSwift', '~> 7.11.0-beta'
   
-end
+# end
 

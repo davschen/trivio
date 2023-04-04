@@ -38,10 +38,10 @@ struct HomepageView: View {
                                     .onTapGesture {
                                         exploreVM.homepageIsDisplaying = .publicSets
                                     }
-                                Text("Recently played")
-                                    .foregroundColor(formatter.color(exploreVM.homepageIsDisplaying == .recentlyPlayed ? .highContrastWhite : .lowContrastWhite))
+                                Text("Jeopardy sets")
+                                    .foregroundColor(formatter.color(.lowContrastWhite))
                                     .onTapGesture {
-                                        exploreVM.homepageIsDisplaying = .recentlyPlayed
+                                        jeopardySeasonsViewActive.toggle()
                                     }
                                 Rectangle()
                                     .frame(maxWidth: .infinity)
@@ -50,8 +50,13 @@ struct HomepageView: View {
                             }
                             ScrollView(.vertical, showsIndicators: false) {
                                 VStack (alignment: .leading, spacing: 30) {
-                                    ForEach(gamesVM.customSets) { customSet in
-                                        HomepageMySetSelectorView(customSet: customSet)
+                                    if gamesVM.customSets.count > 0 {
+                                        ForEach(gamesVM.customSets) { customSet in
+                                            HomepageMySetSelectorView(customSet: customSet)
+                                        }
+                                    } else {
+                                        Text("You haven't created any sets yet. Once you do, they'll show up here. Build a set by tapping the button below.")
+                                            .font(formatter.font(.regularItalic, fontSize: .medium))
                                     }
                                 }
                                 .padding(.vertical, 30)
@@ -111,7 +116,7 @@ struct HomepageView: View {
                     .navigationBarTitle("All Public Sets", displayMode: .inline),
                                isActive: $allPublicSetsViewActive,
                                label: { EmptyView() }).isDetailLink(false).hidden()
-                NavigationLink(destination: MobileJeopardySeasonsView()
+                NavigationLink(destination: JeopardySeasonsView()
                     .navigationBarTitle("All Seasons", displayMode: .inline),
                                isActive: $jeopardySeasonsViewActive,
                                label: { EmptyView() }).isDetailLink(false).hidden()
@@ -248,7 +253,7 @@ struct HomepageHeaderView: View {
                         profileViewActive.toggle()
                     } label: {
                         Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
-                            .font(formatter.font(.boldItalic, fontSize: .small))
+                            .font(formatter.font(.boldItalic, fontSize: .micro))
                             .frame(width: 45, height: 45)
                             .background(formatter.color(.primaryAccent))
                             .clipShape(Circle())

@@ -17,10 +17,16 @@ class GamesViewModel: ObservableObject {
     @Published var gameSetupMode: GameSetupMode = .settings
     @Published var gamePhase: GamePhase = .round1
     @Published var gameplayDisplay: GameplayDisplay = .grid
-    @Published var finalTrivioStage: FinalTrivioStage = .makeWager
+    @Published var finalTrivioStage: FinalTrivioStage = .notBegun
     
     @Published var gamePreviews = [JeopardySetPreview]()
     @Published var jeopardySeasons = [JeopardySeason]()
+    
+    // Editing note: this could have far fewer variables
+    // if I made classes with some of these variables
+    
+    // Flashcards
+    @Published var flashcardClues2D = [[FlashcardClue]]()
     
     // Nested arrays clues & responses can be indexed into with [i][j]
     // where categoryIndex = i and pointValueIndex = j
@@ -34,13 +40,15 @@ class GamesViewModel: ObservableObject {
     @Published var finishedClues2D = [[ClueCompletionStatus]]()
     @Published var finishedCategories = [Bool](repeating: false, count: 6)
     @Published var usedAnswers = [String]()
-    @Published var timeRemaining: Double = 5
+    @Published var clueMechanics = ClueMechanics()
     
     @Published var customSets = [CustomSetCherry]()
     @Published var customSet = CustomSetCherry()
     @Published var jeopardySet = JeopardySet()
     @Published var tidyCustomSet = TidyCustomSet()
     @Published var liveGameCustomSet = LiveGameCustomSet()
+    @Published var liveGamePlayers = [LiveGamePlayer]()
+    
     @Published var title = ""
     @Published var queriedUserName = ""
 
@@ -55,6 +63,7 @@ class GamesViewModel: ObservableObject {
     public var jRoundCompletes = 0
     public var djRoundCompletes = 0
     public var latestJeopardyDoc: DocumentSnapshot? = nil
+    public var listener: ListenerRegistration?
     
     public var dateFormatter: DateFormatter {
         let df = DateFormatter()
@@ -62,10 +71,10 @@ class GamesViewModel: ObservableObject {
         return df
     }
     
-    private var round1PointValues = ["200", "400", "600", "800", "1000"]
-    private var round2PointValues = ["400", "800", "1200", "1600", "2000"]
+    public var round1PointValues = ["200", "400", "600", "800", "1000"]
+    public var round2PointValues = ["400", "800", "1200", "1600", "2000"]
     
-    public var db = Firestore.firestore()
+    public var db = FirebaseConfigurator.shared.getFirestore()
     
     init() {
         getSeasons()
@@ -99,8 +108,8 @@ class GamesViewModel: ObservableObject {
     }
     
     func getCountdown(second: Int) -> (lower: Int, upper: Int) {
-        let highBound = Int(timeRemaining * 2)
-        if second <= Int(timeRemaining) {
+        let highBound = Int(clueMechanics.numCountdownSeconds * 2)
+        if second <= Int(clueMechanics.numCountdownSeconds) {
             return (second, highBound - second)
         } else {
             return (0, 0)
@@ -148,6 +157,16 @@ class GamesViewModel: ObservableObject {
         return finishedClues2D.joined().filter{$0 == .complete}.count
     }
     
+    func timerBlockIsUnlit(timeElapsed: Double, blockIndex: Int) -> Bool {
+        let maxIndex = 8
+        if timeElapsed <= 0 { return false }
+        if timeElapsed > (Double(maxIndex) / 2.0) + 1 { return true }
+        let a = 0
+        let b = maxIndex
+        let adjustedTimeElapsed = Int(timeElapsed - 1)
+        return (blockIndex <= a + adjustedTimeElapsed) || (blockIndex >= b - adjustedTimeElapsed)
+    }
+    
     func getCurrentSelectedClue() -> Clue {
         return currentSelectedClue
     }
@@ -168,7 +187,8 @@ class GamesViewModel: ObservableObject {
     }
     
     func clueIsDailyDouble(categoryIndex: Int, clueIndex: Int) -> Bool {
-        let toCheck: [Int] = queriedUserName.isEmpty ? [clueIndex, categoryIndex] : [categoryIndex, clueIndex]
+        // Check if this is a Jeopardy-made set or not...
+        let toCheck: [Int] = customSet.userID.isEmpty ? [clueIndex, categoryIndex] : [categoryIndex, clueIndex]
         if gamePhase == .round1 {
             return toCheck == customSet.roundOneDaily
         } else {
@@ -182,6 +202,18 @@ class GamesViewModel: ObservableObject {
             return round1TripleStumpers.contains(toCheck)
         } else {
             return round2TripleStumpers.contains(toCheck)
+        }
+    }
+    
+    func progressGame() {
+        gameplayDisplay = .grid
+        clueMechanics.resetAllVariables()
+        if doneWithRound() {
+            if gamePhase == .round1 && customSet.hasTwoRounds {
+                moveOntoRound2()
+            } else {
+                gamePhase = .finalRound
+            }
         }
     }
     
@@ -222,4 +254,31 @@ enum GamePhase: CaseIterable {
 
 enum GameplayDisplay {
     case grid, clue
+}
+
+struct ClueMechanics {
+    var showResponse: Bool = false
+    var wvcWagerMade: Bool = false
+    var numCountdownSeconds: Double = 5
+    var timeElapsed: Double = 0
+    var wvcWager: Double = 0
+    
+    mutating func resetAllVariables() {
+        timeElapsed = 0
+        wvcWager = 0
+        wvcWagerMade = false
+        showResponse = false
+    }
+    
+    mutating func toggleWVCWagerMade() {
+        wvcWagerMade.toggle()
+    }
+    
+    mutating func toggleShowResponse() {
+        showResponse.toggle()
+    }
+    
+    mutating func setTimeElapsed(newValue: Double) {
+        timeElapsed = newValue
+    }
 }

@@ -96,7 +96,7 @@ struct MobileBuildGridView: View {
             } else if buildVM.buildStage == .trivioRoundDD || buildVM.buildStage == .dtRoundDD {
                 VStack (alignment: .leading) {
                     HStack {
-                        Text("Duplex of the Day")
+                        Text("Wager-valued Clue")
                         Button {
                             showsDuplexExplanation.toggle()
                         } label: {
@@ -118,7 +118,7 @@ struct MobileBuildGridView: View {
                     }
                     .frame(height: 20)
                     if showsDuplexExplanation {
-                        Text("Pick \(buildVM.buildStage == .trivioRoundDD ? "a" : "two") clue\(buildVM.buildStage == .trivioRoundDD ? "" : "s") to serve as your duplex of the day.")
+                        Text("Pick \(buildVM.buildStage == .trivioRoundDD ? "a" : "two") clue\(buildVM.buildStage == .trivioRoundDD ? "" : "s") to serve as your wager-value clue.")
                             .font(formatter.font(.regularItalic, fontSize: .small))
                     }
                 }

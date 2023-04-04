@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>430656125256-8mu14rncra26e7iatunfc7ol09kats7k.apps.googleusercontent.com</string>
+	<string>430656125256-cgm3va033i5skk0igcmnq4a43ve5gll7.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.430656125256-8mu14rncra26e7iatunfc7ol09kats7k</string>
+	<string>com.googleusercontent.apps.430656125256-cgm3va033i5skk0igcmnq4a43ve5gll7</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAATWbbz-_sapkoz3Ip9RF88StXawHWxjg</string>
 	<key>GCM_SENDER_ID</key>
@@ -19,16 +19,16 @@
 	<key>STORAGE_BUCKET</key>
 	<string>trivio-55757.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:430656125256:ios:0fcaf56fc14ca033f99b7d</string>
+	<string>1:430656125256:ios:a28b956e9d9c8565f99b7d</string>
 </dict>
 </plist>

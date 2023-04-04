@@ -61,6 +61,14 @@ extension MasterHandler {
         return Font.custom("Metropolis-" + styleString, size: sizeFloat)
     }
     
+    func korinnaFont(sizeFloat: CGFloat = 15) -> Font {
+        return Font.custom("Korinna-Regular", size: sizeFloat)
+    }
+    
+    func swiss911Font(sizeFloat: CGFloat = 15) -> Font {
+        return Font.custom("Swiss911BT-Compressed", size: sizeFloat)
+    }
+    
     func iconFont(_ systemFontSize: SystemFontSize = .medium) -> Font {
         return .system(size: systemFontSize.rawValue, weight: .bold)
     }
@@ -79,5 +87,6 @@ enum SystemFontSize: CGFloat {
     case small = 15
     case medium = 20
     case mediumLarge = 25
+    case semiLarge = 27
     case large = 30
 }

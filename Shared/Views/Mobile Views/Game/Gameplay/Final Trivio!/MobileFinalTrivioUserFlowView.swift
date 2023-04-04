@@ -15,6 +15,17 @@ struct MobileFinalTrivioUserFlowView: View {
     
     @State var isShowingInstructions = false
     
+    var submissionsAllValid: Bool {
+        switch gamesVM.finalTrivioStage {
+        case .makeWager:
+            return participantsVM.wagersValid()
+        case .revealResponse:
+            return true
+        default:
+            return participantsVM.answersValid()
+        }
+    }
+    
     var headingLabelText: String {
         switch gamesVM.finalTrivioStage {
         case .makeWager:
@@ -116,13 +127,12 @@ struct MobileFinalTrivioUserFlowView: View {
                     .padding(10)
                 }
             }
-            .resignKeyboardOnDragGesture()
             .background(formatter.color(.primaryFG))
             .cornerRadius(10)
             
             // Continue button
             Button(action: {
-                if participantsVM.wagersValid() {
+                if submissionsAllValid {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     gamesVM.finalTrivioFinishedAction()
                     if gamesVM.finalTrivioStage == .submitAnswer {
@@ -138,7 +148,7 @@ struct MobileFinalTrivioUserFlowView: View {
                     .background(formatter.color(.highContrastWhite))
                     .clipShape(Capsule())
                     .contentShape(Capsule())
-                    .opacity(participantsVM.wagersValid() ? 1 : 0.4)
+                    .opacity(submissionsAllValid ? 1 : 0.4)
             })
         }
     }

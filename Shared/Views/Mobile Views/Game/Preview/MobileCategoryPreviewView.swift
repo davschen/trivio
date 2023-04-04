@@ -19,8 +19,8 @@ struct MobileCategoryPreviewView: View {
     var body: some View {
         ScrollView (.horizontal, showsIndicators: false) {
             HStack (spacing: 7) {
-                ForEach(categories, id: \.self) { category in
-                    MobileCategoryPreviewCellView(categoryName: category)
+                ForEach(categories.indices, id: \.self) { categoryIndex in
+                    MobileCategoryPreviewCellView(categoryName: categories[categoryIndex])
                         .id(UUID().uuidString)
                 }
             }

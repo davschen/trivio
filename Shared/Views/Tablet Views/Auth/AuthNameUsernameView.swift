@@ -14,6 +14,7 @@ import FirebaseFirestoreSwift
 
 struct AuthNameUsernameView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var authVM: AuthViewModel
     
     @Binding var isLoggedIn: Bool
     @Binding var signInStage: SignInStage
@@ -24,7 +25,7 @@ struct AuthNameUsernameView: View {
     @State var usernameValid = false
     @State var isLoading = false
     
-    var db = Firestore.firestore()
+    var db = FirebaseConfigurator.shared.getFirestore()
     
     var nameValid: Bool {
         return !name.isEmpty
@@ -132,7 +133,12 @@ struct AuthNameUsernameView: View {
             .padding(.top, 20)
         }
         .padding(30)
-        .keyboardAware(heightFactor: 0.7)
+        .onAppear {
+            name = authVM.givenNameFromApple
+        }
+        .onChange(of: authVM.givenNameFromApple, perform: { newValue in
+            name = authVM.givenNameFromApple
+        })
     }
     
     // This is crazy levels of raw-dogging it. All so that I
@@ -182,7 +188,7 @@ struct AuthNameUsernameView: View {
     }
     
     func usernameFinishedUploading(completion: @escaping (Bool) -> Void) {
-        let userRef = db.collection("users").document(Auth.auth().currentUser?.uid ?? "")
+        let userRef = db.collection("users").document(FirebaseConfigurator.shared.auth.currentUser?.uid ?? "")
         userRef.setData([
             "name" : name,
             "username" : username.lowercased()
@@ -193,7 +199,7 @@ struct AuthNameUsernameView: View {
                 return
             }
             guard let doc = docSnap else { return }
-            let myUID = Auth.auth().currentUser?.uid
+            let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid
             if myUID == doc.documentID {
                 completion(true)
             }

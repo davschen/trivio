@@ -11,10 +11,9 @@ import SwiftUI
 struct MobileGamePreviewView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    @State var isPresentingGameView = false
-    @State var isPresentingTrivioLiveView = false
+    @State var playingMode: PlayingMode = .game
+    @State var headerString = "Set Preview"
     
     init() {
         Theme.navigationBarColors(
@@ -28,44 +27,115 @@ struct MobileGamePreviewView: View {
         ZStack {
             formatter.color(.primaryBG)
                 .edgesIgnoringSafeArea(.all)
-            ZStack (alignment: .bottom) {
-                ScrollView (.vertical, showsIndicators: false) {
-                    VStack (alignment: .leading, spacing: 20) {
-                        // Settings header
-                        MobileGameSettingsHeaderView()
-                            .padding([.top, .horizontal])
-                            .padding(.top, 15)
-                        
-                        MobileGameSettingsCategoryPreviewView()
-                        
-                        // Contestants View
-                        MobileGameSettingsContestantsView()
-                        
-                        // Game Settings
-                        MobileGameSettingsCardView()
-                            .padding(.horizontal)
-                            .padding(.bottom, 45)
-                    }
+            VStack {
+                MobileGamePlayingModeSelectorView(playingMode: $playingMode, headerString: $headerString)
+                if playingMode == .game {
+                    MobileGameGameshowPreviewView()
+                } else {
+                    MobileGameFlashcardsCategoriesView()
                 }
-                .padding(.bottom)
-                
-                MobileGameSettingsFooterView(isPresentingGameView: $isPresentingGameView, isPresentingTrivioLiveView: $isPresentingTrivioLiveView)
-                    .padding(.top, 5)
             }
-            
-            NavigationLink(isActive: $isPresentingGameView, destination: {
-                MobileGameBoardView()
-            }, label: { EmptyView() })
-            .isDetailLink(false)
-            .hidden()
-            
-            NavigationLink(isActive: $isPresentingTrivioLiveView, destination: {
-                MobileTrivioLivePreviewView()
-            }, label: { EmptyView() })
-            .isDetailLink(false)
-            .hidden()
         }
         .withBackButton()
+        .navigationBarTitle(headerString, displayMode: .inline)
+    }
+}
+
+struct MobileGamePlayingModeSelectorView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var playingMode: PlayingMode
+    @Binding var headerString: String
+    
+    var body: some View {
+        HStack (spacing: 7) {
+            Button {
+                formatter.hapticFeedback(style: .medium, intensity: .weak)
+                headerString = "Set Preview"
+                playingMode = .game
+            } label: {
+                HStack {
+                    Image(systemName: "gamecontroller.fill")
+                        .font(formatter.iconFont(.small))
+                    Text("Game")
+                        .font(formatter.font())
+                }
+                .padding(.horizontal, 20)
+                .frame(height: 40)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(5)
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: playingMode == .game ? 1 : 0))
+            }
+            
+            Button {
+                formatter.hapticFeedback(style: .medium, intensity: .weak)
+                playingMode = .flashcards
+                headerString = gamesVM.customSet.title
+                gamesVM.flashcardClues2D = gamesVM.generateFlashcards2D()
+            } label: {
+                HStack {
+                    Image(systemName: "rectangle.portrait.on.rectangle.portrait.fill")
+                        .font(formatter.iconFont(.small))
+                    Text("Flashcards")
+                        .font(formatter.font())
+                }
+                .padding(.horizontal, 20)
+                .frame(height: 40)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(5)
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: playingMode == .flashcards ? 1 : 0))
+            }
+            Spacer()
+        }
+        .padding([.top, .horizontal])
+    }
+}
+
+struct MobileGameGameshowPreviewView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    
+    @State var isPresentingGameView = false
+    @State var isPresentingTrivioLiveView = false
+    
+    var body: some View {
+        ZStack (alignment: .bottom) {
+            ScrollView (.vertical, showsIndicators: false) {
+                VStack (alignment: .leading, spacing: 20) {
+                    // Settings header
+                    MobileGameSettingsHeaderView()
+                        .padding([.top, .horizontal])
+                    
+                    MobileGameSettingsCategoryPreviewView()
+                    
+                    // Contestants View
+                    MobileGameSettingsContestantsView()
+                    
+                    // Game Settings
+                    MobileGameSettingsCardView()
+                        .padding(.horizontal)
+                        .padding(.bottom, 45)
+                }
+            }
+            .padding(.bottom)
+            
+            MobileGameSettingsFooterView(isPresentingGameView: $isPresentingGameView, isPresentingTrivioLiveView: $isPresentingTrivioLiveView)
+                .padding(.top, 5)
+        }
+        
+        NavigationLink(isActive: $isPresentingGameView, destination: {
+            MobileGameBoardView()
+        }, label: { EmptyView() })
+        .isDetailLink(false)
+        .hidden()
+        
+        NavigationLink(isActive: $isPresentingTrivioLiveView, destination: {
+            MobileTrivioLivePreviewView()
+        }, label: { EmptyView() })
+        .isDetailLink(false)
+        .hidden()
     }
 }
 
@@ -75,6 +145,8 @@ struct MobileGameSettingsHeaderView: View {
     @EnvironmentObject var exploreVM: ExploreViewModel
     
     @State var userViewActive = false
+    
+    var isShowingDescription: Bool = true
     
     var body: some View {
         ZStack {
@@ -92,11 +164,12 @@ struct MobileGameSettingsHeaderView: View {
                     }
                     Text(" on \(gamesVM.dateFormatter.string(from: gamesVM.customSet.dateCreated))")
                 }
-                if !gamesVM.customSet.description.isEmpty {
+                if !gamesVM.customSet.description.isEmpty && isShowingDescription {
                     Text(gamesVM.customSet.description)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .foregroundColor(formatter.color(.mediumContrastWhite))
                         .lineSpacing(3)
+                        .padding(.top, 2)
                 }
             }
             .font(formatter.font(.regular, fontSize: .regular))
@@ -143,7 +216,7 @@ struct MobileGameSettingsContestantsView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var editingName = ""
-    @State var editingColor = ""
+    @State var editingColor = "blue"
     @State var editingID: String? = nil
     
     var body: some View {
@@ -175,31 +248,29 @@ struct MobileGameSettingsContestantsView: View {
                     .foregroundColor(formatter.color(.lowContrastWhite))
                     .padding(.leading)
                 // Contestants currently in the game float to the top
-                ForEach(participantsVM.savedTeams) { team in
-                    if participantsVM.teams.contains(team) {
-                        VStack (alignment: .leading, spacing: 10) {
-                            MobileContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    if team.id == editingID { return }
-                                    formatter.hapticFeedback(style: .rigid, intensity: .weak)
-                                    if gamesVM.gameInProgress() && team.score > 0 {
-                                        formatter.setAlertSettings(alertAction: {
-                                            participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                        }, alertTitle: "Remove \(team.name)?", alertSubtitle: "\(team.name) has \(team.score) points right now. If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
-                                    } else {
+                ForEach(participantsVM.teams) { team in
+                    VStack (alignment: .leading, spacing: 10) {
+                        MobileContestantsCellView(editingID: $editingID, editingName: $editingName, editingColor: $editingColor, team: team)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if team.id == editingID { return }
+                                formatter.hapticFeedback(style: .rigid, intensity: .weak)
+                                if gamesVM.gameInProgress() && team.score > 0 {
+                                    formatter.setAlertSettings(alertAction: {
                                         participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
-                                    }
+                                    }, alertTitle: "Remove \(team.name)?", alertSubtitle: "\(team.name) has \(team.score) points right now. If you remove a contestant during a game, their score will not be saved.", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                                } else {
+                                    participantsVM.removeTeam(index: participantsVM.getIndexByID(id: team.id))
                                 }
-                            
-                            Rectangle()
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 1)
-                                .foregroundColor(formatter.color(.lowContrastWhite))
-                                .padding(.leading, 15)
-                        }
-                        .animation(.easeInOut(duration: 0.2))
+                            }
+                        
+                        Rectangle()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 1)
+                            .foregroundColor(formatter.color(.lowContrastWhite))
+                            .padding(.leading, 15)
                     }
+                    .animation(.easeInOut(duration: 0.2))
                 }
                 ForEach(participantsVM.savedTeams) { team in
                     if !participantsVM.teams.contains(team) {
@@ -394,7 +465,7 @@ struct MobileGameSettingsCardView: View {
             ThinDividerView()
             MobileGameSettingsClueAppearanceView(editingSettingName: $editingSettingName)
             ThinDividerView()
-            MobileGameSettingsVoiceTypeView(editingSettingName: $editingSettingName)
+            MobileGameSettingsLanguageTypeView(editingSettingName: $editingSettingName)
             ThinDividerView()
             MobileGameSettingsVoiceSpeedView(editingSettingName: $editingSettingName)
             ThinDividerView()
@@ -486,12 +557,12 @@ struct MobileGameSettingsClueAppearancePickerView: View {
     }
 }
 
-struct MobileGameSettingsVoiceTypeView: View {
+struct MobileGameSettingsLanguageTypeView: View {
     @EnvironmentObject var formatter: MasterHandler
     
     @Binding var editingSettingName: String
 
-    @State var selectedLanguage: SpeechLanguage = SpeechLanguage(rawValue: UserDefaults.standard.string(forKey: "speechLanguage") ?? "americanEnglish") ?? .britishEnglish
+    @State var selectedLanguage: SpeechLanguage = SpeechLanguage(rawValue: UserDefaults.standard.string(forKey: "speechLanguage") ?? "americanEnglish") ?? .americanEnglish
     
     let settingName = "Reading Voice"
     
@@ -550,7 +621,7 @@ struct MobileGameSettingsLanguagePickerView: View {
             }
             .onAppear {
                 NotificationCenter.default.addObserver(forName: NSNotification.Name("SpeechLanguageChange"), object: nil, queue: .main) { (_) in
-                    let selectedLanguage = SpeechLanguage(rawValue: UserDefaults.standard.string(forKey: "speechLanguage") ?? "britishEnglish") ?? .britishEnglish
+                    let selectedLanguage = SpeechLanguage(rawValue: UserDefaults.standard.string(forKey: "speechLanguage") ?? "britishEnglish") ?? .americanEnglish
                     self.selectedLanguage = selectedLanguage
                 }
             }
@@ -604,6 +675,38 @@ struct MobileGameSettingsVoiceSpeedView: View {
             }
         }
         .padding()
+    }
+}
+
+struct MobileGameSettingsSpeedPickerView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
+    @Binding var selectedSpeed: Float
+    
+    let speechSpeed: SpeechSpeed
+    let speedString: String
+    let defaults = UserDefaults.standard
+    
+    var emphasisColor: ColorType = .primaryFG
+    
+    var body: some View {
+        Text("\(speedString)")
+            .font(formatter.font(.regular, fontSize: .regular))
+            .padding(7).padding(.horizontal, 3)
+            .foregroundColor(formatter.color(selectedSpeed == speechSpeed.rawValue ? .primaryFG : .highContrastWhite))
+            .background(formatter.color(selectedSpeed == speechSpeed.rawValue ? .highContrastWhite : .primaryFG))
+            .clipShape(Capsule())
+            .onTapGesture {
+                formatter.hapticFeedback(style: .soft, intensity: .weak)
+                UserDefaults.standard.set(speechSpeed.rawValue, forKey: "speechSpeed")
+                NotificationCenter.default.post(name: NSNotification.Name("SpeechSpeedChange"), object: nil)
+            }
+            .onAppear {
+                NotificationCenter.default.addObserver(forName: NSNotification.Name("SpeechSpeedChange"), object: nil, queue: .main) { (_) in
+                    let selectedSpeed = UserDefaults.standard.value(forKey: "speechSpeed") as? Float ?? 0.5
+                    self.selectedSpeed = selectedSpeed
+                }
+            }
     }
 }
 
@@ -676,46 +779,17 @@ struct MobileGameSettingsGenderPickerView: View {
     }
 }
 
-struct MobileGameSettingsSpeedPickerView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    
-    @Binding var selectedSpeed: Float
-    
-    let speechSpeed: SpeechSpeed
-    let speedString: String
-    let defaults = UserDefaults.standard
-    
-    var emphasisColor: ColorType = .primaryFG
-    
-    var body: some View {
-        Text("\(speedString)")
-            .font(formatter.font(.regular, fontSize: .regular))
-            .padding(7).padding(.horizontal, 3)
-            .foregroundColor(formatter.color(selectedSpeed == speechSpeed.rawValue ? .primaryFG : .highContrastWhite))
-            .background(formatter.color(selectedSpeed == speechSpeed.rawValue ? .highContrastWhite : .primaryFG))
-            .clipShape(Capsule())
-            .onTapGesture {
-                formatter.hapticFeedback(style: .soft, intensity: .weak)
-                UserDefaults.standard.set(speechSpeed.rawValue, forKey: "speechSpeed")
-                NotificationCenter.default.post(name: NSNotification.Name("SpeechSpeedChange"), object: nil)
-            }
-            .onAppear {
-                NotificationCenter.default.addObserver(forName: NSNotification.Name("SpeechSpeedChange"), object: nil, queue: .main) { (_) in
-                    let selectedSpeed = UserDefaults.standard.value(forKey: "speechSpeed") as? Float ?? 0.5
-                    self.selectedSpeed = selectedSpeed
-                }
-            }
-    }
-}
-
 struct MobileGameSettingsFooterView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @Binding var isPresentingGameView: Bool
     @Binding var isPresentingTrivioLiveView: Bool
+    
+    @State var currOrientation: UIInterfaceOrientationMask = .portrait
     
     var gameIsPlayable: Bool {
         return participantsVM.teams.count > 0
@@ -735,7 +809,7 @@ struct MobileGameSettingsFooterView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                 }
             }, label: {
-                Text("\(gamesVM.gameInProgress() ? "Resume Game" : "Play Game")")
+                Text("\(gamesVM.gameInProgress() ? "Resume Game" : "Play Offline")")
                     .font(formatter.font(.boldItalic, fontSize: .regular))
                     .foregroundColor(formatter.color(.primaryFG))
                     .padding(20)
@@ -745,22 +819,28 @@ struct MobileGameSettingsFooterView: View {
                     .clipShape(Capsule())
             })
             // So sad, gotta leave this for now (12/7/22); will come back to it later
-//            Button(action: {
-//                isPresentingTrivioLiveView.toggle()
-//                formatter.hapticFeedback(style: .soft, intensity: .strong)
-//                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
-//            }, label: {
-//                Text("Host this game live!")
-//                    .font(formatter.font(.boldItalic, fontSize: .regular))
-//                    .foregroundColor(formatter.color(.highContrastWhite))
-//                    .padding()
-//                    .frame(maxWidth: .infinity)
-//                    .background(formatter.color(.primaryAccent))
-//                    .clipShape(Capsule())
-//            })
+            Button(action: {
+                isPresentingTrivioLiveView.toggle()
+                formatter.hapticFeedback(style: .soft, intensity: .strong)
+                gamesVM.createLiveGameDocument(hostUsername: profileVM.username, hostName: profileVM.name)
+                AppDelegate.orientationLock = .landscapeRight
+                UINavigationController.attemptRotationToDeviceOrientation()
+                currOrientation = .landscapeRight
+            }, label: {
+                Text("\(gamesVM.liveGameCustomSet.gameHasBegun ? "Resume Live" : "Host online!")")
+                    .font(formatter.font(.boldItalic, fontSize: .regular))
+                    .foregroundColor(formatter.color(.highContrastWhite))
+                    .padding(20)
+                    .frame(maxWidth: .infinity)
+                    .background(formatter.color(.primaryAccent))
+                    .clipShape(Capsule())
+            })
         }
         .padding([.horizontal, .top])
         .background(formatter.color(.primaryBG).mask(LinearGradient(gradient: Gradient(colors: [bgColor, bgColor, bgColor, .clear]), startPoint: .bottom, endPoint: .top)))
     }
 }
 
+enum PlayingMode {
+    case game, flashcards
+}

@@ -29,15 +29,13 @@ struct GameBoardView: View {
             }
             .padding(.bottom, 15)
         }
-        .navigationBarTitle("")
-        .navigationBarHidden(true)
-        .navigationBarBackButtonHidden()
         .animation(.easeInOut(duration: 0.2))
     }
 }
 
 struct GameplayGridView: View {
     @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
@@ -63,7 +61,11 @@ struct GameplayGridView: View {
                     }
                 }
             }
+            // Funky, but not having it crashed the app so
             GameInfoView(showInfoView: $showInfoView)
+                .environmentObject(formatter)
+                .environmentObject(exploreVM)
+                .environmentObject(gamesVM)
         }
     }
 }
@@ -113,15 +115,15 @@ struct GameplayHeaderView: View {
                         gamesVM.moveOntoRound2()
                         gamesVM.gameplayDisplay = .grid
                     } else {
-                        gamesVM.finalTrivioStage = .makeWager
                         gamesVM.gamePhase = .finalRound
+                        gamesVM.finalTrivioStage = .makeWager
                     }
                 } label: {
                     Text("Skip Round")
                         .font(formatter.font(.regularItalic, fontSize: .small))
                         .padding()
                         .frame(maxHeight: 25)
-                        .background(formatter.color(.secondaryFG))
+                        .background(formatter.color(.primaryFG))
                         .clipShape(Capsule())
                 }
                 Button {
@@ -132,6 +134,7 @@ struct GameplayHeaderView: View {
                         .font(.system(size: 22))
                 }
             }
+            .padding(.top)
             if gamesVM.finalTrivioStage == .submitAnswer {
                 FinalTrivioCountdownTimerView()
             }

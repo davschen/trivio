@@ -43,7 +43,7 @@ struct BuildCellView: View {
             } else {
                 ZStack {
                     Text("\(amount)")
-                        .font(formatter.fontFloat(.bold, sizeFloat: 65.0))
+                        .font(formatter.fontFloat(.bold, sizeFloat: 50.0))
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .padding()

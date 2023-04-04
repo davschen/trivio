@@ -13,7 +13,7 @@ import FirebaseFirestoreSwift
 
 extension GamesViewModel {
     func readCustomData() {
-        guard let myUID = Auth.auth().currentUser?.uid else { return }
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         db.collection("userSets")
             .whereField("userID", isEqualTo: myUID)
             .order(by: "dateCreated", descending: true).addSnapshotListener { (snap, error) in
