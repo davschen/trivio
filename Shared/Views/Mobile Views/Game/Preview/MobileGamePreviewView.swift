@@ -222,7 +222,7 @@ struct MobileGameSettingsContestantsView: View {
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
             HStack {
-                Text("Contestants")
+                Text("Offline Contestants")
                     .font(formatter.font(fontSize: .mediumLarge))
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
@@ -810,13 +810,13 @@ struct MobileGameSettingsFooterView: View {
                 }
             }, label: {
                 Text("\(gamesVM.gameInProgress() ? "Resume Game" : "Play Offline")")
-                    .font(formatter.font(.boldItalic, fontSize: .regular))
+                    .font(formatter.font(.boldItalic))
                     .foregroundColor(formatter.color(.primaryFG))
                     .padding(20)
                     .frame(maxWidth: .infinity)
                     .background(formatter.color(.highContrastWhite))
                     .opacity(gameIsPlayable ? 1 : 0.5)
-                    .clipShape(Capsule())
+                    .cornerRadius(5)
             })
             // So sad, gotta leave this for now (12/7/22); will come back to it later
             Button(action: {
@@ -828,12 +828,12 @@ struct MobileGameSettingsFooterView: View {
                 currOrientation = .landscapeRight
             }, label: {
                 Text("\(gamesVM.liveGameCustomSet.gameHasBegun ? "Resume Live" : "Host online!")")
-                    .font(formatter.font(.boldItalic, fontSize: .regular))
+                    .font(formatter.font(.boldItalic))
                     .foregroundColor(formatter.color(.highContrastWhite))
                     .padding(20)
                     .frame(maxWidth: .infinity)
                     .background(formatter.color(.primaryAccent))
-                    .clipShape(Capsule())
+                    .cornerRadius(5)
             })
         }
         .padding([.horizontal, .top])

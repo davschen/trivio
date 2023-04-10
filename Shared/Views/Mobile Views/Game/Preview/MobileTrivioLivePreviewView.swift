@@ -14,7 +14,8 @@ struct MobileTrivioLivePreviewView: View {
     @EnvironmentObject var appStoreManager: AppStoreManager
     @EnvironmentObject var gamesVM: GamesViewModel
     
-    @State var isPresentingTrivioLiveView: Bool = false
+    @State var isPresentingTrivioLiveView = false
+    @State var isShowingFreeGamesBanner = true
     
     var hasSubscribed: Bool {
         return UserDefaults.standard.bool(forKey: "iOS.Trivio.3.0.Cherry.OTLHT")
@@ -36,23 +37,29 @@ struct MobileTrivioLivePreviewView: View {
             HStack (spacing: 15) {
                 VStack (alignment: .leading, spacing: 15) {
                     // Banner
-                    HStack {
-                        VStack (alignment: .leading, spacing: 5) {
-                            Text("\(numMonthlyGamesLeft) free live game left this month")
-                                .font(formatter.font(fontSize: .regular))
-                            Text("Effective once game starts. Tap to find out more.")
-                                .font(formatter.font(.regularItalic, fontSize: .small))
+                    if isShowingFreeGamesBanner {
+                        HStack {
+                            VStack (alignment: .leading, spacing: 5) {
+                                Text("\(numMonthlyGamesLeft) free live game\(numMonthlyGamesLeft == 1 ? "" : "s") left")
+                                    .font(formatter.font(fontSize: .regular))
+                                Text("Effective once game starts. Tap to learn more.")
+                                    .font(formatter.font(.regularItalic, fontSize: .small))
+                            }
+                            Spacer(minLength: 0)
+                            Button {
+                                isShowingFreeGamesBanner.toggle()
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
                         }
-                        Spacer(minLength: 0)
-                        Image(systemName: "xmark")
+                        .padding()
+                        .background(formatter.color(.red))
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .strokeBorder(formatter.color(.highContrastWhite), lineWidth: 2)
+                        )
                     }
-                    .padding()
-                    .background(formatter.color(.red))
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .strokeBorder(formatter.color(.highContrastWhite), lineWidth: 2)
-                    )
                     
                     MobileTrivioLivePreviewHeaderView()
                     
@@ -94,10 +101,8 @@ struct MobileTrivioLivePreviewView: View {
                                         HStack {
                                             Text("\(player.nickname)")
                                             Spacer()
-                                            Text("Rename")
-                                                .font(formatter.font(.regular))
                                             Button {
-                                                
+                                                gamesVM.deleteLiveGamePlayer(playerId: player.id)
                                             } label: {
                                                 Image(systemName: "xmark")
                                                     .font(.system(size: 14, weight: .regular))

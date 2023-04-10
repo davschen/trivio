@@ -114,6 +114,7 @@ struct LiveGamePlayer: Codable, Hashable, Identifiable {
     var currentWager: Int
     var wagerSubmitted: Bool
     var lastBuzzedDateTime: Date
+    var inBuzzerRace: Bool
 
     init(id: String? = nil,
          nickname: String = "",
@@ -125,7 +126,8 @@ struct LiveGamePlayer: Codable, Hashable, Identifiable {
          responseSubmitted: Bool = false,
          currentWager: Int = 0,
          wagerSubmitted: Bool = false,
-         lastBuzzedDateTime: Date = Date()) {
+         lastBuzzedDateTime: Date = Date(),
+         inBuzzerRace: Bool = false) {
 
         self.id = id
         self.nickname = nickname
@@ -138,6 +140,7 @@ struct LiveGamePlayer: Codable, Hashable, Identifiable {
         self.currentWager = currentWager
         self.wagerSubmitted = wagerSubmitted
         self.lastBuzzedDateTime = lastBuzzedDateTime
+        self.inBuzzerRace = inBuzzerRace
     }
 }
 

@@ -15,21 +15,9 @@ struct MobileLiveClueView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     
     var body: some View {
-        MobileLiveClueResponseView(progressGame: progressGame)
+        MobileLiveClueResponseView()
             .transition(AnyTransition.move(edge: .bottom))
             .animation(.easeInOut(duration: 0.2))
-    }
-    
-    func progressGame() {
-        formatter.stopSpeaker()
-        gamesVM.progressGame()
-        if !profileVM.myUserRecords.hasShownHeldClueCell {
-            formatter.setAlertSettings(alertAction: {
-                profileVM.updateMyUserRecords(fieldName: "hasShownHeldClueCell", newValue: true)
-                profileVM.myUserRecords.hasShownHeldClueCell = true
-            }, alertType: .tip, alertTitle: "Some advice", alertSubtitle: "If you'd like to bring back a clue, just hold down on the empty grid cell for a few seconds", hasCancel: false, actionLabel: "Got it")
-        }
-        participantsVM.progressGame(gameHasTwoRounds: gamesVM.customSet.hasTwoRounds)
     }
 }
 
@@ -76,8 +64,7 @@ struct MobileLiveClueResponseView: View {
     @State var hasWaited = false
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
-    var progressGame: () -> Void
+
     var isDisplayingLandscapeMode: Bool = false
     
     private var currentLiveClue: Clue {
@@ -138,6 +125,11 @@ struct MobileLiveClueResponseView: View {
                     gamesVM.clueMechanics.setTimeElapsed(newValue: timeElapsed - 1)
                 }
             } else if !formatter.speaker.isSpeaking && timeElapsed < gamesVM.clueMechanics.numCountdownSeconds {
+                if !gamesVM.liveGameCustomSet.buzzersEnabled {
+                    gamesVM.liveGameCustomSet.buzzersEnabled.toggle()
+                    gamesVM.liveGameCustomSet.buzzersEnabledDateTime = Date()
+                    gamesVM.updateLiveGameCustomSet()
+                }
                 gamesVM.clueMechanics.setTimeElapsed(newValue: timeElapsed + 1)
             }
         }

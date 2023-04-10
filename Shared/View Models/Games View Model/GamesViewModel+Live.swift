@@ -127,12 +127,167 @@ extension GamesViewModel {
             print("Error encoding liveGameCustomSet: \(error)")
         }
     }
-}
+    
+    func clearLiveBuzzers() {
+        guard let liveGameCustomSetID = self.liveGameCustomSet.id else {
+            return
+        }
 
-// Flow so I can get this shit out of my head and onto a screen:
-/// iOS User creates this live game doc by tapping on "Host this game live!" in Gameplay : MobileGameSettingsView
-///     This live game doc contains all the information anyone with low-level privileges will ever need to read or write to
-/// When web user on desktop joins with hostCode, hostHasJoined = true
-///     All web users have the same permissions upon visiting www.trivio.live, namely read and write access to the "liveGames" collection
-/// If hostHasJoined, mobile web users can add themselves to "players" collection by entering playerCode
-///
+        let liveGamesRef = db.collection("liveGames").document(liveGameCustomSetID)
+        let playersRef = liveGamesRef.collection("players")
+
+        playersRef.whereField("inBuzzerRace", isEqualTo: true).getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for document in snapshot!.documents {
+                    document.reference.updateData([
+                        "inBuzzerRace": false
+                    ])
+                }
+            }
+        }
+
+        liveGamesRef.updateData([
+            "buzzerWinnerId": "",
+            "buzzersEnabledDateTime": Date()
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            } else {
+                print("Document successfully updated")
+            }
+        }
+    }
+    
+    func clearLiveBuzzersSideRail() {
+        liveGameCustomSet.buzzerWinnerId.removeAll()
+        liveGameCustomSet.buzzersEnabled = false
+        
+        guard let liveGameCustomSetID = self.liveGameCustomSet.id else {
+            return
+        }
+
+        let liveGamesRef = db.collection("liveGames").document(liveGameCustomSetID)
+        let playersRef = liveGamesRef.collection("players")
+
+        playersRef.whereField("inBuzzerRace", isEqualTo: true).getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for document in snapshot!.documents {
+                    document.reference.updateData([
+                        "inBuzzerRace": false,
+                        "responseSubmitted": false,
+                        "currentResponse": "",
+                    ])
+                }
+            }
+        }
+    }
+    
+    func updateLivePlayerScore(previousResponseStatus: LiveGameResponseStatus, responseStatus: LiveGameResponseStatus) {
+        guard let liveGameCustomSetID = liveGameCustomSet.id else { return }
+        
+        let playerRef = db.collection("liveGames").document(liveGameCustomSetID)
+            .collection("players").document(liveGameCustomSet.buzzerWinnerId)
+        
+        let currentPointValueInt = Clue(liveGameCustomSet: liveGameCustomSet).pointValueInt
+        
+        func scoreAdjustment(for status: LiveGameResponseStatus) -> Int {
+            switch status {
+            case .correct:
+                return currentPointValueInt
+            case .incorrect:
+                return -currentPointValueInt
+            default:
+                return 0
+            }
+        }
+        
+        let toAdd = -scoreAdjustment(for: previousResponseStatus)
+        let newScore = scoreAdjustment(for: responseStatus)
+        
+        playerRef.getDocument { document, error in
+            if let document = document, document.exists, let currentScore = document.get("currentScore") as? Int {
+                playerRef.updateData([
+                    "currentScore": currentScore + toAdd + newScore,
+                    "previousScore": currentScore + toAdd
+                ])
+            }
+        }
+    }
+    
+    func deleteLiveGamePlayer(playerId: String?) {
+        guard let playerId = playerId else { return }
+        guard let liveGameCustomSetId = liveGameCustomSet.id else { return }
+
+        let playerRef = db.collection("liveGames")
+            .document(liveGameCustomSetId)
+            .collection("players")
+            .document(playerId)
+
+        // Delete the player document from Firestore
+        playerRef.delete { error in
+            if let error = error {
+                print("Error deleting player: \(error.localizedDescription)")
+            } else {
+                print("Player successfully deleted")
+                
+                // Remove the deleted player from the liveGamePlayers array
+                if let playerIndex = self.liveGamePlayers.firstIndex(where: { $0.id == playerId }) {
+                    self.liveGamePlayers.remove(at: playerIndex)
+                }
+            }
+        }
+    }
+    
+    func updateLiveGamePlayerRanks() {
+        guard let liveGameCustomSetID = liveGameCustomSet.id else { return }
+        
+        let playersRef = db.collection("liveGames").document(liveGameCustomSetID).collection("players")
+        
+        // Fetch all players
+        playersRef.getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching live game players: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = snapshot?.documents else { return }
+            
+            // Sort players by currentScore in descending order
+            let sortedPlayers = documents.sorted { document1, document2 in
+                (document1.get("currentScore") as? Int ?? 0) > (document2.get("currentScore") as? Int ?? 0)
+            }
+            
+            var rank = 1
+            var previousScore: Int?
+            
+            for (index, player) in sortedPlayers.enumerated() {
+                let currentScore = player.get("currentScore") as? Int ?? 0
+                
+                // Handle ties
+                if let previousScore = previousScore, currentScore == previousScore {
+                    // Do not increment rank for tied players
+                } else {
+                    rank = index + 1
+                }
+                
+                let playerID = player.documentID
+                
+                // Update player ranks
+                playersRef.document(playerID).updateData([
+                    "previousRank": player.get("currentRank"),
+                    "currentRank": rank
+                ]) { error in
+                    if let error = error {
+                        print("Error updating player rank: \(error.localizedDescription)")
+                    }
+                }
+                
+                previousScore = currentScore
+            }
+        }
+    }
+}

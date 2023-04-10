@@ -380,23 +380,24 @@ struct LoadingView: View {
     
     let timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
     var color: ColorType = .highContrastWhite
+    var circleDiameter: CGFloat = 7
     
     var ticker: Int {
         return timeElapsed % 3
     }
     
     var body: some View {
-        HStack {
+        HStack (spacing: circleDiameter / 2) {
             Circle()
-                .frame(width: 7, height: 7)
+                .frame(width: circleDiameter, height: circleDiameter)
                 .foregroundColor(formatter.color(color))
                 .offset(y: ticker == 0 ? -10 : 0)
             Circle()
-                .frame(width: 7, height: 7)
+                .frame(width: circleDiameter, height: circleDiameter)
                 .foregroundColor(formatter.color(color))
                 .offset(y: ticker == 1 ? -10 : 0)
             Circle()
-                .frame(width: 7, height: 7)
+                .frame(width: circleDiameter, height: circleDiameter)
                 .foregroundColor(formatter.color(color))
                 .offset(y: ticker == 2 ? -10 : 0)
         }
