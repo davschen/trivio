@@ -18,13 +18,41 @@ extension GamesViewModel {
         listenToLiveGamePlayers(liveGameCustomSetId: myUID)
     }
     
+    public func startLiveJeopardyGame(hostUsername: String, hostName: String) {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        createLiveJeopardyGameDocument(hostUsername: hostUsername, hostName: hostName)
+        listenToLiveGameDocument(liveGameCustomSetId: myUID)
+        listenToLiveGamePlayers(liveGameCustomSetId: myUID)
+    }
+    
     public func createLiveGameDocument(hostUsername: String, hostName: String) {
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
-        guard let customSetID = self.customSet.id else { return }
+        
         let hostCode = String(randomNumberWith(digits: 6))
         let playerCode = String(randomNumberWith(digits: 6))
+        
+        guard let customSetID = self.customSet.id else { return }
         self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: customSetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet)
+        
         // the document ID is myUID because I don't want one user to be making multiple live games
+        do {
+            try self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
+        } catch let error {
+            print("Error writing live game custom set: \(error.localizedDescription)")
+        }
+    }
+    
+    public func createLiveJeopardyGameDocument(hostUsername: String, hostName: String) {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        
+        let hostCode = String(randomNumberWith(digits: 6))
+        let playerCode = String(randomNumberWith(digits: 6))
+        
+        guard let jeopardySetID = self.customSet.id else {
+            print("Error getting jeopardy set id")
+            return
+        }
+        self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: jeopardySetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet, jeopardySet: self.jeopardySet)
         do {
             try self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
         } catch let error {
@@ -83,10 +111,20 @@ extension GamesViewModel {
     func setLiveCurrentSelectedClue(categoryIndex: Int, clueIndex: Int) {
         liveGameCustomSet.currentCategoryIndex = categoryIndex
         liveGameCustomSet.currentClueIndex = clueIndex
-        liveGameCustomSet.currentGameDisplay = "clue"
+        liveGameCustomSet.buzzersEnabled = false
+        
+        if Clue(liveGameCustomSet: liveGameCustomSet).isWVC {
+            liveGameCustomSet.currentGameDisplay = "preWVC"
+        } else {
+            liveGameCustomSet.currentGameDisplay = "clue"
+        }
+        
+        clueMechanics.setTimeElapsed(newValue: 0)
         
         modifyFinishedClues2D(categoryIndex: categoryIndex, clueIndex: clueIndex)
         currentCategoryIndex = categoryIndex
+        
+        updateLiveGameCustomSet()
     }
 
     func getRandomIncompleteClue() -> (categoryIndex: Int, clueIndex: Int)? {
@@ -161,6 +199,8 @@ extension GamesViewModel {
     }
     
     func clearLiveBuzzersSideRail() {
+        setCurrentPlayer(buzzerWinnerId: liveGameCustomSet.buzzerWinnerId)
+        
         liveGameCustomSet.buzzerWinnerId.removeAll()
         liveGameCustomSet.buzzersEnabled = false
         
@@ -180,6 +220,7 @@ extension GamesViewModel {
                         "inBuzzerRace": false,
                         "responseSubmitted": false,
                         "currentResponse": "",
+                        "wager": 0
                     ])
                 }
             }
@@ -192,7 +233,10 @@ extension GamesViewModel {
         let playerRef = db.collection("liveGames").document(liveGameCustomSetID)
             .collection("players").document(liveGameCustomSet.buzzerWinnerId)
         
-        let currentPointValueInt = Clue(liveGameCustomSet: liveGameCustomSet).pointValueInt
+        var currentPointValueInt = Clue(liveGameCustomSet: liveGameCustomSet).pointValueInt
+        
+        guard let buzzedPlayer = liveGamePlayers.first(where: { $0.id == liveGameCustomSet.buzzerWinnerId }) else { return }
+        currentPointValueInt = buzzedPlayer.currentWager > 0 ? buzzedPlayer.currentWager : currentPointValueInt
         
         func scoreAdjustment(for status: LiveGameResponseStatus) -> Int {
             switch status {
@@ -278,7 +322,7 @@ extension GamesViewModel {
                 
                 // Update player ranks
                 playersRef.document(playerID).updateData([
-                    "previousRank": player.get("currentRank"),
+                    "previousRank": player.get("currentRank") ?? rank,
                     "currentRank": rank
                 ]) { error in
                     if let error = error {
@@ -288,6 +332,58 @@ extension GamesViewModel {
                 
                 previousScore = currentScore
             }
+        }
+    }
+    
+    func setCurrentPlayer(buzzerWinnerId: String) {
+        if buzzerWinnerId.isEmpty { return }
+        
+        guard let liveGameCustomSetID = self.liveGameCustomSet.id else {
+            return
+        }
+
+        let liveGamesRef = db.collection("liveGames").document(liveGameCustomSetID)
+        let playersRef = liveGamesRef.collection("players").document(buzzerWinnerId)
+
+        playersRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching player data: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let document = document, document.exists else {
+                print("Player document does not exist")
+                return
+            }
+            
+            let currentScore = document.get("currentScore") as? Int ?? 0
+            let previousScore = document.get("previousScore") as? Int ?? 0
+            
+            if currentScore > previousScore {
+                liveGamesRef.updateData([
+                    "currentPlayerId": buzzerWinnerId
+                ]) { error in
+                    if let error = error {
+                        print("Error updating currentPlayerId: \(error.localizedDescription)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func moveOntoLiveGameRound2() {
+        liveGameCustomSet.currentRound = "round2"
+        categories = liveGameCustomSet.round2CategoryNames
+        generateFinishedClues2D()
+        pointValueArray = round2PointValues
+        currentCategoryIndex = 0
+    }
+    
+    func doneWithLiveRound() -> Bool {
+        if liveGameCustomSet.currentRound != "finalRound" {
+            return finishedCategories.allSatisfy({ $0 })
+        } else {
+            return false
         }
     }
 }

@@ -23,11 +23,15 @@ struct MobileTrivioLiveView: View {
                         switch display {
                         case .preWVC:
                             MobileLiveDuplexWagerView()
-                        case .clue, .response:
-                            MobileLiveClueView()
+                        case .preFinalClue:
+                            MobileLivePreFinalClueView()
                         default:
-                            // Display is set to board by default
                             MobileLiveGameBoardView()
+                                .opacity(display == .board ? 1 : 0)
+                                .animation(.easeInOut(duration: 0.3))
+                            MobileLiveClueView()
+                                .offset(y: (display == .clue || display == .response) ? 0 : 1000)
+                                .animation(.easeInOut(duration: 0.1))
                         }
                     }
                 }
@@ -38,6 +42,35 @@ struct MobileTrivioLiveView: View {
         }
         .navigationTitle("")
         .navigationBarBackButtonHidden(true)
+    }
+}
+
+struct MobileLivePreFinalClueView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    var body: some View {
+        VStack (spacing: 15) {
+            VStack {
+                Spacer()
+                VStack (spacing: 10) {
+                    Text("FINAL CLUE CATEGORY")
+                        .font(formatter.font(fontSize: .medium))
+                    Text(gamesVM.liveGameCustomSet.finalCat.uppercased())
+                        .font(formatter.fontFloat(sizeFloat: 35))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                    Text("Make your wagers!")
+                        .font(formatter.font(.regular))
+                }
+                .padding(25)
+                Spacer()
+            }
+            .padding(.horizontal)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(formatter.color(.primaryAccent))
+        .cornerRadius(10)
     }
 }
 

@@ -29,22 +29,22 @@ struct UserView: View {
                 .padding(.horizontal)
                 .padding(.top, 25)
                 
-                VStack (alignment: .leading, spacing: 3) {
-                    ForEach(exploreVM.userResults, id: \.self) { customSet in
-                        if profileVM.myUserRecords.isAdmin || customSet.isPublic {
-                            UserCustomSetCellView(customSet: customSet)
-                        }
-                    }
-                    if profileVM.myUserRecords.isAdmin {
-                        Text("\(exploreVM.selectedUserName)'s Drafts")
-                            .padding([.top, .horizontal])
-                            .opacity(exploreVM.userDrafts.count > 0 ? 1 : 0)
-                        ForEach(exploreVM.userDrafts, id: \.self) { draft in
-                            UserCustomSetCellView(customSet: draft)
-                                .disabled(true)
-                        }
-                    }
-                }
+//                VStack (alignment: .leading, spacing: 3) {
+//                    ForEach(exploreVM.userResults, id: \.self) { customSet in
+//                        if profileVM.myUserRecords.isAdmin || customSet.isPublic {
+//                            UserCustomSetCellView(customSet: customSet)
+//                        }
+//                    }
+//                    if profileVM.myUserRecords.isAdmin {
+//                        Text("\(exploreVM.selectedUserName)'s Drafts")
+//                            .padding([.top, .horizontal])
+//                            .opacity(exploreVM.userDrafts.count > 0 ? 1 : 0)
+//                        ForEach(exploreVM.userDrafts, id: \.self) { draft in
+//                            UserCustomSetCellView(customSet: draft)
+//                                .disabled(true)
+//                        }
+//                    }
+//                }
             }
             .padding(.bottom, 25)
         }
@@ -62,7 +62,7 @@ struct UserCustomSetCellView: View {
 
     @State var setPreviewActive = false
     
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -87,9 +87,6 @@ struct UserCustomSetCellView: View {
                         .lineLimit(2)
                         .lineSpacing(3)
                 }
-                Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
-                    .font(formatter.font(.regular))
-                    .foregroundColor(formatter.color(.lowContrastWhite))
                 HStack {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
@@ -104,7 +101,7 @@ struct UserCustomSetCellView: View {
             }
             .padding(.horizontal, 15).padding(.vertical, 20)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(formatter.color(exploreVM.recentlyPlayedSets.contains(customSet) ? .primaryFG : .secondaryFG))
+//            .background(formatter.color(exploreVM.recentlyPlayedSets.contains(customSet) ? .primaryFG : .secondaryFG))
             
             NavigationLink(destination: GamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
@@ -118,7 +115,7 @@ struct UserCustomSetCellView: View {
         }
     }
     
-    func selectSet(customSet: CustomSetCherry) {
+    func selectSet(customSet: CustomSetDurian) {
         formatter.hapticFeedback(style: .light)
         exploreVM.shortenPublicSetsTo(10, customSet: customSet)
         gamesVM.reset()

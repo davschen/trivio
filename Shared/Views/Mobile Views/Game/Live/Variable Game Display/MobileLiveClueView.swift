@@ -24,20 +24,13 @@ struct MobileLiveClueView: View {
 struct MobileLiveDuplexWagerView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
-    @EnvironmentObject var participantsVM: ParticipantsViewModel
-    
-    @State var questionIsSelected = false
-    
-    var maxScore: Int {
-        return gamesVM.gamePhase == .round1 ? 1000 : 2000
-    }
     
     var body: some View {
         VStack (spacing: 15) {
             VStack {
                 Spacer()
                 VStack (spacing: 10) {
-                    Text(gamesVM.currentSelectedClue.categoryString.uppercased())
+                    Text(Clue(liveGameCustomSet: gamesVM.liveGameCustomSet).categoryString.uppercased())
                         .font(formatter.font(fontSize: .medium))
                     Text("WAGER-VALUED CLUE")
                         .font(formatter.fontFloat(sizeFloat: 35))
@@ -91,17 +84,19 @@ struct MobileLiveClueResponseView: View {
                             .shadow(color: formatter.color(.primaryBG), radius: 0, x: 1, y: 2)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .multilineTextAlignment(.center)
-                            .id(gamesVM.currentSelectedClue.clueString)
+                            .transition(.opacity)
+                            .id(currentLiveClue.clueString)
                             .lineSpacing(5)
                             .padding(.bottom, gamesVM.clueMechanics.showResponse ? 5 : 0)
                         if LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) == .response {
                             Text(currentLiveClue.responseString.uppercased())
                                 .font(formatter.korinnaFont(sizeFloat: 20))
+                                .foregroundColor(formatter.color(gamesVM.currentSelectedClue.isTripleStumper ? .red : .secondaryAccent))
                                 .shadow(color: formatter.color(.primaryBG), radius: 0, x: 1, y: 2)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .multilineTextAlignment(.center)
-                                .foregroundColor(formatter.color(gamesVM.currentSelectedClue.isTripleStumper ? .red : .secondaryAccent))
-                                .id(gamesVM.currentSelectedClue.responseString)
+                                .transition(.opacity)
+                                .id(currentLiveClue.responseString)
                                 .padding(.top, 10)
                         }
                     }

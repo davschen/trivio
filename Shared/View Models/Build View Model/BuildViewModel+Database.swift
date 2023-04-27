@@ -89,7 +89,7 @@ extension BuildViewModel {
         }
     }
     
-    func deleteSet(customSet: CustomSetCherry) {
+    func deleteSet(customSet: CustomSetDurian) {
         guard let setID = customSet.id else { return }
         db.collection("userCategories")
             .whereField("gameID", isEqualTo: setID)
@@ -130,7 +130,7 @@ extension BuildViewModel {
         }
     }
     
-    func edit(customSet: CustomSetCherry) {
+    func edit(customSet: CustomSetDurian) {
         self.clearAll()
         
         guard let customSetID = customSet.id else { return }

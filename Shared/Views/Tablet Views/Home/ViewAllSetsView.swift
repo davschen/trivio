@@ -32,7 +32,8 @@ struct ViewAllPublicSetsView: View {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack (alignment: .leading, spacing: 3) {
                         ForEach(exploreVM.allPublicSets, id: \.self) { customSet in
-                            UserCustomSetCellView(customSet: customSet)
+                            Text("PLACEHOLDER")
+//                            UserCustomSetCellView(customSet: customSet)
                         }
                     }
                     Button {
@@ -110,7 +111,8 @@ struct ViewAllRecentSetsView: View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack (alignment: .leading, spacing: 3) {
                 ForEach(exploreVM.recentlyPlayedSets, id: \.self) { customSet in
-                    UserCustomSetCellView(customSet: customSet)
+                    Text("PLACEHOLDER")
+//                    UserCustomSetCellView(customSet: customSet)
                 }
             }
             .padding(.vertical, 25)
@@ -145,7 +147,8 @@ struct ViewAllPrivateSetsView: View {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack (alignment: .leading, spacing: 3) {
                         ForEach(exploreVM.allPrivateSets, id: \.self) { customSet in
-                            UserCustomSetCellView(customSet: customSet)
+                            Text("PLACEHOLDER")
+//                            UserCustomSetCellView(customSet: customSet)
                         }
                     }
                     Button {

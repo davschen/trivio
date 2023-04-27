@@ -14,12 +14,32 @@ struct MobileProfileView: View {
     
     @State var isShowingMyCustomSetsView = true
     @State var isShowingDraftsView = true
+    @State var adminViewActive = false
     
     var body: some View {
         ScrollView (showsIndicators: false) {
             VStack (alignment: .leading, spacing: 15) {
                 MobileAccountInfoView()
-                Spacer(minLength: 10)
+                ZStack {
+                    Button {
+                        adminViewActive.toggle()
+                    } label: {
+                        HStack {
+                            Text("Admin Dashboard")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 15))
+                        }
+                        .padding()
+                        .background(formatter.color(.primaryFG))
+                        .cornerRadius(10)
+                        .padding()
+                    }
+                    NavigationLink (isActive: $adminViewActive) {
+                        MobileAdminView()
+                    } label: { EmptyView() }.hidden()
+                }
+                
                 VStack (spacing: 20) {
                     VStack (alignment: .leading, spacing: 10) {
                         HStack {

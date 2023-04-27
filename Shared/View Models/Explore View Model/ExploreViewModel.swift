@@ -29,6 +29,20 @@ class ExploreViewModel: ObservableObject {
     @Published var userResults = [CustomSetCherry]()
     @Published var userDrafts = [CustomSetCherry]()
     
+    // MARK: - The beginning of time
+    
+    @Published var publicCustomSetsBatch = [CustomSetDurian]()
+    
+    // MARK: The end of time -
+    
+    @Published var allTriviaDecks = [TriviaDeck]()
+    @Published var currentTriviaDeck = TriviaDeck()
+    @Published var currentTriviaDeckClue = TriviaDeckClue()
+    @Published var nextTriviaDeckClue = TriviaDeckClue()
+    @Published var nextTriviaDeckClueDocumentSnapshot: DocumentSnapshot?
+    @Published var allPlayedTriviaDeckClues = [PlayedTriviaDeckClueLog]()
+    @Published var triviaDeckClueViewState = TriviaDeckClueViewState()
+    
     @Published var filterBy = "dateCreated"
     @Published var isDescending = true
     @Published var tagsString = [String]()
@@ -59,10 +73,8 @@ class ExploreViewModel: ObservableObject {
     }
     
     init() {
-        pullAllPublicSetsWithListener()
-        pullAllPublicSets()
-        pullAllPrivateSets()
-        pullRecentlyPlayedSets()
+        fetchPublicSetsBatch()
+        fetchTriviaDeckInfo()
     }
     
     func clearSearch() {
@@ -87,6 +99,10 @@ class ExploreViewModel: ObservableObject {
         return usernameIDDict[userID] ?? "Creator"
     }
     
+    func getIsJeopardySet(userID: String) -> Bool {
+        return usernameIDDict[userID] == nil
+    }
+    
     func getInitialsFromUserID(userID: String) -> String {
         var initials: String = ""
         let name: String = nameIDDict[userID] ?? ""
@@ -98,6 +114,94 @@ class ExploreViewModel: ObservableObject {
             }
         }
         return initials.uppercased()
+    }
+    
+    private func fetchPublicSetsBatch() {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        self.addUsernameNameToDict(userID: myUID)
+        
+        db.collection("userSets")
+            .whereField("isPublic", isEqualTo: true)
+            .order(by: "dateCreated", descending: true)
+            .limit(to: 20)
+            .getDocuments { (snap, error) in
+                if let error = error {
+                    print("Error fetching public sets: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let documents = snap?.documents else { return }
+                
+                for document in documents {
+                    let customSetCherry = try? document.data(as: CustomSetCherry.self)
+                    let customSetDurian = try? document.data(as: CustomSetDurian.self)
+                    
+                    if let cherrySet = customSetCherry {
+                        self.addUsernameNameToDict(userID: cherrySet.userID)
+                    }
+                    
+                    if let durianSet = customSetDurian {
+                        self.addUsernameNameToDict(userID: durianSet.userID)
+                        self.publicCustomSetsBatch.append(durianSet)
+                    } else {
+                        self.fetchDurianData(userSetID: document.documentID) { durianSet in
+                            guard let durianSet = durianSet else { return }
+                            self.addUsernameNameToDict(userID: durianSet.userID)
+                            self.publicCustomSetsBatch.append(durianSet)
+                        }
+                    }
+                }
+            }
+    }
+    
+    private func fetchDurianData(userSetID: String, completion: @escaping (CustomSetDurian?) -> Void) {
+        let userSetsRef = db.collection("userSets").document(userSetID)
+        let userCategoriesRef = db.collection("userCategories")
+
+        userSetsRef.getDocument { (userSetDoc, error) in
+            if let error = error {
+                print("Error fetching userSet: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+
+            guard let userSetDoc = userSetDoc,
+                  userSetDoc.exists,
+                  let customSetCherry = try? userSetDoc.data(as: CustomSetCherry.self),
+                  let round1CatIDs = userSetDoc["round1CatIDs"] as? [String],
+                  let round2CatIDs = userSetDoc["round2CatIDs"] as? [String]
+            else {
+                completion(nil)
+                return
+            }
+
+            let allCategoryIDs = Array(Set(round1CatIDs + round2CatIDs))
+            var categories: [String: (name: String, clues: [String], responses: [String])] = [:]
+
+            let dispatchGroup = DispatchGroup()
+            
+            for catID in allCategoryIDs {
+                if catID.isEmpty { continue }
+                dispatchGroup.enter()
+                userCategoriesRef.document(catID).getDocument { (categoryDoc, error) in
+                    if let error = error {
+                        print("Error fetching category: \(error.localizedDescription)")
+                    } else if let categoryDoc = categoryDoc,
+                              categoryDoc.exists,
+                              let name = categoryDoc["name"] as? String,
+                              let clues = categoryDoc["clues"] as? [String],
+                              let responses = categoryDoc["responses"] as? [String] {
+                        categories[catID] = (name: name, clues: clues, responses: responses)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                let customSet = CustomSetDurian(customSet: customSetCherry, round1CatIDs: round1CatIDs, round2CatIDs: round2CatIDs, categories: categories)
+                completion(customSet)
+            }
+        }
     }
     
     private func pullAllPublicSetsWithListener() {
@@ -121,8 +225,7 @@ class ExploreViewModel: ObservableObject {
         }
     }
     
-    public func shortenPublicSetsTo(_ newLength: Int, customSet: CustomSetCherry) {
-//        let newPublicSetsCopy = Array(allPublicSets.prefix(newLength))
+    public func shortenPublicSetsTo(_ newLength: Int, customSet: CustomSetDurian) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             var ticker = 0
             self.allPublicSets = self.allPublicSets.filter({ customPublicSet in

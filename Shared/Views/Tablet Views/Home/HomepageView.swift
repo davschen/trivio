@@ -73,8 +73,8 @@ struct HomepageView: View {
                                 VStack (alignment: .leading, spacing: 25) {
                                     Text("Recently played")
                                         .font(formatter.font(fontSize: .large))
-                                    CustomSetsView(customSets: $exploreVM.recentlyPlayedSets)
-                                        .id(exploreVM.homepageIsDisplaying)
+//                                    CustomSetsView(customSets: $exploreVM.recentlyPlayedSets)
+//                                        .id(exploreVM.homepageIsDisplaying)
                                 }
                                 .padding(.trailing)
                                 .padding(.bottom, 100)
@@ -85,7 +85,7 @@ struct HomepageView: View {
                                 VStack (alignment: .leading, spacing: 25) {
                                     Text("Public sets")
                                         .font(formatter.font(fontSize: .large))
-                                    CustomSetsView(customSets: $exploreVM.allPublicSets)
+//                                    CustomSetsView(customSets: $exploreVM.allPublicSets)
                                     Button {
                                         exploreVM.pullAllPublicSets()
                                     } label: {
@@ -136,7 +136,7 @@ struct HomepageMySetSelectorView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     
     var imageSystemName: String {
         if !customSet.isPublic {
@@ -177,7 +177,7 @@ struct HomepageMySetSelectorView: View {
 struct SetHorizontalScrollView: View {
     @EnvironmentObject var formatter: MasterHandler
     
-    @Binding var customSets: [CustomSetCherry]
+    @Binding var customSets: [CustomSetDurian]
     
     var emptyLabelString: String = "Nothing yet! When you make a set, it’ll show up here."
     

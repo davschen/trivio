@@ -14,7 +14,6 @@ extension GamesViewModel {
     
     // Fetching seasons
     func getSeasons() {
-//        if !self.isVIP { return }
         db.collection("folders").order(by: "collection_index", descending: true).getDocuments { (snap, error) in
             if error != nil {
                 print(error!.localizedDescription)
@@ -76,6 +75,7 @@ extension GamesViewModel {
         reset()
         gameDocRef.getDocument { (doc, error) in
             guard let jeopardySet = try? doc?.data(as: JeopardySet.self) else { return }
+            self.customSet.id = gameID
             // there are six categories, should be doing stuff for category
             for id in jeopardySet.j_category_ids {
                 self.db.collection("categories").document(id).getDocument { (doc, error) in
@@ -100,14 +100,13 @@ extension GamesViewModel {
                         self.tidyCustomSet.round1Responses[index] = jeopardyCategory.responses
                         self.tidyCustomSet.round1Cats[index] = jeopardyCategory.name
                         
-                        self.finishedClues2D = self.generateFinishedClues2D()
+                        self.generateFinishedClues2D()
                         
                         self.clues = self.tidyCustomSet.round1Clues
                         self.responses = self.tidyCustomSet.round1Responses
                         self.categories = self.tidyCustomSet.round1Cats
                         clues.forEach {
                             self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
-                            self.jCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
                         }
                     }
                 }
@@ -137,7 +136,6 @@ extension GamesViewModel {
                         
                         jeopardyCategory.clues.forEach {
                             self.djRoundCompletes += ($0.isEmpty ? 0 : 1)
-                            self.djCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
                         }
                     }
                 }
@@ -180,6 +178,7 @@ extension GamesViewModel {
                 self.customSet.finalCat = jeopardySet.fj_category
                 self.customSet.finalClue = jeopardySet.fj_clue
                 self.customSet.finalResponse = jeopardySet.fj_response
+                self.customSet.userID = jeopardySet.userID
             }
         }
     }

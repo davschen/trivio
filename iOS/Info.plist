@@ -44,8 +44,10 @@
 	<true/>
 	<key>UIAppFonts</key>
 	<array>
+		<string>BigCaslon.ttf</string>
 		<string>Swiss911-Compressed.otf</string>
 		<string>Korinna-Regular.otf</string>
+		<string>Metropolis-SemiBold.otf</string>
 		<string>Metropolis-Bold.otf</string>
 		<string>Metropolis-ExtraBoldItalic.otf</string>
 		<string>Metropolis-RegularItalic.otf</string>

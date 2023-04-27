@@ -17,6 +17,7 @@ extension GamesViewModel {
         case .revealResponse:
             finalTrivioStage = .podium
         default:
+            // I love when i print hi
             print("hi")
         }
     }

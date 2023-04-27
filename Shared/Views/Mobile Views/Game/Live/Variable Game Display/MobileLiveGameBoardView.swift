@@ -25,6 +25,7 @@ struct MobileLiveGameBoardView: View {
                     ZStack {
                         formatter.color(gamesVM.finishedCategories[categoryIndex] ? .primaryFG : .primaryAccent)
                         Text(categoryName.uppercased())
+                            .font(formatter.fontFloat(.bold, sizeFloat: 10))
                             .font(formatter.font(.bold, fontSize: .small))
                             .foregroundColor(formatter.color(.highContrastWhite))
                             .multilineTextAlignment(.center)
@@ -67,7 +68,8 @@ struct MobileLiveGameBoardView: View {
             gamesVM.setLiveCurrentSelectedClue(categoryIndex: categoryIndex, clueIndex: clueIndex)
             
             if !Clue(liveGameCustomSet: gamesVM.liveGameCustomSet).isWVC {
-                formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
+                let selectedClue = Clue(liveGameCustomSet: gamesVM.liveGameCustomSet)
+                formatter.speaker.speak(selectedClue.clueString)
             }
         }
     }

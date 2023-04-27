@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Introspect
 
 struct MobileAdminView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -15,21 +16,160 @@ struct MobileAdminView: View {
     @EnvironmentObject var gamesVM: GamesViewModel
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack (spacing: 25) {
-                Spacer(minLength: 15)
-                VStack (spacing: 5) {
-                    MobileAdminVIPLookupView()
-                    MobileAdminVIPStatusPanelView()
+        ZStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack (spacing: 25) {
+                    HStack {
+                        Text("Trivia Deck Clue Submissions")
+                            .font(formatter.font(.bold, fontSize: .regular))
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                    .padding()
+                    .background(formatter.color(.secondaryFG))
+                    MobileAdminTriviaPackReviewView()
+                    HStack {
+                        Text("VIP Tracker")
+                            .font(formatter.font(.bold, fontSize: .regular))
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                    .padding()
+                    .background(formatter.color(.secondaryFG))
+                    VStack (spacing: 5) {
+                        MobileAdminVIPLookupView()
+                        MobileAdminVIPStatusPanelView()
+                    }
+                    .padding(.horizontal)
+                    MobileAdminActivityView()
+                        .padding(.bottom, 30)
                 }
-                .padding(.horizontal)
-                MobileAdminActivityView()
-                    .padding(.bottom, 30)
             }
         }
         .withBackButton()
+        .navigationTitle("Admin Dashboard")
+        .navigationBarTitleDisplayMode(.inline)
         .withBackground()
         .edgesIgnoringSafeArea(.bottom)
+    }
+}
+
+struct MobileAdminTriviaPackReviewView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var profileVM: ProfileViewModel
+    
+    @State var isWritingRejectionNote = false
+    @State var rejectionNote = ""
+    
+    var dateFormatter: DateFormatter {
+        let df = DateFormatter()
+        df.dateFormat = "MM/dd/YY"
+        return df
+    }
+    
+    func rejectTriviaDeckClue() {
+        if let triviaDeckClue = profileVM.triviaDeckCluesToReview.first {
+            profileVM.rejectTriviaDeckClue(triviaDeckClue: triviaDeckClue, rejectionNote: rejectionNote)
+            isWritingRejectionNote.toggle()
+            rejectionNote.removeAll()
+        }
+    }
+    
+    var body: some View {
+        VStack (alignment: .leading, spacing: 5) {
+            Text("\(profileVM.triviaDeckCluesToReview.count) trivia deck clues to review")
+                .padding(.leading)
+            if profileVM.triviaDeckCluesToReview.count > 0 {
+                Group {
+                    VStack (spacing: 10) {
+                        if let triviaDeckClue = profileVM.triviaDeckCluesToReview.first {
+                            Text(triviaDeckClue.category)
+                            Spacer(minLength: 10)
+                            Text(triviaDeckClue.clue)
+                                .frame(maxWidth: .infinity)
+                                .font(formatter.bigCaslonFont(sizeFloat: 18))
+                                .padding(.horizontal, 20)
+                                .multilineTextAlignment(.center)
+                            Text(triviaDeckClue.response.uppercased())
+                                .font(formatter.bigCaslonFont(sizeFloat: 18))
+                                .foregroundColor(formatter.color(.secondaryAccent))
+                                .multilineTextAlignment(.center)
+                            Spacer(minLength: 10)
+                            Text("Submitted by \(triviaDeckClue.authorUsername) on \(dateFormatter.string(from: triviaDeckClue.submittedDate))")
+                                .font(formatter.font(.regularItalic, fontSize: .regular))
+                        }
+                    }
+                    .padding(20)
+                    .background(formatter.color(.primaryFG))
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+                    if isWritingRejectionNote {
+                        VStack (spacing: 3) {
+                            HStack {
+                                Text("Rejection Note")
+                                    .font(formatter.font(fontSize: .regular))
+                                Spacer()
+                                Button {
+                                    isWritingRejectionNote.toggle()
+                                } label: {
+                                    Text("Cancel")
+                                        .font(formatter.font(fontSize: .regular))
+                                        .foregroundColor(formatter.color(.secondaryAccent))
+                                }
+                            }
+                            Text("\(rejectionNote.count)/100 characters")
+                                .font(formatter.font(.regular, fontSize: .regular))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            HStack (alignment: .bottom, spacing: 20) {
+                                MobileMultilineTextField("Your kind rejection note here...", text: $rejectionNote) {
+                                    rejectTriviaDeckClue()
+                                }
+                                .offset(x: -5)
+                                Button {
+                                    rejectTriviaDeckClue()
+                                } label: {
+                                    Image(systemName: "paperplane.fill")
+                                        .font(.system(size: 20))
+                                        .offset(y: -10)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(formatter.color(.primaryFG))
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                    } else {
+                        HStack (spacing: 5) {
+                            Button {
+                                isWritingRejectionNote.toggle()
+                            } label: {
+                                Text("Reject")
+                                    .foregroundColor(formatter.color(.red))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 55)
+                                    .background(formatter.color(.primaryFG))
+                                    .clipShape(RoundedCorner(radius: 10, corners: [.bottomLeft, .topLeft]))
+                            }
+                            Button {
+                                if let triviaDeckClue = profileVM.triviaDeckCluesToReview.first {
+                                    profileVM.approveTriviaDeckClue(triviaDeckClue: triviaDeckClue)
+                                }
+                            } label: {
+                                Text("Approve")
+                                    .foregroundColor(formatter.color(.green))
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 55)
+                                    .background(formatter.color(.primaryFG))
+                                    .clipShape(RoundedCorner(radius: 10, corners: [.bottomRight, .topRight]))
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct MobileCustomSetsView: View {
-    @Binding var customSets: [CustomSetCherry]
+    @Binding var customSets: [CustomSetDurian]
     
     var emptyLabelString: String = "No sets yet! When you make a set, it’ll show up here."
     
@@ -45,7 +45,7 @@ struct MobileCustomSetCellView: View {
     @State var userViewActive = false
     
     var isInUserView = false
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -58,53 +58,48 @@ struct MobileCustomSetCellView: View {
     
     var body: some View {
         ZStack {
-            VStack (alignment: .leading, spacing: 7) {
-                HStack (spacing: 2) {
-                    if !customSet.isPublic {
-                        Image(systemName: "lock.fill")
-                            .font(formatter.iconFont(.small))
-                            .offset(x: -2, y: -1)
+            HStack (alignment: .top, spacing: 8) {
+                ZStack {
+                    Button {
+                        exploreVM.pullAllFromUser(withID: customSet.userID)
+                        userViewActive.toggle()
+                    } label: {
+                        Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
+                            .font(formatter.font(.boldItalic, fontSize: .small))
+                            .frame(width: 40, height: 40)
+                            .background(formatter.color(.secondaryFG))
+                            .clipShape(Circle())
                     }
-                    Text(customSet.title)
-                        .font(formatter.font(fontSize: .mediumLarge))
-                        .lineLimit(1)
-                    Spacer(minLength: 0)
-                }
-                Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
-                    .font(formatter.font(.regular))
-                Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
-                    .font(formatter.font(.regular))
-                    .foregroundColor(formatter.color(.mediumContrastWhite))
-                    .lineLimit(1)
-                Text("\(customSet.description)")
-                    .font(formatter.font(.regular))
-                    .foregroundColor(formatter.color(customSet.description.isEmpty ? .secondaryFG : .lowContrastWhite))
-                    .lineLimit(1)
-                    .frame(height: 20)
-                    .padding(.bottom, 5)
-                HStack (spacing: 8) {
-                    ZStack {
-                        Button {
-                            exploreVM.pullAllFromUser(withID: customSet.userID)
-                            userViewActive.toggle()
-                        } label: {
-                            Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
-                                .font(formatter.font(.boldItalic, fontSize: .small))
-                                .frame(width: 40, height: 40)
-                                .background(formatter.color(.primaryAccent))
-                                .clipShape(Circle())
-                        }
 
-                        NavigationLink(destination: MobileUserView()
-                            .navigationBarTitle("Profile", displayMode: .inline),
-                                       isActive: $userViewActive,
-                                       label: { EmptyView() }).hidden()
-                    }
+                    NavigationLink(destination: MobileUserView()
+                        .navigationBarTitle("Profile", displayMode: .inline),
+                                   isActive: $userViewActive,
+                                   label: { EmptyView() }).hidden()
+                }
+                Button {
+                    selectSet(customSet: customSet)
+                    setPreviewActive.toggle()
+                } label: {
                     VStack (alignment: .leading, spacing: 5) {
-                        Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
+                        HStack (spacing: 2) {
+                            if !customSet.isPublic {
+                                Image(systemName: "lock.fill")
+                                    .font(formatter.iconFont(.small))
+                                    .offset(x: -2, y: -1)
+                            }
+                            Text(customSet.title.trimmingCharacters(in: .whitespacesAndNewlines))
+                                .font(formatter.fontFloat(.bold, sizeFloat: 18))
+                                .lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                             .font(formatter.font(.regular))
-                            .lineLimit(1)
                         HStack {
+                            Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
+                                .font(formatter.font(.regular))
+                                .lineLimit(1)
+                            Circle()
+                                .frame(width: 5, height: 5)
                             Text("\(customSet.plays) \(customSet.plays == 1 ? "play" : "plays")")
                             Circle()
                                 .frame(width: 5, height: 5)
@@ -113,6 +108,7 @@ struct MobileCustomSetCellView: View {
                         .font(formatter.font(.regular))
                         .foregroundColor(formatter.color(.lowContrastWhite))
                     }
+                    .contentShape(Rectangle())
                 }
             }
             
@@ -120,22 +116,13 @@ struct MobileCustomSetCellView: View {
                            isActive: $setPreviewActive,
                            label: { EmptyView() }).hidden()
         }
-        .padding()
-        .frame(width: 280, alignment: .leading)
-        .background(formatter.color(.secondaryFG))
-        .cornerRadius(10)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            selectSet(customSet: customSet)
-            setPreviewActive.toggle()
-        }
+        .padding(.horizontal, 10)
+        .frame(maxWidth: .infinity)
     }
     
-    func selectSet(customSet: CustomSetCherry) {
+    func selectSet(customSet: CustomSetDurian) {
         formatter.hapticFeedback(style: .light)
-        guard let setID = customSet.id else { return }
-        gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomSetData(customSet: customSet)
         participantsVM.resetScores()
     }
 }

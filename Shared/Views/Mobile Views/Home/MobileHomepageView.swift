@@ -16,82 +16,58 @@ struct MobileHomepageView: View {
     
     @EnvironmentObject var buildVM: BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
-    @EnvironmentObject var profileVM: ProfileViewModel
     @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
-    @State var profileViewActive = false
-    @State var allPublicSetsViewActive = false
-    @State var allPrivateSetsViewActive = false
-    @State var allRecentSetsViewActive = false
-    @State var jeopardySeasonsViewActive = false
+    @State private var headerVisible: Bool = true
+    @State private var profileViewActive = false
+    @State private var jeopardySeasonsViewActive = false
     
     var body: some View {
         NavigationView() {
-            ZStack (alignment: .top) {
-                // VStack for Trivio! Header
-                VStack {
-                    MobileHomepageHeaderView()
+            ZStack {
+                ZStack {
                     ScrollView(.vertical, showsIndicators: false) {
-                        VStack (alignment: .leading, spacing: 10) {
-                            Spacer(minLength: 10)
-                            // Was a Search bar that used :searchAndPull from exploreVM
-                            MobileSetHorizontalScrollView(customSets: $gamesVM.customSets,
-                                                          labelText: "My sets",
-                                                          promptText: "View all") {
-                                profileViewActive.toggle()
-                            }
-                            MobileExploreBuildPromptButtonView()
-                            if profileVM.myUserRecords.isAdmin {
-                                MobileHomepageAdminPanelView()
-                                    .padding(.horizontal)
-                            }
-                            MobileSetHorizontalScrollView(customSets: $exploreVM.allPublicSetsWithListener,
-                                                          labelText: "Public sets",
-                                                          promptText: "View all") {
-                                exploreVM.pullAllPublicSets()
-                                allPublicSetsViewActive.toggle()
-                            }
-                                                          .padding(.top, 5)
-                            MobileSetHorizontalScrollView(customSets: $exploreVM.recentlyPlayedSets,
-                                                          emptyLabelString: "You haven't played any games yet! When you do, you'll see them here.",
-                                                          labelText: "Recently played",
-                                                          promptText: "View all")  {
-                                allRecentSetsViewActive.toggle()
-                            }
-                                                          .padding(.top, 5)
-                            if profileVM.myUserRecords.isAdmin {
-                                MobileSetHorizontalScrollView(customSets: $exploreVM.allPrivateSets,
-                                                              labelText: "Private sets",
-                                                              promptText: "View all") {
-                                    allPrivateSetsViewActive.toggle()
+                        VStack (alignment: .leading, spacing: 30) {
+                            VStack (alignment: .leading, spacing: 5) {
+                                HStack (spacing: 3) {
+                                    Text("Trivia Decks")
+                                        .font(formatter.font(.bold, fontSize: .medium))
+                                    Text("NEW")
+                                        .font(formatter.font(.boldItalic, fontSize: .micro))
+                                        .padding(4)
+                                        .padding(.horizontal, 4)
+                                        .background(formatter.color(.primaryAccent))
+                                        .clipShape(Capsule())
                                 }
-                                                              .padding(.top, 5)
+                                .padding(.horizontal, 10)
+                                ScrollView (.horizontal, showsIndicators: false) {
+                                    HStack (spacing: 10) {
+                                        MobileDailyChallengePreviewView()
+                                        ForEach(exploreVM.allTriviaDecks, id: \.self) { triviaDeck in
+                                            MobileTriviaDeckPreviewView(triviaDeck: triviaDeck, numFreshClues: 20)
+                                        }
+                                    }
+                                    .frame(height: 200)
+                                    .padding(.horizontal, 10)
+                                }
                             }
-                            if profileVM.myUserRecords.isVIP {
-                                MobileJeopardySetsView(jeopardySeasonsViewActive: $jeopardySeasonsViewActive)
-                                    .padding(.top, 5)
-                            }
-                            Button {
-                                formatter.setAlertSettings(alertAction: {}, alertType: .greeting, alertTitle: "Hi! I'm David", alertSubtitle: "I made this app so my friends in college could play Jeopardy with all the right rules, but it grew from there and I'm happy it did! I'm recently out of a job and thought that maybe my free app could pay its dividends by helping me find a Software Engineering job. So, if you know of any opportunities for iOS Engineers, or if you'd simply like to contact me for any reason, do reach out to me via the second button below. All the best, and enjoy Trivio!", hasCancel: false, actionLabel: "Done", hasSecondaryAction: true, secondaryAction: {
-                                    UIPasteboard.general.setValue("devdavidchen@gmail.com",
-                                                forPasteboardType: UTType.plainText.identifier)
-                                }, secondaryActionLabel: "Copy my email")
-                            } label: {
-                                Text("About the Developer")
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 50)
-                                    .background(formatter.color(.primaryFG))
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 15)
-                            }
-
+                            MobileHomepageFeedView(headerVisible: $headerVisible)
                         }
-                        .padding(.bottom, 100)
+                        .padding(.top, 70)
                     }
-                }
-                if buildVM.dirtyBit > 0 && !buildVM.currCustomSet.title.isEmpty {
+                    .padding(.bottom)
+                    .coordinateSpace(name: "scroll")
+                    VStack {
+                        Spacer()
+                        MobileExploreBuildPromptButtonView()
+                    }
+                    VStack {
+                        MobileHomepageHeaderView(headerVisible: $headerVisible)
+                        Spacer()
+                    }
                     GeometryReader { reader in
-                        formatter.color(.primaryFG)
+                        formatter.color(buildVM.dirtyBit > 0 && !buildVM.currCustomSet.title.isEmpty ? .primaryFG : .primaryBG)
                             .frame(height: reader.safeAreaInsets.top, alignment: .top)
                             .ignoresSafeArea()
                     }
@@ -100,17 +76,6 @@ struct MobileHomepageView: View {
                     .navigationBarTitle("Profile", displayMode: .inline),
                                isActive: $profileViewActive,
                                label: { EmptyView() }).isDetailLink(false).hidden()
-                NavigationLink(destination: MobileViewAllPublicSetsView()
-                    .navigationBarTitle("All Public Sets", displayMode: .inline),
-                               isActive: $allPublicSetsViewActive,
-                               label: { EmptyView() }).isDetailLink(false).hidden()
-                NavigationLink(destination: MobileViewAllPrivateSetsView(),
-                               isActive: $allPrivateSetsViewActive,
-                               label: { EmptyView() }).isDetailLink(false).hidden()
-                NavigationLink(destination: MobileViewAllRecentSetsView()
-                    .navigationBarTitle("All Played Sets", displayMode: .inline),
-                               isActive: $allRecentSetsViewActive,
-                               label: { EmptyView() }).isDetailLink(false).hidden()
                 NavigationLink(destination: MobileJeopardySeasonsView()
                     .navigationBarTitle("All Seasons", displayMode: .inline),
                                isActive: $jeopardySeasonsViewActive,
@@ -118,15 +83,268 @@ struct MobileHomepageView: View {
             }
             .navigationBarHidden(true)
             .withBackground()
-            .edgesIgnoringSafeArea(.bottom)
             .animation(.easeInOut(duration: 0.2))
         }
     }
 }
 
+struct ViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
+struct MobileDailyChallengePreviewView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
+    var hasPlayedDailyChallenge = false
+    
+    var formattedDate: String {
+        let dateFormatter = DateFormatter()
+        let currentDate = Date()
+        dateFormatter.dateFormat = "MMM d, yyyy"
+        return dateFormatter.string(from: currentDate)
+    }
+    
+    var body: some View {
+        VStack (alignment: .leading, spacing: 5) {
+            HStack (alignment: .top, spacing: 3) {
+                Text("Daily Challenge")
+                    .font(formatter.font(.bold, fontSize: .regular))
+                    .lineLimit(1)
+                Circle()
+                    .frame(width: 5, height: 5)
+                    .foregroundColor(formatter.color(.secondaryAccent))
+                    .opacity(hasPlayedDailyChallenge ? 0 : 1)
+            }
+            Text("\(formattedDate)")
+                .font(formatter.font(.regularItalic, fontSize: .regular))
+            Spacer(minLength: 0)
+            Text("Answer today's question and see how you stack up against the crowd.")
+                .font(formatter.font(.regular, fontSize: .regular))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .lineSpacing(2)
+            Spacer(minLength: 0)
+            Text("Streak: 8 days")
+                .font(formatter.font(.regularItalic, fontSize: .regular))
+        }
+        .padding(15)
+        .frame(width: 160)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            Image("dailytrivio.bg")
+                .resizable()
+        )
+        .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(formatter.color(.highContrastWhite), lineWidth: 1)
+                .opacity(hasPlayedDailyChallenge ? 0 : 1)
+        )
+    }
+}
+
+struct MobileTriviaDeckPreviewView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    
+    @State var triviaDeckGameplayViewActive = false
+    
+    var triviaDeck: TriviaDeck
+    var numFreshClues: Int
+    
+    var body: some View {
+        ZStack {
+            VStack (alignment: .leading, spacing: 5) {
+                HStack (alignment: .top, spacing: 3) {
+                    Text("\(triviaDeck.title)")
+                        .lineLimit(1)
+                        .font(formatter.font(.bold, fontSize: .regular))
+                    Circle()
+                        .frame(width: 5, height: 5)
+                        .foregroundColor(formatter.color(.secondaryAccent))
+                        .opacity(numFreshClues > 0 ? 1 : 0)
+                }
+                Text("\(numFreshClues) fresh clues")
+                    .font(formatter.font(.regularItalic, fontSize: .regular))
+                Spacer(minLength: 0)
+                Text("\(triviaDeck.description)")
+                    .font(formatter.font(.regular, fontSize: .regular))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .lineSpacing(2)
+            }
+            .padding(15)
+            .frame(width: 160)
+            .frame(maxHeight: .infinity)
+            .background(LinearGradient(gradient: Gradient(colors: [Color(hex: "#211F3B"), Color(hex: "#2D2A4D")]), startPoint: .top, endPoint: .bottom))
+            .cornerRadius(10)
+            .onTapGesture {
+                triviaDeckGameplayViewActive.toggle()
+                exploreVM.setCurrentTriviaDeck(triviaDeck: triviaDeck)
+            }
+            NavigationLink(destination: MobileTriviaDeckGameplayView(),
+                           isActive: $triviaDeckGameplayViewActive,
+                           label: { EmptyView() }
+            ).isDetailLink(false).hidden()
+        }
+    }
+}
+
+struct MobileHomepageFeedView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var exploreVM: ExploreViewModel
+    
+    @Binding var headerVisible: Bool
+    
+    @State private var scrollOffset: CGFloat = 0
+    @State private var lastScrollOffset: CGFloat = 0
+    
+    private func handleScrollOffsetChange(_ newOffset: CGFloat) {
+        let scrollDirection = newOffset - lastScrollOffset
+        if scrollOffset > 0 {
+            headerVisible = scrollDirection <= 0
+        }
+        lastScrollOffset = newOffset
+    }
+    
+    var body: some View {
+        VStack (spacing: 40) {
+            ForEach(exploreVM.publicCustomSetsBatch, id: \.self) { customSetDurian in
+                MobileHomepageCustomSetCellView(customSetDurian: customSetDurian)
+                    .id(customSetDurian.id)
+            }
+        }
+        .padding(.bottom, 150)
+        .background(GeometryReader {
+            Color.clear.preference(key: ViewOffsetKey.self,
+                value: -$0.frame(in: .named("scroll")).origin.y)
+        })
+        .onPreferenceChange(ViewOffsetKey.self) {
+            handleScrollOffsetChange($0)
+            scrollOffset = $0
+        }
+    }
+}
+
+struct MobileHomepageCustomSetCellView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var participantsVM: ParticipantsViewModel
+    
+    @State var currentCategoryIndex: Int = 0
+    @State var scaleEffectFloat: CGFloat = 1
+    @State var temporaryCustomSetIsLiked = false
+    @State var currentLikedHeartOpacity: CGFloat = 0
+    @State var setPreviewActive = false
+    
+    var customSetDurian: CustomSetDurian
+    
+    var body: some View {
+        VStack (spacing: 0) {
+            TabView(selection: $currentCategoryIndex) {
+                ForEach(0..<customSetDurian.round1Len, id: \.self) { categoryIndex in
+                    let categoryName = customSetDurian.round1CategoryNames[categoryIndex]
+                    let clueSample = customSetDurian.round1Clues[categoryIndex]?.first ?? "NULL CLUE"
+                    ZStack {
+                        VStack {
+                            VStack (spacing: 2) {
+                                Text("\(categoryName.uppercased())")
+                                    .id(categoryName)
+                                    .font(formatter.font(.bold, fontSize: .small))
+                                Text("for 200")
+                                    .font(formatter.font(.bold, fontSize: .small))
+                            }
+                            Spacer(minLength: 0)
+                            Text("\(clueSample.uppercased())")
+                                .id(clueSample)
+                                .font(formatter.korinnaFont(sizeFloat: 16))
+                                .shadow(color: formatter.color(.primaryBG), radius: 0, x: 1, y: 2)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(3)
+                                .padding(25)
+                            Spacer(minLength: 0)
+                        }
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 70))
+                            .opacity(currentLikedHeartOpacity)
+                            .scaleEffect(scaleEffectFloat)
+                            .animation(.easeInOut(duration: 0.1))
+                            .onChange(of: temporaryCustomSetIsLiked) { isLiked in
+                                if !isLiked { return }
+                                scaleEffectFloat = 0.7
+                                currentLikedHeartOpacity = 1
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    currentLikedHeartOpacity = 0
+                                }
+                            }
+                        NavigationLink(destination: MobileGamePreviewView(),
+                                       isActive: $setPreviewActive,
+                                       label: { EmptyView() }).hidden()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
+                    .frame(minHeight: 200, maxHeight: 250)
+                    .background(currentCategoryIndex == categoryIndex ? formatter.color(.primaryAccent) : formatter.color(.primaryAccent).opacity(0.5))
+                    .cornerRadius(5)
+                    .scaleEffect(currentCategoryIndex == categoryIndex ? 1 : 0.95)
+                    .onTapGesture(count: 2) {
+                        formatter.hapticFeedback(style: .medium, intensity: .strong)
+                        temporaryCustomSetIsLiked = true
+                    }
+                    .onTapGesture(count: 1) {
+                        setPreviewActive.toggle()
+                        selectSet(customSet: customSetDurian)
+                    }
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(minHeight: 200, maxHeight: 250)
+            HStack (spacing: 10) {
+                Button {
+                    formatter.hapticFeedback(style: .medium, intensity: .strong)
+                    temporaryCustomSetIsLiked.toggle()
+                } label: {
+                    Image(systemName: temporaryCustomSetIsLiked ? "heart.fill" : "heart")
+                        .foregroundColor(formatter.color(temporaryCustomSetIsLiked ? .red : .highContrastWhite ))
+                        .scaleEffect(scaleEffectFloat)
+                        .animation(.easeInOut(duration: 0.1))
+                        .onChange(of: temporaryCustomSetIsLiked) { _ in
+                            scaleEffectFloat = 0.7
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                scaleEffectFloat = 1
+                            }
+                        }
+                }
+                Image(systemName: "paperplane")
+                Spacer()
+                HStack (spacing: 5) {
+                    ForEach(0..<customSetDurian.round1Len, id: \.self) { i in
+                        Circle()
+                            .frame(width: 6, height: 6)
+                            .foregroundColor(formatter.color(currentCategoryIndex == i ? .highContrastWhite : .lowContrastWhite))
+                    }
+                }
+            }
+            .font(.system(size: 22))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 15)
+            MobileCustomSetCellView(customSet: customSetDurian)
+        }
+    }
+    
+    func selectSet(customSet: CustomSetDurian) {
+        formatter.hapticFeedback(style: .light)
+        gamesVM.getCustomSetData(customSet: customSet)
+        participantsVM.resetScores()
+    }
+}
+
 struct MobileSetHorizontalScrollView: View {
     @EnvironmentObject var formatter: MasterHandler
-    @Binding var customSets: [CustomSetCherry]
+    @Binding var customSets: [CustomSetDurian]
     
     var emptyLabelString: String = "Nothing yet! When you make a set, it’ll show up here."
     
@@ -157,6 +375,8 @@ struct MobileHomepageHeaderView: View {
     @EnvironmentObject var buildVM : BuildViewModel
     @EnvironmentObject var exploreVM: ExploreViewModel
     @EnvironmentObject var profileVM: ProfileViewModel
+    
+    @Binding var headerVisible: Bool
     
     @State var buildViewActive = false
     @State var profileViewActive = false
@@ -194,8 +414,16 @@ struct MobileHomepageHeaderView: View {
                     }
                 }
                 HStack {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 22))
+                    }
+                    Spacer()
                     Text("Trivio!")
-                        .font(formatter.font(fontSize: .large))
+                        .kerning(-1)
+                        .font(formatter.font(.extraBold, fontSize: .large))
                     Spacer()
                     Button {
                         formatter.hapticFeedback(style: .heavy, intensity: .weak)
@@ -203,16 +431,19 @@ struct MobileHomepageHeaderView: View {
                     } label: {
                         Text("\(exploreVM.getInitialsFromUserID(userID: profileVM.myUID ?? ""))")
                             .font(formatter.font(.boldItalic, fontSize: .micro))
-                            .frame(width: 30, height: 30)
+                            .frame(width: 28, height: 28)
                             .background(formatter.color(.primaryAccent))
                             .clipShape(Circle())
                             .overlay(
                                     Circle()
-                                        .stroke(formatter.color(.highContrastWhite), lineWidth: 2)
+                                        .stroke(formatter.color(.highContrastWhite), lineWidth: 1)
                                 )
                     }
                 }
-                .padding([.horizontal, .top], 15)
+                .padding(15)
+                .background(formatter.color(.primaryBG))
+                .opacity(headerVisible ? 1 : 0)
+                .offset(y: headerVisible ? 0 : -50)
             }
             
             NavigationLink(destination: MobileProfileView()
@@ -232,6 +463,10 @@ struct MobileExploreBuildPromptButtonView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var isPresentingBuildView = false
+    
+    var bgColor: Color {
+        return formatter.color(.primaryBG)
+    }
     
     var body: some View {
         ZStack {
@@ -253,11 +488,15 @@ struct MobileExploreBuildPromptButtonView: View {
                             .font(.system(size: 10, weight: .bold))
                         Text("Build a Set!")
                     }
+                    .shadow(color: Color.black.opacity(0.1), radius: 4)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(formatter.color(.primaryAccent))
+                    .background(formatter.color(.secondaryAccent))
                     .cornerRadius(10)
                     .padding(.horizontal, 15)
+                    .background(formatter.color(.primaryBG)
+                        .mask(LinearGradient(gradient: Gradient(colors: [bgColor, bgColor, bgColor.opacity(0.5), .clear]), startPoint: .bottom, endPoint: .top))
+                    )
                 }
             }
             NavigationLink (isActive: $isPresentingBuildView) {

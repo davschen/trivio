@@ -396,7 +396,7 @@ struct MobileEditContestantsCellView: View {
                     formatter.setAlertSettings(alertAction: {
                         formatter.hapticFeedback(style: .soft)
                         participantsVM.removeTeamFromFirestore(id: team.id)
-                    }, alertTitle: "Remove \(team.name) from saved teams?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                    }, alertTitle: "Remove \(team.name) from offline contestants?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                 } label: {
                     Image(systemName: "trash")
                         .font(.system(size: 20))
@@ -818,11 +818,14 @@ struct MobileGameSettingsFooterView: View {
                     .opacity(gameIsPlayable ? 1 : 0.5)
                     .cornerRadius(5)
             })
-            // So sad, gotta leave this for now (12/7/22); will come back to it later
             Button(action: {
                 isPresentingTrivioLiveView.toggle()
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
-                gamesVM.startLiveGame(hostUsername: profileVM.username, hostName: profileVM.name)
+                if exploreVM.getIsJeopardySet(userID: gamesVM.customSet.userID) {
+                    gamesVM.startLiveJeopardyGame(hostUsername: profileVM.username, hostName: profileVM.name)
+                } else {
+                    gamesVM.startLiveGame(hostUsername: profileVM.username, hostName: profileVM.name)
+                }
                 AppDelegate.orientationLock = .landscapeRight
                 UINavigationController.attemptRotationToDeviceOrientation()
                 currOrientation = .landscapeRight

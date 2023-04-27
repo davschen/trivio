@@ -387,7 +387,7 @@ struct LoadingView: View {
     }
     
     var body: some View {
-        HStack (spacing: circleDiameter / 2) {
+        HStack (spacing: circleDiameter) {
             Circle()
                 .frame(width: circleDiameter, height: circleDiameter)
                 .foregroundColor(formatter.color(color))

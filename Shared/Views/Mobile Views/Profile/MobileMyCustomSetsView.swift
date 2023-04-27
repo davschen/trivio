@@ -17,7 +17,7 @@ struct MobileMyCustomSetsView: View {
     @EnvironmentObject var profileVM: ProfileViewModel
     @State var idSelected = ""
     
-    @Binding var customSets: [CustomSetCherry]
+    @Binding var customSets: [CustomSetDurian]
     
     @State var expandedSetID = ""
     
@@ -57,7 +57,7 @@ struct MobileMyCustomSetCellView: View {
     @State var setPreviewActive = false
     
     var isInUserView = false
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -81,9 +81,6 @@ struct MobileMyCustomSetCellView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .lineLimit(2)
             }
-            Text("Tags: \(customSet.tags.map{ String($0).lowercased() }.joined(separator: ", "))")
-                .font(formatter.font(.regular))
-                .foregroundColor(formatter.color(.lowContrastWhite))
             HStack {
                 Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                 Circle()

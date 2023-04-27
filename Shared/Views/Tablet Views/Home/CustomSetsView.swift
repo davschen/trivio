@@ -12,7 +12,7 @@ struct CustomSetsView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var exploreVM: ExploreViewModel
     
-    @Binding var customSets: [CustomSetCherry]
+    @Binding var customSets: [CustomSetDurian]
     
     @State var showSortByMenu = false
     
@@ -92,7 +92,7 @@ struct CustomSetCellView: View {
     @State var userViewActive = false
     
     var isInUserView = false
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -119,10 +119,6 @@ struct CustomSetCellView: View {
                 }
                 Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     .font(formatter.font(.regular))
-                Text("Tags: \(customSet.tags.map{String($0).lowercased()}.joined(separator: ", "))")
-                    .font(formatter.font(.regular))
-                    .foregroundColor(formatter.color(.mediumContrastWhite))
-                    .lineLimit(1)
                 Text("\(customSet.description)")
                     .font(formatter.font(.regular))
                     .foregroundColor(formatter.color(customSet.description.isEmpty ? .secondaryFG : .lowContrastWhite))
@@ -180,7 +176,7 @@ struct CustomSetCellView: View {
         }
     }
     
-    func selectSet(customSet: CustomSetCherry) {
+    func selectSet(customSet: CustomSetDurian) {
         formatter.hapticFeedback(style: .light)
         guard let setID = customSet.id else { return }
         exploreVM.shortenPublicSetsTo(10, customSet: customSet)

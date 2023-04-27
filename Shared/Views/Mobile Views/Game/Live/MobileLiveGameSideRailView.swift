@@ -12,6 +12,8 @@ struct MobileLiveGameSideRailView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     
+    @State var buzzerWinnerResponseStatus: LiveGameResponseStatus = .neither
+    
     var variableButtonLabel: String {
         switch LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) {
         case .clue: return "Show Response"
@@ -24,20 +26,33 @@ struct MobileLiveGameSideRailView: View {
         }
     }
     
+    var currentGameDisplay: LiveGameDisplay {
+        return LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) ?? .board
+    }
+    
     func variableButtonAction() {
         var newLiveGameDisplay = ""
         
         switch LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) {
         case .clue:
             formatter.stopSpeaker()
-            gamesVM.clueMechanics.setTimeElapsed(newValue: 6)
-            gamesVM.clearLiveBuzzersSideRail()
+            gamesVM.clueMechanics.setTimeElapsed(newValue: 5)
             gamesVM.updateLiveGamePlayerRanks()
             newLiveGameDisplay = "response"
         case .response:
+            if gamesVM.liveGameCustomSet.currentRound == "round1" && gamesVM.doneWithLiveRound() && gamesVM.liveGameCustomSet.hasTwoRounds {
+                gamesVM.moveOntoLiveGameRound2()
+            } else if gamesVM.liveGameCustomSet.currentRound == "round2" && gamesVM.doneWithLiveRound() {
+                gamesVM.liveGameCustomSet.currentRound = "finalRound"
+            }
             gamesVM.clueMechanics.resetAllVariables()
+            gamesVM.clearLiveBuzzersSideRail()
+            buzzerWinnerResponseStatus = .neither
             newLiveGameDisplay = "board"
-        case .preWVC: newLiveGameDisplay = "clue"
+        case .preWVC:
+            let selectedClue = Clue(liveGameCustomSet: gamesVM.liveGameCustomSet)
+            formatter.speaker.speak(selectedClue.clueString)
+            newLiveGameDisplay = "clue"
         case .preFinalClue: newLiveGameDisplay = "finalClue"
         case .finalClue: newLiveGameDisplay = "finalResponse"
         case .finalResponse: newLiveGameDisplay = "response"
@@ -45,13 +60,12 @@ struct MobileLiveGameSideRailView: View {
             if let randomClueCoords = gamesVM.getRandomIncompleteClue() {
                 gamesVM.setLiveCurrentSelectedClue(categoryIndex: randomClueCoords.categoryIndex, clueIndex: randomClueCoords.clueIndex)
                 let selectedClue = Clue(liveGameCustomSet: gamesVM.liveGameCustomSet)
-                newLiveGameDisplay = "clue"
                 if !selectedClue.isWVC {
                     formatter.speaker.speak(selectedClue.clueString)
                 }
+                return
             }
         }
-
         gamesVM.liveGameCustomSet.currentGameDisplay = newLiveGameDisplay
         gamesVM.updateLiveGameCustomSet()
     }
@@ -59,9 +73,16 @@ struct MobileLiveGameSideRailView: View {
     var body: some View {
         VStack (spacing: 20) {
             MobileLiveGameSideRailHeaderView()
-            if LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) == .clue {
-                MobileLiveGameSideRailBuzzerRaceView()
+            if Clue(liveGameCustomSet: gamesVM.liveGameCustomSet).isWVC {
+                MobileLiveGameWVCSideRailView()
+            } else if currentGameDisplay == .clue {
+                MobileLiveGameSideRailBuzzerRaceView(buzzerWinnerResponseStatus: $buzzerWinnerResponseStatus)
+            } else if currentGameDisplay == .finalResponse {
+                
             } else {
+                if !gamesVM.liveGameCustomSet.buzzerWinnerId.isEmpty {
+                    MobileLiveGamePlayerScoringView(buzzerWinnerResponseStatus: $buzzerWinnerResponseStatus)
+                }
                 MobileLiveGameSideRailLeaderboardView()
             }
             Button {
@@ -142,9 +163,8 @@ struct MobileLiveGameSideRailHeaderView: View {
                             .font(formatter.font(.regularItalic, fontSize: .small))
                         Spacer()
                         Button {
-                            if gamesVM.gamePhase == .round1 && gamesVM.liveGameCustomSet.hasTwoRounds {
-                                gamesVM.moveOntoRound2()
-                                gamesVM.gameplayDisplay = .grid
+                            if gamesVM.liveGameCustomSet.currentRound == "round1" && gamesVM.liveGameCustomSet.hasTwoRounds {
+                                gamesVM.moveOntoLiveGameRound2()
                             } else {
                                 gamesVM.finalTrivioStage = .makeWager
                                 gamesVM.gamePhase = .finalRound
@@ -170,7 +190,7 @@ struct MobileLiveGameSideRailLeaderboardView: View {
         VStack (alignment: .leading, spacing: 0) {
             Text("Leaderboard")
                 .font(formatter.font(fontSize: .medium))
-                .padding(.bottom, 10)
+                .padding(.bottom, 5)
             Rectangle()
                 .frame(maxWidth: .infinity, maxHeight: 1)
                 .foregroundColor(formatter.color(.highContrastWhite))
@@ -202,7 +222,7 @@ struct MobileLiveGameSideRailBuzzerRaceView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
     
-    @State var buzzerWinnerResponseStatus: LiveGameResponseStatus = .neither
+    @Binding var buzzerWinnerResponseStatus: LiveGameResponseStatus
     
     var buzzerWinner: LiveGamePlayer? {
         return gamesVM.liveGamePlayers.first(where: {$0.id == gamesVM.liveGameCustomSet.buzzerWinnerId})
@@ -211,52 +231,7 @@ struct MobileLiveGameSideRailBuzzerRaceView: View {
     var body: some View {
         VStack (spacing: 20) {
             if !gamesVM.liveGameCustomSet.buzzerWinnerId.isEmpty {
-                VStack (alignment: .leading, spacing: 5) {
-                    Text("\(buzzerWinner?.nickname ?? "NULL")'s response:")
-                    VStack (spacing: 0) {
-                        ZStack {
-                            if buzzerWinner?.responseSubmitted ?? false {
-                                Text(buzzerWinner?.currentResponse ?? "NULL")
-                                    .font(formatter.font(.regular, fontSize: .regular))
-                            } else {
-                                LoadingView(circleDiameter: 4)
-                            }
-                        }
-                        .frame(height: 35)
-                        Rectangle()
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 1)
-                            .foregroundColor(formatter.color(buzzerWinner?.responseSubmitted ?? false ? .highContrastWhite : .lowContrastWhite))
-                        HStack (spacing: 0) {
-                            Button {
-                                let responseStatusCopy = buzzerWinnerResponseStatus
-                                buzzerWinnerResponseStatus = buzzerWinnerResponseStatus == .incorrect ? .neither : .incorrect
-                                gamesVM.updateLivePlayerScore(previousResponseStatus: responseStatusCopy, responseStatus: buzzerWinnerResponseStatus)
-                            } label: {
-                                Text("Incorrect")
-                                    .frame(height: 35)
-                                    .frame(maxWidth: .infinity)
-                                    .background(formatter.color(buzzerWinnerResponseStatus == .incorrect ? .red : .primaryBG))
-                            }
-                            Rectangle()
-                                .frame(width: 1)
-                            Button {
-                                let responseStatusCopy = buzzerWinnerResponseStatus
-                                buzzerWinnerResponseStatus = buzzerWinnerResponseStatus == .correct ? .neither : .correct
-                                gamesVM.updateLivePlayerScore(previousResponseStatus: responseStatusCopy, responseStatus: buzzerWinnerResponseStatus)
-                            } label: {
-                                Text("Correct")
-                                    .frame(height: 35)
-                                    .frame(maxWidth: .infinity)
-                                    .background(formatter.color(buzzerWinnerResponseStatus == .correct ? .green : .primaryBG))
-                            }
-                        }
-                        .frame(height: 35)
-                        .font(formatter.font(fontSize: .regular))
-                        .foregroundColor(formatter.color(buzzerWinner?.responseSubmitted ?? false ? .highContrastWhite : .lowContrastWhite))
-                    }
-                    .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: 1))
-                }
+                MobileLiveGamePlayerScoringView(buzzerWinnerResponseStatus: $buzzerWinnerResponseStatus, currentPlayer: buzzerWinner)
             }
             
             VStack (alignment: .leading, spacing: 0) {
@@ -303,6 +278,104 @@ struct MobileLiveGameSideRailBuzzerRaceView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+struct MobileLiveGamePlayerScoringView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @Binding var buzzerWinnerResponseStatus: LiveGameResponseStatus
+    
+    var currentPlayer: LiveGamePlayer?
+    
+    var buzzerWinner: LiveGamePlayer {
+        return gamesVM.liveGamePlayers.first(where: {$0.id == gamesVM.liveGameCustomSet.buzzerWinnerId}) ?? LiveGamePlayer(nickname: "NULL")
+    }
+    
+    var body: some View {
+        VStack (spacing: 0) {
+            Text("\(currentPlayer?.nickname ?? buzzerWinner.nickname)")
+                .multilineTextAlignment(.center)
+                .frame(height: 35)
+            Rectangle()
+                .frame(maxWidth: .infinity)
+                .frame(height: 1)
+            HStack (spacing: 0) {
+                Button {
+                    let responseStatusCopy = buzzerWinnerResponseStatus
+                    buzzerWinnerResponseStatus = buzzerWinnerResponseStatus == .incorrect ? .neither : .incorrect
+                    gamesVM.updateLivePlayerScore(previousResponseStatus: responseStatusCopy, responseStatus: buzzerWinnerResponseStatus)
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .regular))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(formatter.color(buzzerWinnerResponseStatus == .incorrect ? .red : .primaryBG))
+                }
+                Rectangle()
+                    .frame(width: 1)
+                Button {
+                    let responseStatusCopy = buzzerWinnerResponseStatus
+                    buzzerWinnerResponseStatus = buzzerWinnerResponseStatus == .correct ? .neither : .correct
+                    gamesVM.updateLivePlayerScore(previousResponseStatus: responseStatusCopy, responseStatus: buzzerWinnerResponseStatus)
+                } label: {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 15, weight: .regular))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(formatter.color(buzzerWinnerResponseStatus == .correct ? .green : .primaryBG))
+                }
+            }
+            .frame(height: 35)
+            .font(formatter.font(fontSize: .regular))
+        }
+        .cornerRadius(5)
+        .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: 1))
+    }
+}
+
+struct MobileLiveGamePlayerWagerView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    var currentPlayer: LiveGamePlayer? {
+        return gamesVM.liveGamePlayers.first(where: {$0.id == gamesVM.liveGameCustomSet.currentPlayerId})
+    }
+    
+    var body: some View {
+        VStack (alignment: .leading, spacing: 5) {
+            Text("\(currentPlayer?.nickname ?? "NULL")'s wager:")
+            ZStack {
+                if currentPlayer?.wagerSubmitted ?? false {
+                    Text("\(currentPlayer?.currentWager ?? 0)")
+                } else {
+                    LoadingView(circleDiameter: 4)
+                }
+            }
+            .frame(height: 50)
+            .frame(maxWidth: .infinity)
+            .overlay(RoundedRectangle(cornerRadius: 5).stroke(formatter.color(.highContrastWhite), lineWidth: 1))
+        }
+    }
+}
+
+struct MobileLiveGameWVCSideRailView: View {
+    @EnvironmentObject var gamesVM: GamesViewModel
+    
+    @State var buzzerWinnerResponseStatus: LiveGameResponseStatus = .neither
+    
+    var currentGameDisplay: LiveGameDisplay {
+        return LiveGameDisplay(from: gamesVM.liveGameCustomSet.currentGameDisplay) ?? .board
+    }
+    
+    var body: some View {
+        VStack (spacing: 20) {
+            if currentGameDisplay == .preWVC {
+                MobileLiveGamePlayerWagerView()
+            } else if currentGameDisplay == .clue {
+                MobileLiveGamePlayerScoringView(buzzerWinnerResponseStatus: $buzzerWinnerResponseStatus, currentPlayer: gamesVM.liveGamePlayers.first(where: {$0.id == gamesVM.liveGameCustomSet.currentPlayerId}))
+            }
+            MobileLiveGameSideRailLeaderboardView()
         }
     }
 }

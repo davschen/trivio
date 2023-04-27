@@ -155,5 +155,15 @@ class MasterHandler: ObservableObject {
         }
         return toReturn
     }
+    
+    func dictToNestedStringArray(dict: [Int:[String]]) -> [[String]] {
+        var toReturn = [[String]]()
+        for categoryIndex in 0..<dict.count {
+            if let stringArray = dict[categoryIndex] {
+                toReturn.append(stringArray)
+            }
+        }
+        return toReturn
+    }
 }
 

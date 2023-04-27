@@ -22,14 +22,10 @@ class GamesViewModel: ObservableObject {
     @Published var gamePreviews = [JeopardySetPreview]()
     @Published var jeopardySeasons = [JeopardySeason]()
     
-    // Editing note: this could have far fewer variables
-    // if I made classes with some of these variables
-    
     // Flashcards
     @Published var flashcardClues2D = [[FlashcardClue]]()
     
-    // Nested arrays clues & responses can be indexed into with [i][j]
-    // where categoryIndex = i and pointValueIndex = j
+    // Nested arrays can be indexed into with [categoryIndex][clueIndex]
     @Published var categories = [String]()
     @Published var clues: [[String]] = []
     @Published var responses: [[String]] = []
@@ -42,8 +38,8 @@ class GamesViewModel: ObservableObject {
     @Published var usedAnswers = [String]()
     @Published var clueMechanics = ClueMechanics()
     
-    @Published var customSets = [CustomSetCherry]()
-    @Published var customSet = CustomSetCherry()
+    @Published var customSets = [CustomSetDurian]()
+    @Published var customSet = CustomSetDurian()
     @Published var jeopardySet = JeopardySet()
     @Published var tidyCustomSet = TidyCustomSet()
     @Published var liveGameCustomSet = LiveGameCustomSet()
@@ -58,8 +54,6 @@ class GamesViewModel: ObservableObject {
     public var currentSelectedClue = Clue()
     public var currentCategoryIndex = 0
     public var categoryCompletes = [Int](repeating: 0, count: 6)
-    public var jCategoryCompletesReference = [Int](repeating: 0, count: 6)
-    public var djCategoryCompletesReference = [Int](repeating: 0, count: 6)
     public var jRoundCompletes = 0
     public var djRoundCompletes = 0
     public var latestJeopardyDoc: DocumentSnapshot? = nil
@@ -86,7 +80,7 @@ class GamesViewModel: ObservableObject {
         gamePhase = .round1
         clues = tidyCustomSet.round1Clues
         responses = tidyCustomSet.round1Responses
-        finishedClues2D = generateFinishedClues2D()
+        generateFinishedClues2D()
         pointValueArray = round1PointValues
         categories = tidyCustomSet.round1Cats
         finalTrivioStage = .notBegun
@@ -96,7 +90,7 @@ class GamesViewModel: ObservableObject {
     func moveOntoRound2() {
         gamePhase = .round2
         categories = tidyCustomSet.round2Cats
-        finishedClues2D = generateFinishedClues2D()
+        generateFinishedClues2D()
         clues = tidyCustomSet.round2Clues
         responses = tidyCustomSet.round2Responses
         pointValueArray = round2PointValues
@@ -124,23 +118,30 @@ class GamesViewModel: ObservableObject {
         gameSetupMode = .settings
         round1TripleStumpers.removeAll()
         round2TripleStumpers.removeAll()
-        customSet = CustomSetCherry(customSet: CustomSet())
+        customSet = CustomSetDurian()
         clearCategoryDones()
-        jCategoryCompletesReference = [Int](repeating: 0, count: 6)
-        djCategoryCompletesReference = [Int](repeating: 0, count: 6)
         jRoundCompletes = 0
         djRoundCompletes = 0
         queriedUserName.removeAll()
     }
     
-    func generateFinishedClues2D() -> [[ClueCompletionStatus]] {
+    func generateFinishedClues2D() {
         let cluesNestedArray = gamePhase == .round1 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
         var finishedClues2D = [[ClueCompletionStatus]]()
         cluesNestedArray.forEach { cluesArray in
             finishedClues2D.append(cluesArray.compactMap { $0.isEmpty ? .empty : .incomplete })
         }
-        finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
-        return finishedClues2D
+        self.finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
+        self.finishedClues2D = finishedClues2D
+    }
+    
+    func generateFinishedCatsAndClues(cluesNestedArray: [[String]]) {
+        var finishedClues2D = [[ClueCompletionStatus]]()
+        cluesNestedArray.forEach { cluesArray in
+            finishedClues2D.append(cluesArray.compactMap { $0.isEmpty ? .empty : .incomplete })
+        }
+        self.finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
+        self.finishedClues2D = finishedClues2D
     }
     
     func modifyFinishedClues2D(categoryIndex: Int, clueIndex: Int, completed: Bool = true) {

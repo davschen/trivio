@@ -15,7 +15,7 @@ struct GameInfoView: View {
     
     @Binding var showInfoView: Bool
     
-    var customSet: CustomSetCherry {
+    var customSet: CustomSetDurian {
         return gamesVM.customSet
     }
     

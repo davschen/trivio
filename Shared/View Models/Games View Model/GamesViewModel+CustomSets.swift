@@ -16,25 +16,26 @@ extension GamesViewModel {
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         db.collection("userSets")
             .whereField("userID", isEqualTo: myUID)
-            .order(by: "dateCreated", descending: true).addSnapshotListener { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let data = snap?.documents else { return }
-            DispatchQueue.main.async {
-                self.customSets = data.compactMap { (queryDocSnap) -> CustomSetCherry? in
-                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
-                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
-                        // Custom set for version 3.0
-                        return customSetCherry
+            .order(by: "dateCreated", descending: true).getDocuments { (snap, error) in
+                if let error = error {
+                    print("Error fetching public sets: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let documents = snap?.documents else { return }
+                
+                for document in documents {
+                    let customSetDurian = try? document.data(as: CustomSetDurian.self)
+                    if let durianSet = customSetDurian {
+                        self.customSets.append(durianSet)
                     } else {
-                        // default
-                        return CustomSetCherry(customSet: customSet ?? CustomSet())
+                        self.fetchDurianData(userSetID: document.documentID) { durianSet in
+                            guard let durianSet = durianSet else { return }
+                            self.customSets.append(durianSet)
+                        }
                     }
                 }
             }
-        }
     }
 
     func getUserName(userID: String) {
@@ -46,6 +47,87 @@ extension GamesViewModel {
             guard let doc = docSnap else { return }
             DispatchQueue.main.async {
                 self.queriedUserName = doc.get("username") as? String ?? ""
+            }
+        }
+    }
+    
+    func getCustomSetData(customSet: CustomSetDurian) {
+        clearAll()
+        reset()
+        self.customSet = customSet
+        tidyCustomSet.round1Clues = MasterHandler().dictToNestedStringArray(dict: customSet.round1Clues)
+        tidyCustomSet.round1Responses = MasterHandler().dictToNestedStringArray(dict: customSet.round1Responses)
+        tidyCustomSet.round1Cats = customSet.round1CategoryNames
+        
+        if customSet.hasTwoRounds {
+            tidyCustomSet.round2Clues = MasterHandler().dictToNestedStringArray(dict: customSet.round2Clues)
+            tidyCustomSet.round2Responses = MasterHandler().dictToNestedStringArray(dict: customSet.round2Responses)
+            tidyCustomSet.round2Cats = customSet.round2CategoryNames
+        }
+        
+        clues = tidyCustomSet.round1Clues
+        responses = tidyCustomSet.round1Responses
+        categories = tidyCustomSet.round1Cats
+        
+        func getCompleteStringsCount(nestedArray: [[String]]) -> Int {
+            let completeStringsCount = nestedArray.reduce(0) { (count, array) -> Int in
+                count + array.filter { $0.isEmpty }.count
+            }
+            return completeStringsCount
+        }
+        
+        jRoundCompletes = getCompleteStringsCount(nestedArray: tidyCustomSet.round1Clues)
+        djRoundCompletes = getCompleteStringsCount(nestedArray: tidyCustomSet.round2Clues)
+        
+        generateFinishedCatsAndClues(cluesNestedArray: tidyCustomSet.round1Clues)
+    }
+    
+    private func fetchDurianData(userSetID: String, completion: @escaping (CustomSetDurian?) -> Void) {
+        let userSetsRef = db.collection("userSets").document(userSetID)
+        let userCategoriesRef = db.collection("userCategories")
+
+        userSetsRef.getDocument { (userSetDoc, error) in
+            if let error = error {
+                print("Error fetching userSet: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+
+            guard let userSetDoc = userSetDoc,
+                  userSetDoc.exists,
+                  let customSetCherry = try? userSetDoc.data(as: CustomSetCherry.self),
+                  let round1CatIDs = userSetDoc["round1CatIDs"] as? [String],
+                  let round2CatIDs = userSetDoc["round2CatIDs"] as? [String]
+            else {
+                completion(nil)
+                return
+            }
+
+            let allCategoryIDs = Array(Set(round1CatIDs + round2CatIDs))
+            var categories: [String: (name: String, clues: [String], responses: [String])] = [:]
+
+            let dispatchGroup = DispatchGroup()
+            
+            for catID in allCategoryIDs {
+                if catID.isEmpty { continue }
+                dispatchGroup.enter()
+                userCategoriesRef.document(catID).getDocument { (categoryDoc, error) in
+                    if let error = error {
+                        print("Error fetching category: \(error.localizedDescription)")
+                    } else if let categoryDoc = categoryDoc,
+                              categoryDoc.exists,
+                              let name = categoryDoc["name"] as? String,
+                              let clues = categoryDoc["clues"] as? [String],
+                              let responses = categoryDoc["responses"] as? [String] {
+                        categories[catID] = (name: name, clues: clues, responses: responses)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                let customSet = CustomSetDurian(customSet: customSetCherry, round1CatIDs: round1CatIDs, round2CatIDs: round2CatIDs, categories: categories)
+                completion(customSet)
             }
         }
     }
@@ -70,7 +152,7 @@ extension GamesViewModel {
                 return
             }
             
-            self.customSet = customSet
+            self.customSet = CustomSetDurian()
             
             for id in customSet.round1CatIDs {
                 self.db.collection("userCategories").document(id).getDocument { (doc, err) in
@@ -93,13 +175,12 @@ extension GamesViewModel {
                             self.tidyCustomSet.round1Clues[index] = customSetCategory.clues
                             self.tidyCustomSet.round1Responses[index] = customSetCategory.responses
                             self.tidyCustomSet.round1Cats[index] = customSetCategory.name
-                            self.finishedClues2D = self.generateFinishedClues2D()
+                            self.generateFinishedClues2D()
                             self.clues = self.tidyCustomSet.round1Clues
                             self.responses = self.tidyCustomSet.round1Responses
                             self.categories = self.tidyCustomSet.round1Cats
                             customSetCategory.clues.forEach {
                                 self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
-                                self.jCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
                             }
                         }
                     }
@@ -135,7 +216,6 @@ extension GamesViewModel {
                             self.tidyCustomSet.round2Cats[index] = customSetCategory.name
                             customSetCategory.clues.forEach {
                                 self.djRoundCompletes += ($0.isEmpty ? 0 : 1)
-                                self.djCategoryCompletesReference[index] += ($0.isEmpty ? 0 : 1)
                             }
                         }
                     }
@@ -144,7 +224,7 @@ extension GamesViewModel {
             
             DispatchQueue.main.async {
                 self.getUserName(userID: customSet.userID)
-                self.customSet = customSet
+                self.customSet = CustomSetDurian()
             }
         }
     }

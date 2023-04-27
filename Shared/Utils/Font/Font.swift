@@ -17,6 +17,7 @@ extension MasterHandler {
         case .regular: styleString = "Regular"
         case .regularItalic: styleString = "RegularItalic"
         case .medium: styleString = "Medium"
+        case .semiBold: styleString = "SemiBold"
         case .boldItalic: styleString = "ExtraBoldItalic"
         case .extraBold: styleString = "ExtraBold"
         default: styleString = "Bold"
@@ -69,13 +70,17 @@ extension MasterHandler {
         return Font.custom("Swiss911BT-Compressed", size: sizeFloat)
     }
     
+    func bigCaslonFont(sizeFloat: CGFloat = 15) -> Font {
+        return Font.custom("Big Caslon Medium", size: sizeFloat)
+    }
+    
     func iconFont(_ systemFontSize: SystemFontSize = .medium) -> Font {
         return .system(size: systemFontSize.rawValue, weight: .bold)
     }
 }
 
 enum FontStyle {
-    case regular, regularItalic, medium, bold, boldItalic, extraBold
+    case regular, regularItalic, medium, semiBold, bold, boldItalic, extraBold
 }
 
 enum FontSize {

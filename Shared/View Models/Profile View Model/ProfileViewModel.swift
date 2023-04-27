@@ -17,6 +17,8 @@ class ProfileViewModel: ObservableObject {
     @Published var name = ""
     @Published var usernameValid = false
     @Published var drafts = [CustomSetCherry]()
+    @Published var triviaDeckCluesToReview = [TriviaDeckClue]()
+    @Published var myTriviaDeckClues = [TriviaDeckClue]()
     @Published var searchItem = ""
     @Published var showingSettingsView = false
     @Published var settingsMenuSelectedItem = "Game Settings"
@@ -25,12 +27,13 @@ class ProfileViewModel: ObservableObject {
     
     @Published var currentVIPs = [String:String]()
     
-    private var db = FirebaseConfigurator.shared.getFirestore()
+    public var db = FirebaseConfigurator.shared.getFirestore()
     public var myUID = FirebaseConfigurator.shared.auth.currentUser?.uid
     
     init() {
         getUserInfo()
         pullUserRecordsData()
+        fetchCluesToReview()
     }
     
     func markAsPlayed(gameID: String) {

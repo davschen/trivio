@@ -20,12 +20,12 @@ struct MyDraftsView: View {
         if profileVM.drafts.count > 0 {
             VStack (spacing: 3) {
                 ForEach(profileVM.drafts, id: \.self) { draft in
-                    DraftCellView(expandedSetID: $expandedSetID, draft: draft)
-                        .animation(.easeInOut(duration: 0.2))
-                        .onAppear {
-                            guard let firstSetID = profileVM.drafts.first?.id else { return }
-                            expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
-                        }
+//                    DraftCellView(expandedSetID: $expandedSetID, draft: draft)
+//                        .animation(.easeInOut(duration: 0.2))
+//                        .onAppear {
+//                            guard let firstSetID = profileVM.drafts.first?.id else { return }
+//                            expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
+//                        }
                 }
             }
         } else {
@@ -43,7 +43,7 @@ struct DraftCellView: View {
     
     @Binding var expandedSetID: String
     
-    @State var draft: CustomSetCherry
+    @State var draft: CustomSetDurian
     
     var setID: String {
         return draft.id ?? "NID"

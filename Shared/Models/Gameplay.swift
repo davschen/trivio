@@ -145,13 +145,13 @@ struct Clue {
     }
     
     init(liveGameCustomSet: LiveGameCustomSet) {
-        var round1PointValues = [200, 400, 600, 800, 1000]
-        var clues = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Clues : liveGameCustomSet.round2Clues
-        var responses = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Responses : liveGameCustomSet.round2Responses
-        var categoryNames = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1CategoryNames : liveGameCustomSet.round2CategoryNames
-        var categoryIndex = liveGameCustomSet.currentCategoryIndex
-        var clueIndex = liveGameCustomSet.currentClueIndex
-        var coordsToCheckWVC = [categoryIndex, clueIndex]
+        let round1PointValues = [200, 400, 600, 800, 1000]
+        let clues = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Clues : liveGameCustomSet.round2Clues
+        let responses = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1Responses : liveGameCustomSet.round2Responses
+        let categoryNames = liveGameCustomSet.currentRound == "round1" ? liveGameCustomSet.round1CategoryNames : liveGameCustomSet.round2CategoryNames
+        let categoryIndex = liveGameCustomSet.currentCategoryIndex
+        let clueIndex = liveGameCustomSet.currentClueIndex
+        let coordsToCheckWVC = [categoryIndex, clueIndex]
         
         self.categoryString = categoryNames[categoryIndex]
         self.clueString = clues[categoryIndex]?[clueIndex] ?? ""

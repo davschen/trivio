@@ -430,7 +430,7 @@ struct EditContestantsCellView: View {
                     formatter.setAlertSettings(alertAction: {
                         formatter.hapticFeedback(style: .soft)
                         participantsVM.removeTeamFromFirestore(id: team.id)
-                    }, alertTitle: "Remove \(team.name) from saved teams?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
+                    }, alertTitle: "Remove \(team.name) from offline contestants?", alertSubtitle: "You cannot undo this action", hasCancel: true, actionLabel: "Yes, remove \(team.name)")
                 } label: {
                     Image(systemName: "trash")
                         .font(.system(size: 24))

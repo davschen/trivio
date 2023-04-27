@@ -30,7 +30,7 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
     var hasFinishedDictating: Bool = false
     var currentGameDisplay: String = "board"
     
-    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetCherry, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
+    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetDurian, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
         self.hostUsername = hostUsername
         self.hostName = hostName
         self.userSetID = userSetId
@@ -41,10 +41,10 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
         self.numSubmitted = numSubmitted
         self.round1CategoryNames = tidyCustomSet.round1Cats
         self.round2CategoryNames = tidyCustomSet.round2Cats
-        self.round1Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Clues)
-        self.round1Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Responses)
-        self.round2Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Clues)
-        self.round2Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Responses)
+        self.round1Clues = customSet.round1Clues
+        self.round1Responses = customSet.round1Responses
+        self.round2Clues = customSet.round2Clues
+        self.round2Responses = customSet.round2Responses
         self.title = customSet.title
         self.finalCat = customSet.finalCat
         self.finalClue = customSet.finalClue
@@ -99,6 +99,36 @@ extension LiveGameCustomSet {
         self.hasBegunDictating = hasBegunDictating
         self.hasFinishedDictating = hasFinishedDictating
         self.currentGameDisplay = currentGameDisplay
+    }
+    
+    // Jeopardy game init
+    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetDurian, jeopardySet: JeopardySet, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
+        self.hostUsername = hostUsername
+        self.hostName = hostName
+        self.userSetID = userSetId
+        self.hostCode = hostCode
+        self.playerCode = playerCode
+        self.hostHasJoined = hostHasJoined
+        self.gameHasBegun = gameHasBegun
+        self.numSubmitted = numSubmitted
+        self.round1CategoryNames = tidyCustomSet.round1Cats
+        self.round2CategoryNames = tidyCustomSet.round2Cats
+        self.round1Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Clues)
+        self.round1Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Responses)
+        self.round2Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Clues)
+        self.round2Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Responses)
+        self.title = customSet.title
+        self.finalCat = customSet.finalCat
+        self.finalClue = customSet.finalClue
+        self.finalResponse = customSet.finalResponse
+        self.roundOneDaily = customSet.roundOneDaily
+        self.roundTwoDaily1 = customSet.roundTwoDaily1
+        self.roundTwoDaily2 = customSet.roundTwoDaily2
+        self.numClues = 0
+        self.round1Len = 6
+        self.round2Len = 6
+        self.hasTwoRounds = true
+        self.dateInitiated = Date()
     }
 }
 
