@@ -189,20 +189,20 @@ struct MobileGameSettingsCategoryPreviewView: View {
         VStack (alignment: .leading, spacing: 3) {
             HStack {
                 Text("Round 1")
-                Text("(\(gamesVM.tidyCustomSet.round1Cats.count) categories)")
+                Text("(\(gamesVM.customSet.round1CategoryNames.count) categories)")
                     .font(formatter.font(.regularItalic, fontSize: .regular))
             }
             .padding(.horizontal)
-            MobileCategoryPreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
+            MobileCategoryPreviewView(categories: gamesVM.customSet.round1CategoryNames)
                 .padding(.bottom, 5)
             if gamesVM.customSet.hasTwoRounds {
                 HStack {
                     Text("Round 2")
-                    Text("(\(gamesVM.tidyCustomSet.round2Cats.count) categories)")
+                    Text("(\(gamesVM.customSet.round2CategoryNames.count) categories)")
                         .font(formatter.font(.regularItalic, fontSize: .regular))
                 }
                 .padding(.horizontal)
-                MobileCategoryPreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
+                MobileCategoryPreviewView(categories: gamesVM.customSet.round2CategoryNames)
             }
         }
         .id(UUID().uuidString)
@@ -473,7 +473,7 @@ struct MobileGameSettingsCardView: View {
             ThinDividerView()
         }
         .padding(.vertical)
-        .background(formatter.color(.secondaryFG))
+        .background(formatter.color(.primaryFG))
         .cornerRadius(5)
         .padding(.bottom, 20)
         .animation(.easeIn(duration: 0.15))
@@ -483,7 +483,7 @@ struct MobileGameSettingsCardView: View {
         return Rectangle()
             .frame(maxWidth: .infinity)
             .frame(height: 1)
-            .foregroundColor(formatter.color(.lowContrastWhite))
+            .foregroundColor(.white.opacity(0.2))
     }
 }
 

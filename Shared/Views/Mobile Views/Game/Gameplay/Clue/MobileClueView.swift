@@ -119,17 +119,13 @@ struct MobileClueResponseView: View {
                 MobileClueCountdownTimerView(timeElapsed: $gamesVM.clueMechanics.timeElapsed)
                 VStack (alignment: .leading, spacing: 0) {
                     MobileClueHeaderView(progressGame: progressGame)
-                    if clueAppearance == .modern {
-                        MobileModernClueResponseView()
-                    } else {
-                        MobileClassicClueResponseView()
-                            .padding(.bottom, 10)
-                    }
+                    MobileClassicClueResponseView()
+                        .padding(.bottom, 10)
                     if !isDisplayingLandscapeMode {
                         MobileClueRevealedSubView(progressGame: progressGame)
                     }
                 }
-                .background(formatter.color(gamesVM.clueMechanics.timeElapsed >= gamesVM.clueMechanics.numCountdownSeconds ? .primaryFG : .primaryAccent))
+                .background(formatter.gradient(gamesVM.clueMechanics.timeElapsed >= gamesVM.clueMechanics.numCountdownSeconds ? .primaryFG : .primaryAccent))
                 .cornerRadius(10)
             }
         }
@@ -149,37 +145,6 @@ struct MobileClueResponseView: View {
                 gamesVM.clueMechanics.setTimeElapsed(newValue: timeElapsed + 1)
             }
         }
-    }
-}
-
-struct MobileModernClueResponseView: View {
-    @EnvironmentObject var formatter: MasterHandler
-    @EnvironmentObject var gamesVM: GamesViewModel
-    
-    var body: some View {
-        VStack (spacing: 20) {
-            Text(gamesVM.currentSelectedClue.clueString)
-                .lineSpacing(5)
-                .font(formatter.font(.regular, fontSize: .semiLarge))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .multilineTextAlignment(.leading)
-            if gamesVM.clueMechanics.showResponse {
-                Text(gamesVM.currentSelectedClue.responseString.capitalized)
-                    .font(formatter.font(.regular, fontSize: .semiLarge))
-                    .foregroundColor(formatter.color(gamesVM.currentSelectedClue.isTripleStumper ? .red : .secondaryAccent))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .multilineTextAlignment(.leading)
-                if gamesVM.currentSelectedClue.isTripleStumper {
-                    Text("(Triple Stumper)")
-                        .font(formatter.font(.regular, fontSize: .medium))
-                        .foregroundColor(formatter.color(.red))
-                        .shadow(color: Color.black.opacity(0.2), radius: 5)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-        .frame(maxHeight: .infinity, alignment: .top)
-        .padding()
     }
 }
 

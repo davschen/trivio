@@ -422,13 +422,13 @@ class ParticipantsViewModel: ObservableObject {
             let rating = doc.get("rating") as? Int ?? 0
             let numRatings = doc.get("numRatings") as? Int ?? 0
             let averageScore = doc.get("averageScore") as? Double ?? 0.0
-            let plays = doc.get("plays") as? Int ?? 0
+            let plays = doc.get("numPlays") as? Int ?? 0
             
             let newRating: Double = (myRating == 0) ? Double(rating) : (Double(rating * numRatings + myRating) / Double(numRatings + 1))
             let newAverageScore: Double = (averageScore * Double(plays) + Double(myAverageScore)) / Double(plays + 1)
             
             userSetRef.setData([
-                "plays" : FieldValue.increment(Int64(1)),
+                "numPlays" : FieldValue.increment(Int64(1)),
                 "rating" : newRating,
                 "averageScore" : newAverageScore
             ], merge: true)

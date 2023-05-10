@@ -224,7 +224,9 @@ struct MobileFlashcardsView: View {
         return gamesVM.getReadjustedCategoryIndex(flashcardClue: topClue)
     }
     var relevantClues: [[String]] {
-        return readjustedCardIndex.0 == 1 ? gamesVM.tidyCustomSet.round1Clues : gamesVM.tidyCustomSet.round2Clues
+        return MasterHandler().dictToNestedStringArray(
+            dict: readjustedCardIndex.0 == 1 ? gamesVM.customSet.round1Clues : gamesVM.customSet.round2Clues
+        )
     }
     
     var bgColor: Color {
@@ -312,7 +314,7 @@ struct MobileSingleFlashcardView: View {
         return gamesVM.getReadjustedCategoryIndex(flashcardClue: flashcardClue)
     }
     var relevantCategoryNames: [String] {
-        return readjustedCardIndex.0 == 1 ? gamesVM.tidyCustomSet.round1Cats : gamesVM.tidyCustomSet.round2Cats
+        return readjustedCardIndex.0 == 1 ? gamesVM.customSet.round1CategoryNames : gamesVM.customSet.round2CategoryNames
     }
     
     var body: some View {

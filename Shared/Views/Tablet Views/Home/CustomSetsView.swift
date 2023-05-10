@@ -148,7 +148,7 @@ struct CustomSetCellView: View {
                             .font(formatter.font(.regular))
                             .lineLimit(1)
                         HStack {
-                            Text("\(customSet.plays) \(customSet.plays == 1 ? "play" : "plays")")
+                            Text("\(customSet.numPlays) \(customSet.numPlays == 1 ? "play" : "plays")")
                             Circle()
                                 .frame(width: 5, height: 5)
                             Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -181,7 +181,7 @@ struct CustomSetCellView: View {
         guard let setID = customSet.id else { return }
         exploreVM.shortenPublicSetsTo(10, customSet: customSet)
         gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomData(customSet: customSet)
         participantsVM.resetScores()
     }
 }

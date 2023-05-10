@@ -31,6 +31,23 @@ extension MasterHandler {
         }
         return Color(colorString)
     }
+    
+    func gradient(_ colorType: ColorType, startPoint: UnitPoint = .bottom, endPoint: UnitPoint = .top) -> LinearGradient {
+        // Color 1, Color 2
+        var gradientColors = [Color]()
+        switch colorType {
+        case .primaryAccent:
+            gradientColors = [Color(hex: "#2E2D95"), Color(hex: "#574CE2")]
+        case .secondaryFG:
+            gradientColors = [Color(hex: "#444773"), Color(hex: "#5B5F8F")]
+        case .secondaryAccent:
+            gradientColors = [Color(hex: "#F4973B"), Color(hex: "#F9BE44")]
+        default:
+            gradientColors = [Color(hex: "#211F3B"), Color(hex: "#2D2A4D")]
+        }
+        
+        return LinearGradient(gradient: Gradient(colors: gradientColors), startPoint: startPoint, endPoint: endPoint)
+    }
 }
 
 struct ColorMap {
@@ -79,4 +96,7 @@ extension Color {
         self.init(red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: Double(a) / 255)
     }
 }
+
+// MARK: - Gradients
+
 

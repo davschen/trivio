@@ -29,9 +29,11 @@ class ExploreViewModel: ObservableObject {
     @Published var userResults = [CustomSetCherry]()
     @Published var userDrafts = [CustomSetCherry]()
     
-    // MARK: - The beginning of time
+    // MARK: - Custom sets batch
     
     @Published var publicCustomSetsBatch = [CustomSetDurian]()
+    @Published var customSetsBatchIsLoading = false
+    var lastCustomSetDocument: DocumentSnapshot?
     
     // MARK: The end of time -
     
@@ -117,20 +119,28 @@ class ExploreViewModel: ObservableObject {
     }
     
     private func fetchPublicSetsBatch() {
+        customSetsBatchIsLoading = true
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         self.addUsernameNameToDict(userID: myUID)
         
         db.collection("userSets")
             .whereField("isPublic", isEqualTo: true)
             .order(by: "dateCreated", descending: true)
-            .limit(to: 20)
+            .limit(to: 60)
             .getDocuments { (snap, error) in
+                let group = DispatchGroup()
+
                 if let error = error {
                     print("Error fetching public sets: \(error.localizedDescription)")
+                    self.customSetsBatchIsLoading = false
                     return
                 }
                 
                 guard let documents = snap?.documents else { return }
+                
+                self.lastCustomSetDocument = documents.last
+                
+                var fetchedDurianSets: [CustomSetDurian] = []
                 
                 for document in documents {
                     let customSetCherry = try? document.data(as: CustomSetCherry.self)
@@ -142,17 +152,134 @@ class ExploreViewModel: ObservableObject {
                     
                     if let durianSet = customSetDurian {
                         self.addUsernameNameToDict(userID: durianSet.userID)
-                        self.publicCustomSetsBatch.append(durianSet)
+                        fetchedDurianSets.append(durianSet)
                     } else {
+                        group.enter()
                         self.fetchDurianData(userSetID: document.documentID) { durianSet in
+                            defer { group.leave() }
                             guard let durianSet = durianSet else { return }
                             self.addUsernameNameToDict(userID: durianSet.userID)
-                            self.publicCustomSetsBatch.append(durianSet)
+                            fetchedDurianSets.append(durianSet)
                         }
                     }
                 }
+
+                // Sort the fetchedDurianSets based on the weighted scoring algorithm
+                group.notify(queue: .main) {
+                    fetchedDurianSets.sort { set1, set2 in
+                        let score1 = self.calculateScore(customSet: set1)
+                        let score2 = self.calculateScore(customSet: set2)
+                        return score1 > score2
+                    }
+                    
+                    let topPercent = 0.33
+                    let topIndex = Int(Double(fetchedDurianSets.count) * topPercent)
+                    let topSets = fetchedDurianSets.prefix(topIndex)
+                    
+                    self.publicCustomSetsBatch.append(contentsOf: topSets)
+                    self.customSetsBatchIsLoading = false
+                }
             }
     }
+
+    public func loadAdditionalPublicSets() {
+        print("is calling loadAdditionalPublicSets")
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        self.addUsernameNameToDict(userID: myUID)
+        
+        var query = db.collection("userSets")
+            .whereField("isPublic", isEqualTo: true)
+            .order(by: "dateCreated", descending: true)
+            .limit(to: 60)
+        
+        if let lastDocument = lastCustomSetDocument {
+            query = query.start(afterDocument: lastDocument)
+        }
+        
+        query.getDocuments { (snap, error) in
+            let group = DispatchGroup()
+
+            if let error = error {
+                print("Error fetching more public sets: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = snap?.documents, !documents.isEmpty else { return }
+            
+            // Store the last document for the next fetch
+            self.lastCustomSetDocument = documents.last
+            
+            var fetchedDurianSets: [CustomSetDurian] = []
+            
+            for document in documents {
+                let customSetCherry = try? document.data(as: CustomSetCherry.self)
+                let customSetDurian = try? document.data(as: CustomSetDurian.self)
+                
+                if let cherrySet = customSetCherry {
+                    self.addUsernameNameToDict(userID: cherrySet.userID)
+                }
+                
+                if let durianSet = customSetDurian {
+                    self.addUsernameNameToDict(userID: durianSet.userID)
+                    fetchedDurianSets.append(durianSet)
+                } else {
+                    group.enter()
+                    self.fetchDurianData(userSetID: document.documentID) { durianSet in
+                        defer { group.leave() }
+                        guard let durianSet = durianSet else { return }
+                        self.addUsernameNameToDict(userID: durianSet.userID)
+                        fetchedDurianSets.append(durianSet)
+                    }
+                }
+            }
+
+            // Sort the fetchedDurianSets based on the weighted scoring algorithm
+            group.notify(queue: .main) {
+                fetchedDurianSets.sort { set1, set2 in
+                    let score1 = self.calculateScore(customSet: set1)
+                    let score2 = self.calculateScore(customSet: set2)
+                    return score1 > score2
+                }
+                
+                let topPercent = 0.33
+                let topIndex = Int(Double(fetchedDurianSets.count) * topPercent)
+                let topSets = fetchedDurianSets.prefix(topIndex)
+                
+                self.publicCustomSetsBatch.append(contentsOf: topSets)
+            }
+        }
+    }
+
+
+    private func calculateScore(customSet: CustomSetDurian) -> Double {
+        let w1 = 5.0
+        let w2 = 3.0
+        let w3 = 2.0
+        let w4 = 1.0
+        
+        let averageClueLength = calculateAverageClueLength(customSet: customSet)
+        let numRounds = customSet.hasTwoRounds ? 2.0 : 1.0
+        let numCluesPerRound = Double(customSet.numClues) / numRounds
+        let numPlays = Double(customSet.numPlays)
+        let numLikes = Double(customSet.numLikes)
+        let recency = -1 * TimeInterval(customSet.dateCreated.timeIntervalSinceNow)
+
+        let score = w1 * averageClueLength + w2 * numCluesPerRound + w3 * numPlays + w3 * numLikes + w4 * recency
+        return score
+    }
+
+    private func calculateAverageClueLength(customSet: CustomSetDurian) -> Double {
+        // Get all clue lengths from the set.round1Clues
+        // Calculate the average length of the sampled clues
+        // Return the average clue length
+        
+        let clueLengths = customSet.round1Clues.values.flatMap { $0 }.map { Double($0.count) }
+        let totalLength = clueLengths.reduce(0, +)
+        let averageLength = totalLength / Double(clueLengths.count)
+        
+        return averageLength
+    }
+
     
     private func fetchDurianData(userSetID: String, completion: @escaping (CustomSetDurian?) -> Void) {
         let userSetsRef = db.collection("userSets").document(userSetID)

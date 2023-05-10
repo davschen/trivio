@@ -83,6 +83,12 @@
 		8B9DBE1129F9BA90000C87F0 /* FlipCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1029F9BA90000C87F0 /* FlipCard.swift */; };
 		8B9DBE1329FA0D27000C87F0 /* MobileTriviaDeckSubmitClueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1229FA0D27000C87F0 /* MobileTriviaDeckSubmitClueView.swift */; };
 		8B9DBE1629FA1A4E000C87F0 /* Metropolis-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1529FA1A4E000C87F0 /* Metropolis-SemiBold.otf */; };
+		8B9DBE1829FA7459000C87F0 /* ProfileViewModel+AccountSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1729FA7459000C87F0 /* ProfileViewModel+AccountSetup.swift */; };
+		8B9DBE1A29FA7568000C87F0 /* ProfileViewModel+UserRecords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1929FA7568000C87F0 /* ProfileViewModel+UserRecords.swift */; };
+		8B9DBE1D29FA78E9000C87F0 /* TrivioUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE1C29FA78E9000C87F0 /* TrivioUser.swift */; };
+		8B9DBE2129FB783B000C87F0 /* TapGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE2029FB783B000C87F0 /* TapGestureRecognizer.swift */; };
+		8B9DBE2329FC79D6000C87F0 /* MasterHandler+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE2229FC79D6000C87F0 /* MasterHandler+Date.swift */; };
+		8B9DBE2529FC7E57000C87F0 /* MobileMyTriviaDecksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9DBE2429FC7E57000C87F0 /* MobileMyTriviaDecksView.swift */; };
 		8BA3BAC0290A08BD0086451B /* Gameplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BABF290A08BD0086451B /* Gameplay.swift */; };
 		8BA3BAC2290BB12E0086451B /* MobileTrivioLivePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BAC1290BB12E0086451B /* MobileTrivioLivePreviewView.swift */; };
 		8BA3BAC5290CBD050086451B /* Build.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA3BAC4290CBD050086451B /* Build.swift */; };
@@ -153,7 +159,6 @@
 		8BEAE4E22697A75700BF932C /* GamePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4DA2696D22300BF932C /* GamePickerView.swift */; };
 		8BEAE4EA2697A78700BF932C /* ClueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4D42696D21F00BF932C /* ClueView.swift */; };
 		8BEAE4ED2697A79C00BF932C /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4D52696D22000BF932C /* ReportsView.swift */; };
-		8BEAE4EF2697A7A100BF932C /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4D22696D21D00BF932C /* SearchView.swift */; };
 		8BEAE4F12697A7A600BF932C /* BuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4DB2696D22300BF932C /* BuildView.swift */; };
 		8BEAE4F32697A7AA00BF932C /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEAE4CD2696D13B00BF932C /* ProfileView.swift */; };
 		8BEAE4F92697EF0800BF932C /* Metropolis-ExtraBoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8BEAE4F82697EF0800BF932C /* Metropolis-ExtraBoldItalic.otf */; };
@@ -279,6 +284,12 @@
 		8B9DBE1029F9BA90000C87F0 /* FlipCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipCard.swift; sourceTree = "<group>"; };
 		8B9DBE1229FA0D27000C87F0 /* MobileTriviaDeckSubmitClueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileTriviaDeckSubmitClueView.swift; sourceTree = "<group>"; };
 		8B9DBE1529FA1A4E000C87F0 /* Metropolis-SemiBold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-SemiBold.otf"; sourceTree = "<group>"; };
+		8B9DBE1729FA7459000C87F0 /* ProfileViewModel+AccountSetup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+AccountSetup.swift"; sourceTree = "<group>"; };
+		8B9DBE1929FA7568000C87F0 /* ProfileViewModel+UserRecords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+UserRecords.swift"; sourceTree = "<group>"; };
+		8B9DBE1C29FA78E9000C87F0 /* TrivioUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrivioUser.swift; sourceTree = "<group>"; };
+		8B9DBE2029FB783B000C87F0 /* TapGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapGestureRecognizer.swift; sourceTree = "<group>"; };
+		8B9DBE2229FC79D6000C87F0 /* MasterHandler+Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MasterHandler+Date.swift"; sourceTree = "<group>"; };
+		8B9DBE2429FC7E57000C87F0 /* MobileMyTriviaDecksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileMyTriviaDecksView.swift; sourceTree = "<group>"; };
 		8BA3BABF290A08BD0086451B /* Gameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gameplay.swift; sourceTree = "<group>"; };
 		8BA3BAC1290BB12E0086451B /* MobileTrivioLivePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MobileTrivioLivePreviewView.swift; sourceTree = "<group>"; };
 		8BA3BAC4290CBD050086451B /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
@@ -354,7 +365,6 @@
 		8BEAE4C12696744E00BF932C /* Metropolis-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Metropolis-Regular.otf"; sourceTree = "<group>"; };
 		8BEAE4C82696794800BF932C /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		8BEAE4CD2696D13B00BF932C /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		8BEAE4D22696D21D00BF932C /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		8BEAE4D42696D21F00BF932C /* ClueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClueView.swift; sourceTree = "<group>"; };
 		8BEAE4D52696D22000BF932C /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportsView.swift; sourceTree = "<group>"; };
 		8BEAE4D92696D22200BF932C /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -450,6 +460,7 @@
 		8B0EFC3127EC5BD8000BD2DF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8B9DBE1B29FA78D7000C87F0 /* Profile Models */,
 				8BCD180829F3A11500DFBC85 /* Trivia Deck Models */,
 				8B6EBFD629F0CFB7002516CB /* Jeopardy-Style Set Models */,
 				8B0EFC3827F24D6E000BD2DF /* Daily Trivio Models */,
@@ -539,6 +550,7 @@
 				8B9B069B265CC41E00758036 /* MasterHandler.swift */,
 				8B88EA9826AD1437001C5C2C /* MasterHandler+Haptic.swift */,
 				8B88EA9B26AD14B8001C5C2C /* MasterHandler+Navigation.swift */,
+				8B9DBE2229FC79D6000C87F0 /* MasterHandler+Date.swift */,
 			);
 			path = MasterHandler;
 			sourceTree = "<group>";
@@ -546,7 +558,6 @@
 		8B88EA9E26AD1696001C5C2C /* Game Picker */ = {
 			isa = PBXGroup;
 			children = (
-				8BEAE4D22696D21D00BF932C /* SearchView.swift */,
 				8BEAE4DA2696D22300BF932C /* GamePickerView.swift */,
 			);
 			path = "Game Picker";
@@ -628,6 +639,7 @@
 			isa = PBXGroup;
 			children = (
 				8B88EAF426AD2078001C5C2C /* MobileProfileView.swift */,
+				8B9DBE2429FC7E57000C87F0 /* MobileMyTriviaDecksView.swift */,
 				8BA62BA629284D620010835A /* MobileMyCustomSetsView.swift */,
 				8B88EAFD26AD20E2001C5C2C /* MobileMyDraftsView.swift */,
 				8B88EB2726AD22A0001C5C2C /* MobileAccountSettingsView.swift */,
@@ -723,6 +735,14 @@
 				8BFBF1BB2936FF270024174F /* MobileAdminView.swift */,
 			);
 			path = Admin;
+			sourceTree = "<group>";
+		};
+		8B9DBE1B29FA78D7000C87F0 /* Profile Models */ = {
+			isa = PBXGroup;
+			children = (
+				8B9DBE1C29FA78E9000C87F0 /* TrivioUser.swift */,
+			);
+			path = "Profile Models";
 			sourceTree = "<group>";
 		};
 		8BA62B9F292704630010835A /* Build View Model */ = {
@@ -896,6 +916,7 @@
 				8B88EA9726AD140E001C5C2C /* MasterHandler */,
 				8BEAE4C72696793E00BF932C /* Color */,
 				8BEAE4B9269673F000BF932C /* Font */,
+				8B9DBE2029FB783B000C87F0 /* TapGestureRecognizer.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -924,6 +945,8 @@
 			children = (
 				8B9B0694265C9B4500758036 /* ProfileViewModel.swift */,
 				8BCD181729F7675000DFBC85 /* ProfileViewModel+Admin.swift */,
+				8B9DBE1729FA7459000C87F0 /* ProfileViewModel+AccountSetup.swift */,
+				8B9DBE1929FA7568000C87F0 /* ProfileViewModel+UserRecords.swift */,
 			);
 			path = "Profile View Model";
 			sourceTree = "<group>";
@@ -1238,12 +1261,15 @@
 				8BEAE4F12697A7A600BF932C /* BuildView.swift in Sources */,
 				8B88EA9926AD1437001C5C2C /* MasterHandler+Haptic.swift in Sources */,
 				8B88EAB826AD19F9001C5C2C /* MobileHomepageView.swift in Sources */,
+				8B9DBE1829FA7459000C87F0 /* ProfileViewModel+AccountSetup.swift in Sources */,
 				8B88EA9126AA0F0D001C5C2C /* BuildHeaderView.swift in Sources */,
 				8B88EB1026AD21BF001C5C2C /* MobileBuildHUDView.swift in Sources */,
 				8BA62B982927019C0010835A /* NumberFormatter.swift in Sources */,
 				8BFC126626A15A0A00D3E513 /* ParticipantsViewModel.swift in Sources */,
 				8B88EAE326AD1F76001C5C2C /* MobileDuplexWagerView.swift in Sources */,
+				8B9DBE1A29FA7568000C87F0 /* ProfileViewModel+UserRecords.swift in Sources */,
 				8BEAE4EA2697A78700BF932C /* ClueView.swift in Sources */,
+				8B9DBE2129FB783B000C87F0 /* TapGestureRecognizer.swift in Sources */,
 				8BFC126826A15A0A00D3E513 /* SearchViewModel.swift in Sources */,
 				8B68B7092970FAE60024FD70 /* MobileQuickSignInWithApple.swift in Sources */,
 				8B88EA9C26AD14B8001C5C2C /* MasterHandler+Navigation.swift in Sources */,
@@ -1262,7 +1288,6 @@
 				8BFC126926A15A0A00D3E513 /* BuildViewModel.swift in Sources */,
 				8B5D7EAC2938691F004E7221 /* MobileAuthNameUsernameView.swift in Sources */,
 				8BEAE4DC2697A74000BF932C /* SignInView.swift in Sources */,
-				8BEAE4EF2697A7A100BF932C /* SearchView.swift in Sources */,
 				8BAA42C1294162A20077DEA0 /* SignInInputView.swift in Sources */,
 				8B9B788D29DA60130006BA12 /* MobileTrivioLiveView.swift in Sources */,
 				8BCD180D29F3C70A00DFBC85 /* MobileTriviaDeckGameplayView.swift in Sources */,
@@ -1301,12 +1326,14 @@
 				8BA62BB3293463B40010835A /* MobileJeopardySetsView.swift in Sources */,
 				8B0EFC3727EE7C45000BD2DF /* DailyTrivioGameSource.swift in Sources */,
 				8B88EAFB26AD20BC001C5C2C /* MobileCustomSetsView.swift in Sources */,
+				8B9DBE2329FC79D6000C87F0 /* MasterHandler+Date.swift in Sources */,
 				8B88EAC126AD1ABB001C5C2C /* MobileUserView.swift in Sources */,
 				8BEAE4E22697A75700BF932C /* GamePickerView.swift in Sources */,
 				8B88EA8526A9F341001C5C2C /* BuildFinalTrivioView.swift in Sources */,
 				8B88EB0A26AD2192001C5C2C /* MobileBuildCategoryView.swift in Sources */,
 				8BA3BAC2290BB12E0086451B /* MobileTrivioLivePreviewView.swift in Sources */,
 				8B88EA7626A9F230001C5C2C /* BuildCellView.swift in Sources */,
+				8B9DBE1D29FA78E9000C87F0 /* TrivioUser.swift in Sources */,
 				8B88EB1C26AD2238001C5C2C /* MobileBuildFinalTrivioView.swift in Sources */,
 				8BC53861265B5DFF0099D05B /* ContentView.swift in Sources */,
 				8B0EFC2A27EB9B77000BD2DF /* StringUtils.swift in Sources */,
@@ -1327,6 +1354,7 @@
 				8BAA42F329428F940077DEA0 /* MyDraftsView.swift in Sources */,
 				8BCD180A29F3A13D00DFBC85 /* TriviaDeck.swift in Sources */,
 				8BAA42E7294261800077DEA0 /* FinalTrivioUserFlowView.swift in Sources */,
+				8B9DBE2529FC7E57000C87F0 /* MobileMyTriviaDecksView.swift in Sources */,
 				8B88EAE026AD1F12001C5C2C /* MobileClueView.swift in Sources */,
 				8BFBF1BC2936FF270024174F /* MobileAdminView.swift in Sources */,
 				8BA62B94292701550010835A /* KeyboardAdapt.swift in Sources */,

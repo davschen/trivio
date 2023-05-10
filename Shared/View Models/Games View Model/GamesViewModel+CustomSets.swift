@@ -12,7 +12,7 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 
 extension GamesViewModel {
-    func readCustomData() {
+    func fetchMyCustomSets() {
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         db.collection("userSets")
             .whereField("userID", isEqualTo: myUID)
@@ -27,11 +27,15 @@ extension GamesViewModel {
                 for document in documents {
                     let customSetDurian = try? document.data(as: CustomSetDurian.self)
                     if let durianSet = customSetDurian {
-                        self.customSets.append(durianSet)
+                        DispatchQueue.main.async {
+                            self.customSets.append(durianSet)
+                        }
                     } else {
                         self.fetchDurianData(userSetID: document.documentID) { durianSet in
                             guard let durianSet = durianSet else { return }
-                            self.customSets.append(durianSet)
+                            DispatchQueue.main.async {
+                                self.customSets.append(durianSet)
+                            }
                         }
                     }
                 }
@@ -51,35 +55,25 @@ extension GamesViewModel {
         }
     }
     
+    private func dictToNestedStringArray(dict: [Int:[String]]) -> [[String]] {
+        var toReturn = [[String]]()
+        for categoryIndex in 0..<dict.count {
+            if let stringArray = dict[categoryIndex] {
+                toReturn.append(stringArray)
+            }
+        }
+        return toReturn
+    }
+    
     func getCustomSetData(customSet: CustomSetDurian) {
         clearAll()
         reset()
         self.customSet = customSet
-        tidyCustomSet.round1Clues = MasterHandler().dictToNestedStringArray(dict: customSet.round1Clues)
-        tidyCustomSet.round1Responses = MasterHandler().dictToNestedStringArray(dict: customSet.round1Responses)
-        tidyCustomSet.round1Cats = customSet.round1CategoryNames
         
-        if customSet.hasTwoRounds {
-            tidyCustomSet.round2Clues = MasterHandler().dictToNestedStringArray(dict: customSet.round2Clues)
-            tidyCustomSet.round2Responses = MasterHandler().dictToNestedStringArray(dict: customSet.round2Responses)
-            tidyCustomSet.round2Cats = customSet.round2CategoryNames
-        }
-        
-        clues = tidyCustomSet.round1Clues
-        responses = tidyCustomSet.round1Responses
-        categories = tidyCustomSet.round1Cats
-        
-        func getCompleteStringsCount(nestedArray: [[String]]) -> Int {
-            let completeStringsCount = nestedArray.reduce(0) { (count, array) -> Int in
-                count + array.filter { $0.isEmpty }.count
-            }
-            return completeStringsCount
-        }
-        
-        jRoundCompletes = getCompleteStringsCount(nestedArray: tidyCustomSet.round1Clues)
-        djRoundCompletes = getCompleteStringsCount(nestedArray: tidyCustomSet.round2Clues)
-        
-        generateFinishedCatsAndClues(cluesNestedArray: tidyCustomSet.round1Clues)
+        clues = dictToNestedStringArray(dict: customSet.round1Clues)
+        responses = dictToNestedStringArray(dict: customSet.round1Responses)
+        categories = customSet.round1CategoryNames
+        generateFinishedCatsAndClues(cluesNestedDict: customSet.round1Clues)
     }
     
     private func fetchDurianData(userSetID: String, completion: @escaping (CustomSetDurian?) -> Void) {
@@ -132,113 +126,27 @@ extension GamesViewModel {
         }
     }
     
-    func getCustomData(setID: String) {
+    func getCustomData(customSet: CustomSetDurian) {
         clearAll()
         reset()
-        let group = DispatchGroup()
-        db.collection("userSets").document(setID).getDocument { (doc, err) in
-            group.enter()
-            if err != nil {
-                print(err!.localizedDescription)
-                return
-            }
-            guard let doc = doc else { return }
-            var customSet: CustomSetCherry
-            if let customSetOG = try? doc.data(as: CustomSet.self) {
-                customSet = CustomSetCherry(customSet: customSetOG)
-            } else if let customSetCherry = try? doc.data(as: CustomSetCherry.self) {
-                customSet = customSetCherry
-            } else {
-                return
-            }
-            
-            self.customSet = CustomSetDurian()
-            
-            for id in customSet.round1CatIDs {
-                self.db.collection("userCategories").document(id).getDocument { (doc, err) in
-                    if err != nil {
-                        print(err!.localizedDescription)
-                        return
-                    }
-                    guard let doc = doc else { return }
-                    guard let customSetCategory = try? doc.data(as: CustomSetCategory.self) else { return }
-                    
-                    DispatchQueue.main.async {
-                        let index = customSetCategory.index
-                        if self.tidyCustomSet.round1Clues.isEmpty {
-                            let toAdd = (customSet.round1Len - self.tidyCustomSet.round1Clues.count)
-                            self.tidyCustomSet.round1Clues = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round1Responses = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round1Cats = [String](repeating: "", count: toAdd)
-                        }
-                        if self.tidyCustomSet.round1Clues.indices.contains(index) {
-                            self.tidyCustomSet.round1Clues[index] = customSetCategory.clues
-                            self.tidyCustomSet.round1Responses[index] = customSetCategory.responses
-                            self.tidyCustomSet.round1Cats[index] = customSetCategory.name
-                            self.generateFinishedClues2D()
-                            self.clues = self.tidyCustomSet.round1Clues
-                            self.responses = self.tidyCustomSet.round1Responses
-                            self.categories = self.tidyCustomSet.round1Cats
-                            customSetCategory.clues.forEach {
-                                self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if !customSet.hasTwoRounds {
-                self.tidyCustomSet.round2Cats.removeAll()
-                return
-            }
-            
-            for id in customSet.round2CatIDs {
-                self.db.collection("userCategories").document(id).getDocument { (doc, err) in
-                    if err != nil {
-                        print(err!.localizedDescription)
-                        return
-                    }
-                    
-                    guard let doc = doc else { return }
-                    guard let customSetCategory = try? doc.data(as: CustomSetCategory.self) else { return }
-                    
-                    DispatchQueue.main.async {
-                        let index = customSetCategory.index
-                        if self.tidyCustomSet.round2Clues.isEmpty {
-                            let toAdd = (customSet.round2Len - self.tidyCustomSet.round2Clues.count)
-                            self.tidyCustomSet.round2Clues = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round2Responses = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round2Cats = [String](repeating: "", count: toAdd)
-                        }
-                        if self.tidyCustomSet.round2Clues.indices.contains(index) {
-                            self.tidyCustomSet.round2Clues[index] = customSetCategory.clues
-                            self.tidyCustomSet.round2Responses[index] = customSetCategory.responses
-                            self.tidyCustomSet.round2Cats[index] = customSetCategory.name
-                            customSetCategory.clues.forEach {
-                                self.djRoundCompletes += ($0.isEmpty ? 0 : 1)
-                            }
-                        }
-                    }
-                }
-            }
-            
-            DispatchQueue.main.async {
-                self.getUserName(userID: customSet.userID)
-                self.customSet = CustomSetDurian()
-            }
+        getUserName(userID: customSet.userID)
+        completedCustomSetClues = countNonEmptyClues(cluesDict: customSet.round1Clues)
+        self.customSet = customSet
+    }
+    
+    func countNonEmptyClues(cluesDict: [Int:[String]] = [:]) -> Int {
+        let cluesDictCopy = cluesDict.isEmpty ? (gamePhase == .round1 ? customSet.round1Clues : customSet.round2Clues) : cluesDict
+        let nonEmptyCluesCount = cluesDictCopy.reduce(0) { (count, cluesArray) -> Int in
+            count + cluesArray.value.filter { !$0.isEmpty }.count
         }
+        return nonEmptyCluesCount
     }
     
     func deleteSet(setID: String) {
-        var copyOfCustomSets = customSets
-        for i in 0..<customSets.count {
-            let set = customSets[i]
-            guard let id = set.id else { return }
-            if setID == id {
-                copyOfCustomSets.remove(at: i)
-            }
+        customSets = customSets.filter { customSet in
+            guard let id = customSet.id else { return true }
+            return setID != id
         }
-        customSets = copyOfCustomSets
     }
     
     // for scrolling

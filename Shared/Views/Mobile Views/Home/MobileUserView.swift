@@ -91,7 +91,7 @@ struct MobileUserCustomSetCellView: View {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
                         .frame(width: 5, height: 5)
-                    Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
+                    Text("\(customSet.numPlays) play" + "\(customSet.numPlays == 1 ? "" : "s")")
                     Circle()
                         .frame(width: 5, height: 5)
                     Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -119,7 +119,7 @@ struct MobileUserCustomSetCellView: View {
         formatter.hapticFeedback(style: .light)
         exploreVM.shortenPublicSetsTo(10, customSet: customSet)
         gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomData(customSet: customSet)
         participantsVM.resetScores()
     }
 }
@@ -131,7 +131,7 @@ struct MobileUserDraftCellView: View {
 
     @State var setPreviewActive = false
     
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -159,7 +159,7 @@ struct MobileUserDraftCellView: View {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
                         .frame(width: 5, height: 5)
-                    Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
+                    Text("\(customSet.numPlays) play" + "\(customSet.numPlays == 1 ? "" : "s")")
                     Circle()
                         .frame(width: 5, height: 5)
                     Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -183,10 +183,10 @@ struct MobileUserDraftCellView: View {
         }
     }
     
-    func selectSet(customSet: CustomSetCherry) {
+    func selectSet(customSet: CustomSetDurian) {
         formatter.hapticFeedback(style: .light)
         gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomData(customSet: customSet)
         participantsVM.resetScores()
     }
 }

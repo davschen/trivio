@@ -11,12 +11,13 @@ import Firebase
 import FirebaseFirestoreSwift
 
 class ProfileViewModel: ObservableObject {
+    @Published var myTrivioUser: TrivioUser = TrivioUser()
     @Published var playedGameIDs = [String]()
     @Published var menuSelectedItem = "Summary"
     @Published var username = "" 
     @Published var name = ""
     @Published var usernameValid = false
-    @Published var drafts = [CustomSetCherry]()
+    @Published var drafts = [CustomSetDurian]()
     @Published var triviaDeckCluesToReview = [TriviaDeckClue]()
     @Published var myTriviaDeckClues = [TriviaDeckClue]()
     @Published var searchItem = ""
@@ -57,75 +58,7 @@ class ProfileViewModel: ObservableObject {
         return playedGameIDs.contains(gameID)
     }
     
-    func categoryInSearch(categoryName: String, searchQuery: [String]) -> Bool {
-        var toReturn = false
-        for word in searchQuery {
-            if categoryName.lowercased().contains(word.lowercased()) {
-                toReturn = true
-            }
-        }
-        return toReturn
-    }
-    
-    func checkForbiddenChars() -> String {
-        var forbiddenReport = ""
-        let forbiddenChars: [Character] = [" ", "/", "-", "&", "$", "#", "@", "!", "%", "^", "*", "(", ")", "+"]
-        for char in forbiddenChars {
-            if username.contains(String(char)) {
-                forbiddenReport = String(char)
-            }
-        }
-        if forbiddenReport.isEmpty {
-            return ""
-        } else {
-            return forbiddenReport == " " ? "space" : "'" + forbiddenReport + "'"
-        }
-    }
-    
-    func checkUsernameExists(completion: @escaping (Bool) -> Void) {
-        guard let uid = myUID else { return }
-        let docRef = db.collection("users")
-            .whereField("username", isEqualTo: username.lowercased())
-        docRef.addSnapshotListener { (snap, error) in
-            if error != nil {
-                print(error!.localizedDescription)
-                return
-            }
-            guard let data = snap?.documents else { return }
-            if let doc = data.first {
-                if (doc.documentID == uid) {
-                    completion(true)
-                } else {
-                    completion(false)
-                }
-            } else {
-                completion(true)
-            }
-        }
-    }
-    
-    func checkUsernameValidWithHandler(completion: @escaping (Bool) -> Void) {
-        checkUsernameExists { (success) -> Void in
-            if success && !self.username.isEmpty && self.checkForbiddenChars().isEmpty {
-                completion(true)
-            } else {
-                self.usernameValid = false
-                completion(false)
-            }
-        }
-    }
-    
-    func checkUsernameValid() {
-        checkUsernameExists { (success) -> Void in
-            if success && !self.username.isEmpty {
-                self.usernameValid = true 
-            } else {
-                self.usernameValid = false
-            }
-        }
-    }
-    
-    private func pullAllVIPs() {
+    public func pullAllVIPs() {
         db.collectionGroup("myUserRecords").getDocuments { (snap, error) in
             if error != nil { return }
             guard let data = snap?.documents else { return }
@@ -145,86 +78,6 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
-    private func pullUserRecordsData() {
-        guard let myUID = myUID else { return }
-        let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
-        cherryUpdatesDocRef.getDocument(completion: { (docSnap, error) in
-            if error != nil {
-                return
-            }
-            guard let doc = docSnap else { return }
-            // Ideally, I'd check if the doc is of the type MyUserRecordsCherry, but not today.
-            if !doc.exists || doc.get("mostRecentSession") == nil {
-                self.db.collection("users").document(myUID).getDocument(completion: { (docSnap, error) in
-                    if error != nil { return }
-                    guard let doc = docSnap else { return }
-                    let username = doc.get("username") as! String
-                    var newUserRecord = MyUserRecordsCherry()
-                    newUserRecord.username = username
-                    try? cherryUpdatesDocRef.setData(from: newUserRecord)
-                })
-            } else {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "LLLL"
-                
-                guard let myUserRecordsCherry = try? doc.data(as: MyUserRecordsCherry.self) else { return }
-                DispatchQueue.main.async {
-                    if myUserRecordsCherry.numLiveTokens == 0 && myUserRecordsCherry.freeTokenLastGeneratedMonth != dateFormatter.string(from: Date()) {
-                        // If the user is due for a free token
-                        self.incrementNumTokens()
-                        self.updateMyUserRecords(fieldName: "freeTokenLastGeneratedMonth", newValue: dateFormatter.string(from: Date()))
-                        var murCherry = myUserRecordsCherry
-                        murCherry.numLiveTokens += 1
-                        self.myUserRecords.assignFromMURCherry(myUserRecordsCherry: murCherry)
-                    } else {
-                        self.myUserRecords.assignFromMURCherry(myUserRecordsCherry: myUserRecordsCherry)
-                    }
-                    self.updateMostRecentSession()
-                    self.incrementNumSessions()
-                    if self.myUserRecords.isAdmin { self.pullAllVIPs() }
-                }
-                if myUserRecordsCherry.isAdmin {
-                    self.pullAllUserRecords()
-                }
-            }
-        })
-    }
-    
-    public func purgeAndPullAllUserRecords() {
-        allUserRecords.removeAll()
-        pullAllUserRecords()
-    }
-    
-    private func pullAllUserRecords() {
-        db.collection("userSessions").order(by: "mostRecentSession").limit(to: 50).getDocuments { (snap, error) in
-            if error != nil { return }
-            guard let data = snap?.documents else { return }
-            let userSessionIDs = data.compactMap({ (docSnap) -> String in
-                return docSnap.documentID
-            })
-            userSessionIDs.forEach { userID in
-                self.db.collection("users").document(userID).collection("myUserRecords").document("myUserRecordsCherry").getDocument { (docSnap, error) in
-                    if error != nil {
-                        return
-                    }
-                    guard let myUserRecordCherry = try? docSnap?.data(as: MyUserRecordsCherry.self) else { return }
-                    var userRecord = MyUserRecords()
-                    userRecord.assignFromMURCherry(myUserRecordsCherry: myUserRecordCherry)
-                    let insertionIndex = self.allUserRecords.insertionIndexOf(userRecord) { $0.mostRecentSession > $1.mostRecentSession }
-                    self.allUserRecords.insert(userRecord, at: insertionIndex)
-                }
-            }
-        }
-    }
-    
-    public func updateMyUserRecords(fieldName: String, newValue: Any) {
-        guard let myUID = myUID else { return }
-        let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
-        cherryUpdatesDocRef.setData([
-            fieldName : newValue
-        ], merge: true)
-    }
-    
     public func updateMostRecentSession() {
         guard let myUID = myUID else { return }
         let cherryUpdatesDocRef = db.collection("users").document(myUID).collection("myUserRecords").document("myUserRecordsCherry")
@@ -236,39 +89,46 @@ class ProfileViewModel: ObservableObject {
         ], merge: true)
     }
     
-    private func getUserInfo() {
+    public func getUserInfo() {
         guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
         let myProfileDocRef = db.collection("users").document(myUID)
+        
         myProfileDocRef.getDocument { (docSnap, error) in
             if error != nil { return }
             guard let doc = docSnap else { return }
-            let name = doc.get("name") as? String ?? ""
-            let username = doc.get("username") as? String ?? ""
-            DispatchQueue.main.async {
-                self.name = name
-                self.username = username
+            if let myTrivioUser = try? doc.data(as: TrivioUser.self) {
+                self.myTrivioUser = myTrivioUser
             }
             self.db.document("users/\(myUID)/myUserRecords/myUserRecordsCherry").setData([
-                "username" : username,
+                "username" : self.myTrivioUser.username,
             ], merge: true)
         }
+        
+        fetchMyTriviaDeckClues()
+        
         db.collection("drafts")
             .whereField("userID", isEqualTo: myUID)
             .order(by: "dateCreated", descending: true)
-            .addSnapshotListener { snap, error in
+            .getDocuments { snap, error in
                 if error != nil { return }
-                guard let data = snap?.documents else { return }
-                self.drafts = data.compactMap { (queryDocSnap) -> CustomSetCherry? in
-                    let customSet = try? queryDocSnap.data(as: CustomSet.self)
-                    if let customSetCherry = try? queryDocSnap.data(as: CustomSetCherry.self) {
-                        // Custom set for version 3.0
-                        return customSetCherry
+                guard let documents = snap?.documents else { return }
+                for document in documents {
+                    let customSetDurian = try? document.data(as: CustomSetDurian.self)
+                    if let durianSet = customSetDurian {
+                        DispatchQueue.main.async {
+                            self.drafts.append(durianSet)
+                        }
                     } else {
-                        // default
-                        return CustomSetCherry(customSet: customSet ?? CustomSet())
+                        self.fetchDurianData(userSetID: document.documentID) { durianSet in
+                            guard let durianSet = durianSet else { return }
+                            DispatchQueue.main.async {
+                                self.drafts.append(durianSet)
+                            }
+                        }
                     }
                 }
         }
+        
         if UserDefaults.standard.string(forKey: "clueAppearance") == nil {
             UserDefaults.standard.set("classic", forKey: "clueAppearance")
         }
@@ -280,6 +140,73 @@ class ProfileViewModel: ObservableObject {
         }
         if UserDefaults.standard.string(forKey: "speechGender") == nil {
             UserDefaults.standard.set("male", forKey: "speechGender")
+        }
+    }
+    
+    private func fetchDurianData(userSetID: String, completion: @escaping (CustomSetDurian?) -> Void) {
+        let userSetsRef = db.collection("userSets").document(userSetID)
+        let userCategoriesRef = db.collection("userCategories")
+
+        userSetsRef.getDocument { (userSetDoc, error) in
+            if let error = error {
+                print("Error fetching userSet: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+
+            guard let userSetDoc = userSetDoc,
+                  userSetDoc.exists,
+                  let customSetCherry = try? userSetDoc.data(as: CustomSetCherry.self),
+                  let round1CatIDs = userSetDoc["round1CatIDs"] as? [String],
+                  let round2CatIDs = userSetDoc["round2CatIDs"] as? [String]
+            else {
+                completion(nil)
+                return
+            }
+
+            let allCategoryIDs = Array(Set(round1CatIDs + round2CatIDs))
+            var categories: [String: (name: String, clues: [String], responses: [String])] = [:]
+
+            let dispatchGroup = DispatchGroup()
+            
+            for catID in allCategoryIDs {
+                if catID.isEmpty { continue }
+                dispatchGroup.enter()
+                userCategoriesRef.document(catID).getDocument { (categoryDoc, error) in
+                    if let error = error {
+                        print("Error fetching category: \(error.localizedDescription)")
+                    } else if let categoryDoc = categoryDoc,
+                              categoryDoc.exists,
+                              let name = categoryDoc["name"] as? String,
+                              let clues = categoryDoc["clues"] as? [String],
+                              let responses = categoryDoc["responses"] as? [String] {
+                        categories[catID] = (name: name, clues: clues, responses: responses)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                let customSet = CustomSetDurian(customSet: customSetCherry, round1CatIDs: round1CatIDs, round2CatIDs: round2CatIDs, categories: categories)
+                completion(customSet)
+            }
+        }
+    }
+    
+    private func fetchMyTriviaDeckClues() {
+        guard let myUID = FirebaseConfigurator.shared.auth.currentUser?.uid else { return }
+        db.collectionGroup("triviaDeckClues")
+            .whereField("authorID", isEqualTo: myUID)
+            .getDocuments { (snap, error) in
+            if error != nil {
+                print("Error getting triviaDeckClue documents: \(error!.localizedDescription)")
+                return
+            }
+            guard let data = snap?.documents else { return }
+            self.myTriviaDeckClues = data.compactMap({ (queryDocSnap) -> TriviaDeckClue? in
+                let triviaDeckClue = try? queryDocSnap.data(as: TriviaDeckClue.self)
+                return triviaDeckClue
+            }).sorted(by: { $0.submittedDate > $1.submittedDate })
         }
     }
     
@@ -322,60 +249,6 @@ class ProfileViewModel: ObservableObject {
             }
         }
         return initials
-    }
-    
-    func getAuthProvider() -> String {
-        let providerData = FirebaseConfigurator.shared.auth.currentUser?.providerData
-        var provider = ""
-        providerData?.forEach({ userInfo in
-            if userInfo.phoneNumber != nil {
-                provider = "Phone"
-            } else {
-                provider = "Google"
-            }
-        })
-        return provider
-    }
-    
-    func editAccountInfo() {
-        guard let uid = myUID else { return }
-        db.collection("users").document(uid).setData([
-            "name": self.name,
-            "username": self.username.lowercased()
-        ], merge: true)
-        getUserInfo()
-    }
-    
-    func getPhoneNumber() -> String {
-        return FirebaseConfigurator.shared.auth.currentUser?.phoneNumber ?? ""
-    }
-    
-    func updatePhoneNumber(newPhoneNumber: String) {
-        // I assume I may try this in the future but definitely not anytime soon
-    }
-    
-    func accountInformationError(usernameTaken: Bool) -> Bool {
-        return !nameError().isEmpty || !usernameError(usernameTaken: usernameTaken).isEmpty
-    }
-    
-    func usernameError(usernameTaken: Bool) -> String {
-        if usernameTaken {
-            return "That username is already taken"
-        } else if self.username.isEmpty {
-            return "Your username cannot be empty"
-        } else if !self.checkForbiddenChars().isEmpty {
-            return "Your username cannot contain a " + self.checkForbiddenChars()
-        } else {
-            return ""
-        }
-    }
-    
-    func nameError() -> String {
-        if self.name.isEmpty {
-            return "Your name cannot be empty"
-        } else {
-            return ""
-        }
     }
     
     func logOut() {

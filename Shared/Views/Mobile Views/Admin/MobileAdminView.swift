@@ -79,10 +79,10 @@ struct MobileAdminTriviaPackReviewView: View {
     
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
-            Text("\(profileVM.triviaDeckCluesToReview.count) trivia deck clues to review")
-                .padding(.leading)
             if profileVM.triviaDeckCluesToReview.count > 0 {
                 Group {
+                    Text("\(profileVM.triviaDeckCluesToReview.count) trivia deck clues to review")
+                        .padding(.leading)
                     VStack (spacing: 10) {
                         if let triviaDeckClue = profileVM.triviaDeckCluesToReview.first {
                             Text(triviaDeckClue.category)
@@ -168,6 +168,15 @@ struct MobileAdminTriviaPackReviewView: View {
                         .padding(.horizontal)
                     }
                 }
+            } else {
+                Text("No more trivia deck clues to review")
+                    .font(formatter.font(.boldItalic))
+                    .foregroundColor(formatter.color(.mediumContrastWhite))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 200)
+                    .background(formatter.color(.primaryFG))
+                    .cornerRadius(10)
+                    .padding()
             }
         }
     }

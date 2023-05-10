@@ -133,8 +133,6 @@ struct AnalysisView: View {
                         gamesVM.menuChoice = .game
                         if game.episode_played.contains("game_id") {
                             gamesVM.getEpisodeData(gameID: game.episode_played)
-                        } else {
-                            gamesVM.getCustomData(setID: game.episode_played)
                         }
                     }, label: {
                         HStack {

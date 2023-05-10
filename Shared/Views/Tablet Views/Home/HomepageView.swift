@@ -168,7 +168,7 @@ struct HomepageMySetSelectorView: View {
             exploreVM.homepageIsDisplaying = .setPreview
             exploreVM.shortenPublicSetsTo(10, customSet: customSet)
             gamesVM.reset()
-            gamesVM.getCustomData(setID: setID)
+            gamesVM.getCustomData(customSet: customSet)
             participantsVM.resetScores()
         }
     }

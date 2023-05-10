@@ -22,7 +22,7 @@ extension ExploreViewModel {
             filterBy = "rating"
             isDescending = true
         default:
-            filterBy = "plays"
+            filterBy = "numPlays"
             isDescending = true
         }
         if isSortingPublicSets {

@@ -39,29 +39,48 @@ struct MobileTriviaDeckClueView: View {
     
     var body: some View {
         VStack {
-            VStack (spacing: 3) {
-                if currentTriviaDeckClue.clue.isEmpty {
-                    MobileTriviaDeckNoCluesView()
-                } else {
-                    Text("\(exploreVM.currentTriviaDeckClue.category)")
-                        .font(formatter.font(.bold, fontSize: .regular))
-                    Text("\(successRateString)")
-                        .font(formatter.font(.regularItalic, fontSize: .small))
-                    if clueState.hasSolvedClue {
-                        MobileTriviaDeckClueSolvedView(responseString: $responseString, currentClueSecondsElapsed: $currentClueSecondsElapsed)
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .frame(height: 360)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .padding([.top, .horizontal], 10)
+                    .rotationEffect(Angle(degrees: 1))
+                    .shadow(color: .black.opacity(0.3), radius: 10)
+                    .offset(x: 1.5, y: 2.5)
+                RoundedRectangle(cornerRadius: 10)
+                    .frame(height: 360)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(formatter.color(.primaryFG))
+                    .padding([.top, .horizontal], 10)
+                    .rotationEffect(Angle(degrees: -1.5))
+                    .shadow(color: .black.opacity(0.3), radius: 10)
+                    .offset(x: -2, y: 2.5)
+                VStack (spacing: 3) {
+                    if currentTriviaDeckClue.clue.isEmpty {
+                        MobileTriviaDeckNoCluesView()
                     } else {
-                        MobileTriviaDeckClueUnsolvedView()
-                            .onAppear {
-                                startTimer()
-                            }
+                        Text("\(exploreVM.currentTriviaDeckClue.category)")
+                            .font(formatter.font(.bold, fontSize: .regular))
+                        Text("\(successRateString)")
+                            .font(formatter.font(.regularItalic, fontSize: .small))
+                        if clueState.hasSolvedClue {
+                            MobileTriviaDeckClueSolvedView(responseString: $responseString, currentClueSecondsElapsed: $currentClueSecondsElapsed)
+                        } else {
+                            MobileTriviaDeckClueUnsolvedView()
+                                .onAppear {
+                                    startTimer()
+                                }
+                        }
                     }
                 }
+                .padding()
+                .frame(minHeight: 360, maxHeight: .infinity)
+                .background(formatter.color(.primaryFG))
+                .cornerRadius(10)
+                .padding([.top, .horizontal], 10)
+                .shadow(color: .black.opacity(0.3), radius: 10)
             }
-            .padding()
-            .frame(minHeight: 360, maxHeight: .infinity)
-            .background(formatter.color(.primaryFG))
-            .cornerRadius(10)
-            .padding([.top, .horizontal], 10)
             
             HStack (spacing: 5) {
                 MobileTriviaDeckTimerAnimatedPieChart(currentClueSecondsElapsed: $currentClueSecondsElapsed)
@@ -254,8 +273,8 @@ struct MobileTriviaDeckClueTilesView: View {
                                         LinearGradient(gradient: Gradient(colors: [Color(hex: "#C77E24"), Color(hex: "#FFB033")]), startPoint: .bottomLeading, endPoint: .top)
                                     )
                                     .onAppear {
-                                        let delay: Double = !clueState.hasSolvedClue ? 0.0 : 0.2 * Double(i) / Double(responseString.count)
-                                        withAnimation(.easeInOut(duration: 0.4)) {
+                                        let delay: Double = !clueState.hasSolvedClue ? 0.0 : 0.3 * Double(i) / Double(responseString.count)
+                                        withAnimation(.easeInOut(duration: 0.1)) {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                                                 jumpStates[i] = true
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -279,6 +298,7 @@ struct MobileTriviaDeckClueTilesView: View {
                             }
                         }
                         .offset(y: jumpStates[i] ? -20 : 0)
+                        .animation(.easeInOut(duration: 0.2))
                     }
                     .font(formatter.bigCaslonFont(sizeFloat: 24))
                 }

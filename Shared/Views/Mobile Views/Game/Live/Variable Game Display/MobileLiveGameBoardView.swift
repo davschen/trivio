@@ -21,7 +21,7 @@ struct MobileLiveGameBoardView: View {
             // Horizontal arrangement of category names
             HStack (spacing: 3) {
                 ForEach(0..<(liveGameOnRound1 ? gamesVM.liveGameCustomSet.round1Len : gamesVM.liveGameCustomSet.round2Len), id: \.self) { categoryIndex in
-                    let categoryName: String = liveGameOnRound1 ? gamesVM.liveGameCustomSet.round1CategoryNames[categoryIndex] : gamesVM.tidyCustomSet.round2Cats[categoryIndex]
+                    let categoryName: String = liveGameOnRound1 ? gamesVM.liveGameCustomSet.round1CategoryNames[categoryIndex] : gamesVM.liveGameCustomSet.round2CategoryNames[categoryIndex]
                     ZStack {
                         formatter.color(gamesVM.finishedCategories[categoryIndex] ? .primaryFG : .primaryAccent)
                         Text(categoryName.uppercased())

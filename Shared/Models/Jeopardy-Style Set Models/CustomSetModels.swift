@@ -89,7 +89,7 @@ struct CustomSetDurian: Decodable, Hashable, Identifiable, Encodable {
     var roundTwoDaily1: [Int] = []
     var roundTwoDaily2: [Int] = []
     var userID: String = ""
-    var plays: Int = 0
+    var numPlays: Int = 0
     var numLikes: Int = 0
     var numClues: Int = 0
     var round1Len: Int = 0
@@ -119,7 +119,7 @@ struct CustomSetDurian: Decodable, Hashable, Identifiable, Encodable {
         self.roundTwoDaily1 = customSet.roundTwoDaily1
         self.roundTwoDaily2 = customSet.roundTwoDaily2
         self.userID = customSet.userID
-        self.plays = customSet.plays
+        self.numPlays = customSet.plays
         self.numClues = customSet.numClues
         self.round1Len = customSet.round1Len
         self.round2Len = customSet.round2Len

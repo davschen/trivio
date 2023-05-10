@@ -85,7 +85,7 @@ struct MyCustomSetCellView: View {
                 Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                 Circle()
                     .frame(width: 5, height: 5)
-                Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
+                Text("\(customSet.numPlays) play" + "\(customSet.numPlays == 1 ? "" : "s")")
                 Circle()
                     .frame(width: 5, height: 5)
                 Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -99,7 +99,7 @@ struct MyCustomSetCellView: View {
                         setPreviewActive.toggle()
                         formatter.hapticFeedback(style: .light)
                         gamesVM.reset()
-                        gamesVM.getCustomData(setID: setID)
+                        gamesVM.getCustomData(customSet: customSet)
                         participantsVM.resetScores()
                     } label: {
                         ZStack {

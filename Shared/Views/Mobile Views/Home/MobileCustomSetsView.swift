@@ -58,8 +58,9 @@ struct MobileCustomSetCellView: View {
     
     var body: some View {
         ZStack {
-            HStack (alignment: .top, spacing: 8) {
+            HStack (alignment: .top, spacing: 10) {
                 ZStack {
+                    // Initials user symbol
                     Button {
                         exploreVM.pullAllFromUser(withID: customSet.userID)
                         userViewActive.toggle()
@@ -67,7 +68,7 @@ struct MobileCustomSetCellView: View {
                         Text("\(exploreVM.getInitialsFromUserID(userID: customSet.userID))")
                             .font(formatter.font(.boldItalic, fontSize: .small))
                             .frame(width: 40, height: 40)
-                            .background(formatter.color(.secondaryFG))
+                            .background(formatter.gradient(.secondaryFG))
                             .clipShape(Circle())
                     }
 
@@ -92,15 +93,21 @@ struct MobileCustomSetCellView: View {
                                 .lineLimit(1)
                             Spacer(minLength: 0)
                         }
-                        Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
-                            .font(formatter.font(.regular))
+                        HStack {
+                            Text("\(customSet.numLikes) \(customSet.numLikes == 1 ? "like" : "likes")")
+                                .font(formatter.font(.regular))
+                            Circle()
+                                .frame(width: 5, height: 5)
+                            Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
+                                .font(formatter.font(.regular))
+                        }
                         HStack {
                             Text("\(exploreVM.getUsernameFromUserID(userID: customSet.userID))")
                                 .font(formatter.font(.regular))
                                 .lineLimit(1)
                             Circle()
                                 .frame(width: 5, height: 5)
-                            Text("\(customSet.plays) \(customSet.plays == 1 ? "play" : "plays")")
+                            Text("\(customSet.numPlays) \(customSet.numPlays == 1 ? "play" : "plays")")
                             Circle()
                                 .frame(width: 5, height: 5)
                             Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")

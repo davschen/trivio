@@ -11,6 +11,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var formatter: MasterHandler
     @EnvironmentObject var gamesVM: GamesViewModel
+    @EnvironmentObject var profileVM: ProfileViewModel
     
     @State var isShowingMyCustomSetsView = true
     @State var isShowingDraftsView = true
@@ -87,10 +88,10 @@ struct AccountInfoView: View {
                                     .stroke(formatter.color(.highContrastWhite), lineWidth: 2)
                             )
                     VStack (alignment: .leading, spacing: 7) {
-                        Text("\(profileVM.name)")
+                        Text("\(profileVM.myTrivioUser.name)")
                             .font(formatter.font(.bold, fontSize: .mediumLarge))
                             .foregroundColor(formatter.color(.highContrastWhite))
-                        Text("@\(profileVM.username)")
+                        Text("@\(profileVM.myTrivioUser.username)")
                             .font(formatter.font(.regular, fontSize: .medium))
                             .foregroundColor(formatter.color(.highContrastWhite))
                     }

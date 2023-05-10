@@ -35,27 +35,22 @@ class GamesViewModel: ObservableObject {
     @Published var selectedSeason = ""
     @Published var finishedClues2D = [[ClueCompletionStatus]]()
     @Published var finishedCategories = [Bool](repeating: false, count: 6)
-    @Published var usedAnswers = [String]()
     @Published var clueMechanics = ClueMechanics()
     
     @Published var customSets = [CustomSetDurian]()
     @Published var customSet = CustomSetDurian()
     @Published var jeopardySet = JeopardySet()
-    @Published var tidyCustomSet = TidyCustomSet()
     @Published var liveGameCustomSet = LiveGameCustomSet()
     @Published var liveGamePlayers = [LiveGamePlayer]()
     
     @Published var title = ""
     @Published var queriedUserName = ""
-
-    @Published var previewViewShowing = false
     @Published var playedGames = [String]()
     
     public var currentSelectedClue = Clue()
     public var currentCategoryIndex = 0
     public var categoryCompletes = [Int](repeating: 0, count: 6)
-    public var jRoundCompletes = 0
-    public var djRoundCompletes = 0
+    public var completedCustomSetClues = 0
     public var latestJeopardyDoc: DocumentSnapshot? = nil
     public var listener: ListenerRegistration?
     
@@ -72,27 +67,28 @@ class GamesViewModel: ObservableObject {
     
     init() {
         getSeasons()
-        readCustomData()
+        fetchMyCustomSets()
     }
     
     // for starting a new game
     func reset() {
         gamePhase = .round1
-        clues = tidyCustomSet.round1Clues
-        responses = tidyCustomSet.round1Responses
+        clues = MasterHandler().dictToNestedStringArray(dict: customSet.round1Clues)
+        responses = MasterHandler().dictToNestedStringArray(dict: customSet.round1Responses)
         generateFinishedClues2D()
         pointValueArray = round1PointValues
-        categories = tidyCustomSet.round1Cats
+        categories = customSet.round1CategoryNames
         finalTrivioStage = .notBegun
         currentCategoryIndex = 0
     }
     
     func moveOntoRound2() {
         gamePhase = .round2
-        categories = tidyCustomSet.round2Cats
+        categories = customSet.round2CategoryNames
         generateFinishedClues2D()
-        clues = tidyCustomSet.round2Clues
-        responses = tidyCustomSet.round2Responses
+        clues = MasterHandler().dictToNestedStringArray(dict: customSet.round2Clues)
+        responses = MasterHandler().dictToNestedStringArray(dict: customSet.round2Responses)
+        completedCustomSetClues = countNonEmptyClues(cluesDict: customSet.round2Clues)
         pointValueArray = round2PointValues
         currentCategoryIndex = 0
     }
@@ -112,21 +108,17 @@ class GamesViewModel: ObservableObject {
     
     // for clearing your selection
     func clearAll() {
-        usedAnswers.removeAll()
-        tidyCustomSet = TidyCustomSet()
         gamePhase = .round1
         gameSetupMode = .settings
         round1TripleStumpers.removeAll()
         round2TripleStumpers.removeAll()
         customSet = CustomSetDurian()
         clearCategoryDones()
-        jRoundCompletes = 0
-        djRoundCompletes = 0
         queriedUserName.removeAll()
     }
     
     func generateFinishedClues2D() {
-        let cluesNestedArray = gamePhase == .round1 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
+        let cluesNestedArray = MasterHandler().dictToNestedStringArray(dict: gamePhase == .round1 ? customSet.round1Clues : customSet.round2Clues)
         var finishedClues2D = [[ClueCompletionStatus]]()
         cluesNestedArray.forEach { cluesArray in
             finishedClues2D.append(cluesArray.compactMap { $0.isEmpty ? .empty : .incomplete })
@@ -135,9 +127,9 @@ class GamesViewModel: ObservableObject {
         self.finishedClues2D = finishedClues2D
     }
     
-    func generateFinishedCatsAndClues(cluesNestedArray: [[String]]) {
+    func generateFinishedCatsAndClues(cluesNestedDict: [Int: [String]]) {
         var finishedClues2D = [[ClueCompletionStatus]]()
-        cluesNestedArray.forEach { cluesArray in
+        cluesNestedDict.forEach { (key, cluesArray) in
             finishedClues2D.append(cluesArray.compactMap { $0.isEmpty ? .empty : .incomplete })
         }
         self.finishedCategories = [Bool](repeating: false, count: finishedClues2D.count)
@@ -268,7 +260,8 @@ struct ClueMechanics {
         showResponse = false
     }
     
-    mutating func toggleWVCWagerMade() {
+    mutating func makeWVCWager(wager: Double = 0) {
+        wvcWager = wager
         wvcWagerMade.toggle()
     }
     

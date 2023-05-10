@@ -111,10 +111,10 @@ struct MobileAccountSettingsEditView: View {
                                 .frame(height: 35, alignment: .bottom)
                                 .offset(y: -3)
                             Spacer(minLength: 15)
-                            TextField("Username", text: $profileVM.username)
-                                .font(formatter.fontFloat(profileVM.username.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
+                            TextField("Username", text: $profileVM.myTrivioUser.username)
+                                .font(formatter.fontFloat(profileVM.myTrivioUser.username.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
                                 .fixedSize(horizontal: false, vertical: true)
-                                .onChange(of: profileVM.username) { change in
+                                .onChange(of: profileVM.myTrivioUser.username) { change in
                                     profileVM.checkUsernameExists { (success) in
                                         if success {
                                             self.usernameTaken = false
@@ -139,7 +139,7 @@ struct MobileAccountSettingsEditView: View {
                     }
                 }
                 .onReceive(timer) { time in
-                    if !profileVM.username.isEmpty {
+                    if !profileVM.myTrivioUser.username.isEmpty {
                         profileVM.checkUsernameExists { (success) in
                             if success {
                                 self.usernameTaken = false
@@ -159,9 +159,9 @@ struct MobileAccountSettingsEditView: View {
                             .frame(height: 30, alignment: .bottom)
                             .offset(y: -3)
                         Spacer(minLength: 15)
-                        TextField("Name", text: $profileVM.name)
+                        TextField("Name", text: $profileVM.myTrivioUser.name)
                             .fixedSize(horizontal: false, vertical: true)
-                            .font(formatter.fontFloat(profileVM.name.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
+                            .font(formatter.fontFloat(profileVM.myTrivioUser.name.isEmpty ? .boldItalic : .bold, sizeFloat: 26))
                     }
                     .foregroundColor(formatter.color(.highContrastWhite))
                     .accentColor(formatter.color(.secondaryAccent))
@@ -194,7 +194,7 @@ struct MobileAccountSettingsDisplayView: View {
                 VStack (alignment: .leading, spacing: 5) {
                     Text("Username")
                         .font(formatter.font())
-                    Text(profileVM.username)
+                    Text(profileVM.myTrivioUser.username)
                         .font(formatter.font(fontSize: .semiLarge))
                 }
                 .padding(.top, 25)
@@ -202,7 +202,7 @@ struct MobileAccountSettingsDisplayView: View {
                 VStack (alignment: .leading, spacing: 5) {
                     Text("Name")
                         .font(formatter.font())
-                    Text(profileVM.name)
+                    Text(profileVM.myTrivioUser.name)
                         .font(formatter.font(fontSize: .semiLarge))
                 }
                 

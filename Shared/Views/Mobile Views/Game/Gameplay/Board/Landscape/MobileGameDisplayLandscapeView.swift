@@ -50,16 +50,23 @@ struct MobileGameGridLandscapeView: View {
         return gamesVM.customSet.userID.isEmpty
     }
     
+    var numCategories: Int {
+        return gamesVM.gamePhase == .round1 ? gamesVM.customSet.round1CategoryNames.count : gamesVM.customSet.round2CategoryNames.count
+    }
+    
+    func getCategoryName(i: Int) -> String {
+        gamesVM.gamePhase == .round1 ? gamesVM.customSet.round1CategoryNames[i] : gamesVM.customSet.round2CategoryNames[i]
+    }
+    
     var body: some View {
         VStack (spacing: 0) {
             // Horizontal arrangement of category names
             HStack (spacing: 3) {
-                ForEach(0..<(gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats.count : gamesVM.tidyCustomSet.round2Cats.count), id: \.self) { i in
-                    let category: String = gamesVM.gamePhase == .round1 ? gamesVM.tidyCustomSet.round1Cats[i] : gamesVM.tidyCustomSet.round2Cats[i]
-                    
+                ForEach(0..<numCategories, id: \.self) { i in
+                    let categoryName: String = getCategoryName(i: i)
                     ZStack {
                         formatter.color(gamesVM.finishedCategories[i] ? .primaryFG : .primaryAccent)
-                        Text(category.uppercased())
+                        Text(categoryName.uppercased())
                             .font(currentlyPlayingJeopardySet ? formatter.swiss911Font(sizeFloat: 14) : formatter.font(.bold, fontSize: .small))
                             .shadow(color: currentlyPlayingJeopardySet ? .black : .clear, radius: 0, x: 1, y: 2)
                             .foregroundColor(formatter.color(.highContrastWhite))

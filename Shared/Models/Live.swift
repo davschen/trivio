@@ -30,7 +30,7 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
     var hasFinishedDictating: Bool = false
     var currentGameDisplay: String = "board"
     
-    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetDurian, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
+    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, customSet: CustomSetDurian, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
         self.hostUsername = hostUsername
         self.hostName = hostName
         self.userSetID = userSetId
@@ -39,8 +39,8 @@ struct LiveGameCustomSet: Decodable, Hashable, Identifiable, Encodable {
         self.hostHasJoined = hostHasJoined
         self.gameHasBegun = gameHasBegun
         self.numSubmitted = numSubmitted
-        self.round1CategoryNames = tidyCustomSet.round1Cats
-        self.round2CategoryNames = tidyCustomSet.round2Cats
+        self.round1CategoryNames = customSet.round1CategoryNames
+        self.round2CategoryNames = customSet.round2CategoryNames
         self.round1Clues = customSet.round1Clues
         self.round1Responses = customSet.round1Responses
         self.round2Clues = customSet.round2Clues
@@ -102,7 +102,7 @@ extension LiveGameCustomSet {
     }
     
     // Jeopardy game init
-    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, tidyCustomSet: TidyCustomSet, customSet: CustomSetDurian, jeopardySet: JeopardySet, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
+    init(hostUsername: String, hostName: String, userSetId: String, hostCode: String, playerCode: String, customSet: CustomSetDurian, jeopardySet: JeopardySet, hostHasJoined: Bool = false, gameHasBegun: Bool = false, numSubmitted: Int = 0) {
         self.hostUsername = hostUsername
         self.hostName = hostName
         self.userSetID = userSetId
@@ -111,12 +111,12 @@ extension LiveGameCustomSet {
         self.hostHasJoined = hostHasJoined
         self.gameHasBegun = gameHasBegun
         self.numSubmitted = numSubmitted
-        self.round1CategoryNames = tidyCustomSet.round1Cats
-        self.round2CategoryNames = tidyCustomSet.round2Cats
-        self.round1Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Clues)
-        self.round1Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round1Responses)
-        self.round2Clues = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Clues)
-        self.round2Responses = MasterHandler().nestedStringArrayToDict(tidyCustomSet.round2Responses)
+        self.round1CategoryNames = customSet.round1CategoryNames
+        self.round2CategoryNames = customSet.round2CategoryNames
+        self.round1Clues = customSet.round1Clues
+        self.round1Responses = customSet.round1Responses
+        self.round2Clues = customSet.round2Clues
+        self.round2Responses = customSet.round2Responses
         self.title = customSet.title
         self.finalCat = customSet.finalCat
         self.finalClue = customSet.finalClue

@@ -52,9 +52,11 @@ struct MobileTriviaDeckSubmitClueView: View {
                     .padding(.horizontal)
                     if (isTypingResponse && !isNativeKeyboardActive) || !responseStringToSubmit.isEmpty {
                         MobileTriviaDeckResponseTextField(responseStringToSubmit: $responseStringToSubmit, isTypingResponse: $isTypingResponse)
-                            .padding(.top, 20)
+                            .padding(.top, clueStringToSubmit.count > 300 ? 10 : 20)
+                            .padding(.bottom, clueStringToSubmit.count > 300 ? 10 : 0)
                             .frame(maxWidth: .infinity)
                             .onTapGesture(perform: focusResponseTextField)
+                        
                     }
                     Spacer(minLength: 0)
                     MobileTriviaDeckSubmitButtonView(clueStringToSubmit: $clueStringToSubmit, responseStringToSubmit: $responseStringToSubmit, isNativeKeyboardActive: $isNativeKeyboardActive, isTypingResponse: $isTypingResponse, doneWritingTriviaDeckClue: $doneWritingTriviaDeckClue)

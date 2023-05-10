@@ -98,7 +98,7 @@ struct MobileGameplayHeaderView: View {
     }
     
     var cluesInRound: Int {
-        return gamesVM.gamePhase == .round1 ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
+        return gamesVM.countNonEmptyClues()
     }
     
     var body: some View {
@@ -143,7 +143,7 @@ struct MobileGameplayHeaderView: View {
                                 .frame(width: geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryFG))
                             Capsule()
-                                .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
+                                .frame(width: max((CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, 0), height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
                         }
                     }

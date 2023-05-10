@@ -25,8 +25,6 @@ struct GamePickerView: View {
                 GamePickerSearchBarView()
                 if !searchVM.isShowingExpandedView && !searchVM.isShowingSearchView {
                     ClassicGamePickerView()
-                } else if searchVM.isShowingSearchView && !searchVM.isShowingExpandedView {
-                    SearchView()
                 }
             } 
         }
@@ -175,7 +173,6 @@ struct SeasonsListView: View {
                 .onTapGesture {
                     self.gamesVM.getEpisodes(seasonID: seasonID, purge: true)
                     self.gamesVM.clearAll()
-                    self.gamesVM.previewViewShowing = false
                 }
             }
         }
@@ -200,9 +197,7 @@ struct JeopardyGamesView: View {
         if showJeopardyGames {
             GeometryReader { geometry in
                 VStack (alignment: .leading, spacing: 15) {
-                    if gamesVM.previewViewShowing {
-                        GamePreviewView()
-                    }
+                    GamePreviewView()
                     VStack (alignment: .leading, spacing: 0) {
                         ScrollView (.vertical) {
                             VStack {
@@ -259,7 +254,6 @@ struct ShowingJeopardyGamesView: View {
             .cornerRadius(formatter.cornerRadius(5))
             .contentShape(Rectangle())
             .onTapGesture {
-                self.gamesVM.previewViewShowing = true
                 self.participantsVM.resetScores()
             }
             .id(UUID())
@@ -320,7 +314,6 @@ struct NotShowingJeopardyGamesView: View {
             .cornerRadius(formatter.cornerRadius(5))
             .contentShape(Rectangle())
             .onTapGesture {
-                self.gamesVM.previewViewShowing = true
                 self.gamesVM.getEpisodeData(gameID: gamePreviewID)
                 self.participantsVM.resetScores()
             }

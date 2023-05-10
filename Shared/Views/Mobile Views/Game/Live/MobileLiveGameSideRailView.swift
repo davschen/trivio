@@ -119,10 +119,6 @@ struct MobileLiveGameSideRailHeaderView: View {
         }
     }
     
-    var cluesInRound: Int {
-        return gamesVM.liveGameCustomSet.currentRound == "round1" ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
-    }
-    
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
             HStack (spacing: 7) {
@@ -151,7 +147,7 @@ struct MobileLiveGameSideRailHeaderView: View {
                                 .frame(width: geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryFG))
                             Capsule()
-                                .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
+                                .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(3.14159)) * geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
                         }
                     }
@@ -159,7 +155,7 @@ struct MobileLiveGameSideRailHeaderView: View {
                     .frame(height: 10)
                     HStack {
                         // For example, 26/30
-                        Text("\(gamesVM.getNumCompletedClues())/\(cluesInRound) completed")
+                        Text("\(gamesVM.getNumCompletedClues())/\(gamesVM.countNonEmptyClues()) completed")
                             .font(formatter.font(.regularItalic, fontSize: .small))
                         Spacer()
                         Button {

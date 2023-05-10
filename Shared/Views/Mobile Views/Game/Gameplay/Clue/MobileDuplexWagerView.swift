@@ -14,6 +14,7 @@ struct MobileDuplexWagerView: View {
     @EnvironmentObject var participantsVM: ParticipantsViewModel
     
     @State var questionIsSelected = false
+    @State var wvcWager: Double = 0
     
     var isDisplayingLandscapeMode: Bool = false
     
@@ -30,7 +31,7 @@ struct MobileDuplexWagerView: View {
                     Text(gamesVM.currentSelectedClue.categoryString.uppercased())
                         .font(formatter.font(fontSize: .medium))
                     Text("WAGER-VALUED CLUE")
-                        .font(formatter.fontFloat(sizeFloat: 22))
+                        .font(formatter.korinnaFont(sizeFloat: 22))
                         .frame(maxWidth: .infinity)
                 }
                 .padding(25)
@@ -39,15 +40,15 @@ struct MobileDuplexWagerView: View {
                 HStack {
                     Text("\(participantsVM.teams[participantsVM.selectedTeam.index].name), make a wager:")
                     Spacer()
-                    Text("\(Int(gamesVM.clueMechanics.wvcWager))")
+                    Text("\(Int(wvcWager))")
                 }
                 .font(formatter.fontFloat(.regular, sizeFloat: 18))
                 VStack {
-                    Slider(value: $gamesVM.clueMechanics.wvcWager, in: 0...Double(max(maxScore, participantsVM.teams.indices.contains(participantsVM.selectedTeam.index) ? participantsVM.teams[participantsVM.selectedTeam.index].score : 0)), step: 100)
+                    Slider(value: $wvcWager, in: 0...Double(max(maxScore, participantsVM.teams.indices.contains(participantsVM.selectedTeam.index) ? participantsVM.teams[participantsVM.selectedTeam.index].score : 0)), step: 100)
                         .accentColor(formatter.color(.secondaryAccent))
                         .foregroundColor(formatter.color(.mediumContrastWhite))
                 }
-                if (gamesVM.clueMechanics.wvcWager == 0) {
+                if (wvcWager == 0) {
                     ScrollView (showsIndicators: false) {
                         Text("""
                         Select a wager using the slider above. Game show rules apply to wager amounts. The number you choose will either be added or subtracted from your score, depending on if you get it right.
@@ -67,7 +68,7 @@ struct MobileDuplexWagerView: View {
             if !isDisplayingLandscapeMode {
                 Button {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
-                    gamesVM.clueMechanics.toggleWVCWagerMade()
+                    gamesVM.clueMechanics.makeWVCWager(wager: wvcWager)
                     formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
                 } label: {
                     VStack (spacing: 0) {

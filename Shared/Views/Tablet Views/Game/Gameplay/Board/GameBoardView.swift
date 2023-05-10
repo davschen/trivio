@@ -91,7 +91,7 @@ struct GameplayHeaderView: View {
     }
     
     var cluesInRound: Int {
-        return gamesVM.gamePhase == .round1 ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
+        return gamesVM.countNonEmptyClues()
     }
     
     var body: some View {

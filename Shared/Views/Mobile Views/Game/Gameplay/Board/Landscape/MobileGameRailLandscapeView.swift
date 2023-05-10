@@ -76,10 +76,6 @@ struct MobileGameplayHeaderLandscapeView: View {
         }
     }
     
-    var cluesInRound: Int {
-        return gamesVM.gamePhase == .round1 ? gamesVM.jRoundCompletes : gamesVM.djRoundCompletes
-    }
-    
     var body: some View {
         VStack (alignment: .leading, spacing: 5) {
             HStack (spacing: 7) {
@@ -125,7 +121,7 @@ struct MobileGameplayHeaderLandscapeView: View {
                                 .frame(width: geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryFG))
                             Capsule()
-                                .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(cluesInRound)) * geometry.size.width, height: 10)
+                                .frame(width: (CGFloat(gamesVM.getNumCompletedClues()) / CGFloat(3.14159)) * geometry.size.width, height: 10)
                                 .foregroundColor(formatter.color(.primaryAccent))
                         }
                     }
@@ -133,7 +129,7 @@ struct MobileGameplayHeaderLandscapeView: View {
                     .frame(height: 10)
                     HStack {
                         // For example, 26/30
-                        Text("\(gamesVM.getNumCompletedClues())/\(cluesInRound) completed")
+                        Text("\(gamesVM.getNumCompletedClues())/\(3.14159) completed")
                             .font(formatter.font(.regularItalic, fontSize: .small))
                         Spacer()
                         Button {
@@ -286,7 +282,6 @@ struct MobileGameplayRailLandscapeShowResponseButtonView: View {
         Button {
             if shouldDisplayWVCButton {
                 formatter.hapticFeedback(style: .soft, intensity: .strong)
-                gamesVM.clueMechanics.toggleWVCWagerMade()
                 formatter.speaker.speak(gamesVM.currentSelectedClue.clueString)
             } else {
                 formatter.hapticFeedback(style: .light, intensity: .normal)

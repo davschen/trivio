@@ -77,69 +77,65 @@ extension GamesViewModel {
             guard let jeopardySet = try? doc?.data(as: JeopardySet.self) else { return }
             self.customSet.id = gameID
             // there are six categories, should be doing stuff for category
-            for id in jeopardySet.j_category_ids {
-                self.db.collection("categories").document(id).getDocument { (doc, error) in
-                    if error != nil {
-                        print(error!.localizedDescription)
-                        return
-                    }
-                    
-                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
-                    
-                    DispatchQueue.main.async {
-                        if self.tidyCustomSet.round1Clues.isEmpty {
-                            let toAdd = (jeopardySet.j_round_len - self.tidyCustomSet.round1Clues.count)
-                            self.tidyCustomSet.round1Clues = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round1Responses = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round1Cats = [String](repeating: "", count: toAdd)
-                        }
-                        let index = jeopardyCategory.index
-                        let clues = jeopardyCategory.clues
-                        
-                        self.tidyCustomSet.round1Clues[index] = jeopardyCategory.clues
-                        self.tidyCustomSet.round1Responses[index] = jeopardyCategory.responses
-                        self.tidyCustomSet.round1Cats[index] = jeopardyCategory.name
-                        
-                        self.generateFinishedClues2D()
-                        
-                        self.clues = self.tidyCustomSet.round1Clues
-                        self.responses = self.tidyCustomSet.round1Responses
-                        self.categories = self.tidyCustomSet.round1Cats
-                        clues.forEach {
-                            self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
-                        }
-                    }
-                }
-            }
+//            for id in jeopardySet.j_category_ids {
+//                self.db.collection("categories").document(id).getDocument { (doc, error) in
+//                    if error != nil {
+//                        print(error!.localizedDescription)
+//                        return
+//                    }
+//
+//                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
+//
+//                    DispatchQueue.main.async {
+//                        if self.tidyCustomSet.round1Clues.isEmpty {
+//                            let toAdd = (jeopardySet.j_round_len - self.tidyCustomSet.round1Clues.count)
+//                            self.tidyCustomSet.round1Clues = [[String]](repeating: [""], count: toAdd)
+//                            self.tidyCustomSet.round1Responses = [[String]](repeating: [""], count: toAdd)
+//                            self.tidyCustomSet.round1Cats = [String](repeating: "", count: toAdd)
+//                        }
+//                        let index = jeopardyCategory.index
+//                        let clues = jeopardyCategory.clues
+//
+//                        self.tidyCustomSet.round1Clues[index] = jeopardyCategory.clues
+//                        self.tidyCustomSet.round1Responses[index] = jeopardyCategory.responses
+//                        self.tidyCustomSet.round1Cats[index] = jeopardyCategory.name
+//
+//                        self.generateFinishedClues2D()
+//
+//                        self.clues = self.tidyCustomSet.round1Clues
+//                        self.responses = self.tidyCustomSet.round1Responses
+//                        self.categories = self.tidyCustomSet.round1Cats
+//                        clues.forEach {
+//                            self.jRoundCompletes += ($0.isEmpty ? 0 : 1)
+//                        }
+//                    }
+//                }
+//            }
             
-            for id in jeopardySet.dj_category_ids {
-                self.db.collection("categories").document(id).getDocument { (doc, error) in
-                    if error != nil {
-                        print(error!.localizedDescription)
-                        return
-                    }
-                    
-                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
-                    
-                    DispatchQueue.main.async {
-                        if self.tidyCustomSet.round2Clues.isEmpty {
-                            let toAdd = (jeopardySet.dj_round_len - self.tidyCustomSet.round2Clues.count)
-                            self.tidyCustomSet.round2Clues = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round2Responses = [[String]](repeating: [""], count: toAdd)
-                            self.tidyCustomSet.round2Cats = [String](repeating: "", count: toAdd)
-                        }
-                        let index = jeopardyCategory.index
-                        
-                        self.tidyCustomSet.round2Clues[index] = jeopardyCategory.clues
-                        self.tidyCustomSet.round2Responses[index] = jeopardyCategory.responses
-                        self.tidyCustomSet.round2Cats[index] = jeopardyCategory.name
-                        
-                        jeopardyCategory.clues.forEach {
-                            self.djRoundCompletes += ($0.isEmpty ? 0 : 1)
-                        }
-                    }
-                }
-            }
+//            for id in jeopardySet.dj_category_ids {
+//                self.db.collection("categories").document(id).getDocument { (doc, error) in
+//                    if error != nil {
+//                        print(error!.localizedDescription)
+//                        return
+//                    }
+//
+//                    guard let jeopardyCategory = try? doc?.data(as: JeopardyCategory.self) else { return }
+//
+//                    DispatchQueue.main.async {
+//                        if self.tidyCustomSet.round2Clues.isEmpty {
+//                            let toAdd = (jeopardySet.dj_round_len - self.tidyCustomSet.round2Clues.count)
+//                            self.tidyCustomSet.round2Clues = [[String]](repeating: [""], count: toAdd)
+//                            self.tidyCustomSet.round2Responses = [[String]](repeating: [""], count: toAdd)
+//                            self.tidyCustomSet.round2Cats = [String](repeating: "", count: toAdd)
+//                        }
+//                        let index = jeopardyCategory.index
+//
+//                        self.tidyCustomSet.round2Clues[index] = jeopardyCategory.clues
+//                        self.tidyCustomSet.round2Responses[index] = jeopardyCategory.responses
+//                        self.tidyCustomSet.round2Cats[index] = jeopardyCategory.name
+//                    }
+//                }
+//            }
             
             gameDocRef.collection("j_round_triple_stumpers").getDocuments { (snap, error) in
                 if error != nil {

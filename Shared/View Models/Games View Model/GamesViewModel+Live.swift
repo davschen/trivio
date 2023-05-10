@@ -32,7 +32,7 @@ extension GamesViewModel {
         let playerCode = String(randomNumberWith(digits: 6))
         
         guard let customSetID = self.customSet.id else { return }
-        self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: customSetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet)
+        self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: customSetID, hostCode: hostCode, playerCode: playerCode, customSet: self.customSet)
         
         // the document ID is myUID because I don't want one user to be making multiple live games
         do {
@@ -52,7 +52,7 @@ extension GamesViewModel {
             print("Error getting jeopardy set id")
             return
         }
-        self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: jeopardySetID, hostCode: hostCode, playerCode: playerCode, tidyCustomSet: self.tidyCustomSet, customSet: self.customSet, jeopardySet: self.jeopardySet)
+        self.liveGameCustomSet = LiveGameCustomSet(hostUsername: hostUsername, hostName: hostName, userSetId: jeopardySetID, hostCode: hostCode, playerCode: playerCode, customSet: self.customSet, jeopardySet: self.jeopardySet)
         do {
             try self.db.collection("liveGames").document(myUID).setData(from: self.liveGameCustomSet)
         } catch let error {

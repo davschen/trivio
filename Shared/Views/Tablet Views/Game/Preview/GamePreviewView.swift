@@ -223,18 +223,18 @@ struct GameSettingsCategoryPreviewView: View {
         VStack (alignment: .leading, spacing: 3) {
             HStack {
                 Text("Round 1")
-                Text("(\(gamesVM.tidyCustomSet.round1Cats.count) categories)")
+                Text("(\(gamesVM.customSet.round1CategoryNames.count) categories)")
                     .font(formatter.font(.regularItalic, fontSize: .regular))
             }
-            CategoryPreviewView(categories: gamesVM.tidyCustomSet.round1Cats)
+            CategoryPreviewView(categories: gamesVM.customSet.round1CategoryNames)
                 .padding(.bottom, 15)
             if gamesVM.customSet.hasTwoRounds {
                 HStack {
                     Text("Round 2")
-                    Text("(\(gamesVM.tidyCustomSet.round2Cats.count) categories)")
+                    Text("(\(gamesVM.customSet.round2CategoryNames.count) categories)")
                         .font(formatter.font(.regularItalic, fontSize: .regular))
                 }
-                CategoryPreviewView(categories: gamesVM.tidyCustomSet.round2Cats)
+                CategoryPreviewView(categories: gamesVM.customSet.round2CategoryNames)
             }
         }
         .id(UUID().uuidString)

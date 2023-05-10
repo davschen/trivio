@@ -44,9 +44,9 @@ extension GamesViewModel {
     func getCardCategoryName(adjustedCategoryIndex: Int) -> String {
         if adjustedCategoryIndex - customSet.round1Len >= 0 {
             let newCatIndex = adjustedCategoryIndex - customSet.round1Len
-            return tidyCustomSet.round2Cats[newCatIndex]
+            return customSet.round2CategoryNames[newCatIndex]
         }
-        return tidyCustomSet.round1Cats[adjustedCategoryIndex]
+        return customSet.round1CategoryNames[adjustedCategoryIndex]
     }
     
     func getCardIsLearned(categoryIndex: Int, cardIndex: Int) -> Bool {
@@ -70,23 +70,25 @@ extension GamesViewModel {
         var masteredFlashcards2DRound2 = [[FlashcardClue]]()
         
         func generateByRound(roundIndex: Int) {
-            let clues2DArray = roundIndex == 0 ? tidyCustomSet.round1Clues : tidyCustomSet.round2Clues
-            let responses2DArray = roundIndex == 0 ? tidyCustomSet.round1Responses : tidyCustomSet.round2Responses
+            let clues2DArray = roundIndex == 0 ? customSet.round1Clues : customSet.round2Clues
+            let responses2DArray = roundIndex == 0 ? customSet.round1Responses : customSet.round2Responses
             let pointValuesArray = roundIndex == 0 ? round1PointValues : round2PointValues
             let categoryIndexAdjustor = roundIndex == 0 ? 0 : customSet.round1Len
             
-            for categoryIndex in clues2DArray.indices {
-                for clueIndex in clues2DArray[categoryIndex].indices {
-                    let clue = clues2DArray[categoryIndex][clueIndex]
-                    let response = responses2DArray[categoryIndex][clueIndex]
-                    if !clue.isEmpty {
-                        let newFlashcardClue = FlashcardClue(
-                            clueString: clue,
-                            responseString: response,
-                            pointValue: pointValuesArray[clueIndex],
-                            adjustedCategoryIndex: categoryIndex + categoryIndexAdjustor
-                        )
-                        roundIndex == 0 ? masteredFlashcards2DRound1[categoryIndex].append(newFlashcardClue) : masteredFlashcards2DRound2[categoryIndex].append(newFlashcardClue)
+            for categoryIndex in clues2DArray.keys {
+                if let cluesArray = clues2DArray[categoryIndex], let responsesArray = responses2DArray[categoryIndex] {
+                    for clueIndex in cluesArray.indices {
+                        let clue = cluesArray[clueIndex]
+                        let response = responsesArray[clueIndex]
+                        if !clue.isEmpty {
+                            let newFlashcardClue = FlashcardClue(
+                                clueString: clue,
+                                responseString: response,
+                                pointValue: pointValuesArray[clueIndex],
+                                adjustedCategoryIndex: categoryIndex + categoryIndexAdjustor
+                            )
+                            roundIndex == 0 ? masteredFlashcards2DRound1[categoryIndex].append(newFlashcardClue) : masteredFlashcards2DRound2[categoryIndex].append(newFlashcardClue)
+                        }
                     }
                 }
             }

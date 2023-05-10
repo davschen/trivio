@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import StoreKit
 import UniformTypeIdentifiers
+import Combine
 
 struct MobileHomepageView: View {
     @EnvironmentObject var formatter: MasterHandler
@@ -22,42 +23,60 @@ struct MobileHomepageView: View {
     @State private var headerVisible: Bool = true
     @State private var profileViewActive = false
     @State private var jeopardySeasonsViewActive = false
+    @State private var willLoadMore = true
     
     var body: some View {
         NavigationView() {
             ZStack {
                 ZStack {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack (alignment: .leading, spacing: 30) {
-                            VStack (alignment: .leading, spacing: 5) {
-                                HStack (spacing: 3) {
-                                    Text("Trivia Decks")
-                                        .font(formatter.font(.bold, fontSize: .medium))
-                                    Text("NEW")
-                                        .font(formatter.font(.boldItalic, fontSize: .micro))
-                                        .padding(4)
-                                        .padding(.horizontal, 4)
-                                        .background(formatter.color(.primaryAccent))
-                                        .clipShape(Capsule())
-                                }
-                                .padding(.horizontal, 10)
-                                ScrollView (.horizontal, showsIndicators: false) {
-                                    HStack (spacing: 10) {
-                                        MobileDailyChallengePreviewView()
-                                        ForEach(exploreVM.allTriviaDecks, id: \.self) { triviaDeck in
-                                            MobileTriviaDeckPreviewView(triviaDeck: triviaDeck, numFreshClues: 20)
-                                        }
+                    if exploreVM.customSetsBatchIsLoading {
+                        MobileEmptyHomepageView()
+                            .shimmering()
+                    } else {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack (alignment: .leading, spacing: 30) {
+                                VStack (alignment: .leading, spacing: 5) {
+                                    HStack (spacing: 6) {
+                                        Text("Trivia Decks")
+                                            .font(formatter.font(.semiBold, fontSize: .mediumLarge))
+                                            .kerning(-1.5)
+                                        Text("NEW")
+                                            .font(formatter.font(.boldItalic, fontSize: .micro))
+                                            .padding(4)
+                                            .padding(.horizontal, 4)
+                                            .background(formatter.color(.primaryAccent))
+                                            .clipShape(Capsule())
                                     }
-                                    .frame(height: 200)
                                     .padding(.horizontal, 10)
+                                    ScrollView (.horizontal, showsIndicators: false) {
+                                        HStack (spacing: 10) {
+                                            MobileDailyChallengePreviewView()
+                                            ForEach(exploreVM.allTriviaDecks, id: \.self) { triviaDeck in
+                                                MobileTriviaDeckPreviewView(triviaDeck: triviaDeck, numFreshClues: 20)
+                                            }
+                                        }
+                                        .frame(height: 200)
+                                        .padding(.horizontal, 10)
+                                    }
                                 }
+                                MobileHomepageFeedView(headerVisible: $headerVisible)
+                                GeometryReader { geometry in
+                                    Color.clear.preference(key: ScrollViewOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                                }
+                                .frame(height: 1)
                             }
-                            MobileHomepageFeedView(headerVisible: $headerVisible)
+                            .padding(.top, 70)
                         }
-                        .padding(.top, 70)
+                        .padding(.bottom)
+                        .coordinateSpace(name: "scroll")
+                        .onPreferenceChange(ScrollViewOffsetKey.self) { offset in //
+                            // If the offset is less than 1, we're at the bottom of the ScrollView
+                            if offset < 1000 && willLoadMore {
+                                exploreVM.loadAdditionalPublicSets()
+                                willLoadMore = false
+                            }
+                        }
                     }
-                    .padding(.bottom)
-                    .coordinateSpace(name: "scroll")
                     VStack {
                         Spacer()
                         MobileExploreBuildPromptButtonView()
@@ -88,12 +107,94 @@ struct MobileHomepageView: View {
     }
 }
 
+// Responsible for hiding the top bar when a user scrolls down
+// The top bar reveals itself if a user scrolls up.
 struct ViewOffsetKey: PreferenceKey {
     typealias Value = CGFloat
     static var defaultValue: CGFloat = 0
 
     static func reduce(value: inout Value, nextValue: () -> Value) {
         value += nextValue()
+    }
+}
+
+struct ScrollViewOffsetKey: PreferenceKey {
+    typealias Value = CGFloat
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout Value, nextValue: () -> Value) {
+        value += nextValue()
+    }
+}
+
+extension Notification.Name {
+    static let UIScrolledToBottomNotification = Notification.Name("UIScrolledToBottomNotification")
+}
+
+struct MobileEmptyHomepageView: View {
+    @EnvironmentObject var formatter: MasterHandler
+    
+    var body: some View {
+        VStack (alignment: .leading, spacing: 40) {
+            VStack (alignment: .leading) {
+                Rectangle()
+                    .fill(formatter.color(.primaryFG))
+                    .frame(width: 150, height: 25)
+                    .cornerRadius(3)
+                HStack {
+                    Rectangle()
+                        .fill(formatter.color(.primaryFG))
+                        .frame(maxWidth: .infinity, minHeight: 180)
+                        .cornerRadius(3)
+                    Rectangle()
+                        .fill(formatter.color(.primaryFG))
+                        .frame(maxWidth: .infinity, minHeight: 180)
+                        .cornerRadius(3)
+                    Rectangle()
+                        .fill(formatter.color(.primaryFG))
+                        .frame(maxWidth: .infinity, minHeight: 180)
+                        .cornerRadius(3)
+                }
+            }
+            .padding(.horizontal, 10)
+            VStack (alignment: .leading, spacing: 15) {
+                Rectangle()
+                    .fill(formatter.color(.primaryFG))
+                    .frame(maxWidth: .infinity, minHeight: 300)
+                    .cornerRadius(3)
+                VStack (alignment: .leading) {
+                    HStack {
+                        Rectangle()
+                            .fill(formatter.color(.primaryFG))
+                            .frame(width: 40, height: 25)
+                            .cornerRadius(3)
+                        Rectangle()
+                            .fill(formatter.color(.primaryFG))
+                            .frame(width: 40, height: 25)
+                            .cornerRadius(3)
+                    }
+                    HStack {
+                        Circle()
+                            .fill(formatter.color(.primaryFG))
+                            .frame(width: 50, height: 50)
+                        VStack (alignment: .leading, spacing: 5) {
+                            Rectangle()
+                                .fill(formatter.color(.primaryFG))
+                                .frame(maxWidth: .infinity, minHeight: 25)
+                                .cornerRadius(3)
+                            Rectangle()
+                                .fill(formatter.color(.primaryFG))
+                                .frame(maxWidth: .infinity, minHeight: 25)
+                                .cornerRadius(3)
+                            Rectangle()
+                                .fill(formatter.color(.primaryFG))
+                                .frame(maxWidth: .infinity, minHeight: 25)
+                                .cornerRadius(3)
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
+            }
+        }
     }
 }
 
@@ -179,7 +280,7 @@ struct MobileTriviaDeckPreviewView: View {
             .padding(15)
             .frame(width: 160)
             .frame(maxHeight: .infinity)
-            .background(LinearGradient(gradient: Gradient(colors: [Color(hex: "#211F3B"), Color(hex: "#2D2A4D")]), startPoint: .top, endPoint: .bottom))
+            .background(formatter.gradient(.primaryFG))
             .cornerRadius(10)
             .onTapGesture {
                 triviaDeckGameplayViewActive.toggle()
@@ -212,7 +313,7 @@ struct MobileHomepageFeedView: View {
     
     var body: some View {
         VStack (spacing: 40) {
-            ForEach(exploreVM.publicCustomSetsBatch, id: \.self) { customSetDurian in
+            ForEach(exploreVM.publicCustomSetsBatch.sorted(by: { $0.dateCreated > $1.dateCreated }), id: \.self) { customSetDurian in
                 MobileHomepageCustomSetCellView(customSetDurian: customSetDurian)
                     .id(customSetDurian.id)
             }
@@ -257,21 +358,23 @@ struct MobileHomepageCustomSetCellView: View {
                                 Text("for 200")
                                     .font(formatter.font(.bold, fontSize: .small))
                             }
+                            .shadow(color: formatter.color(.primaryBG), radius: 10, x: 0, y: 5)
                             Spacer(minLength: 0)
                             Text("\(clueSample.uppercased())")
                                 .id(clueSample)
-                                .font(formatter.korinnaFont(sizeFloat: 16))
-                                .shadow(color: formatter.color(.primaryBG), radius: 0, x: 1, y: 2)
+                                .font(formatter.korinnaFont(sizeFloat: 20))
+                                .shadow(color: formatter.color(.primaryBG), radius: 0, x: 2, y: 2)
                                 .multilineTextAlignment(.center)
-                                .lineLimit(3)
-                                .padding(25)
+                                .lineLimit(5)
+                                .padding(35)
                             Spacer(minLength: 0)
                         }
+                        // Heart that shows up every time the user double taps
                         Image(systemName: "heart.fill")
-                            .font(.system(size: 70))
+                            .font(.system(size: 90))
                             .opacity(currentLikedHeartOpacity)
                             .scaleEffect(scaleEffectFloat)
-                            .animation(.easeInOut(duration: 0.1))
+                            .animation(.easeInOut(duration: 0.2))
                             .onChange(of: temporaryCustomSetIsLiked) { isLiked in
                                 if !isLiked { return }
                                 scaleEffectFloat = 0.7
@@ -286,23 +389,18 @@ struct MobileHomepageCustomSetCellView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
-                    .frame(minHeight: 200, maxHeight: 250)
-                    .background(currentCategoryIndex == categoryIndex ? formatter.color(.primaryAccent) : formatter.color(.primaryAccent).opacity(0.5))
+                    .frame(minHeight: 280, maxHeight: 300)
+                    .background(formatter.gradient(.primaryAccent))
+                    .opacity(currentCategoryIndex == categoryIndex ? 1 : 0.5)
                     .cornerRadius(5)
                     .scaleEffect(currentCategoryIndex == categoryIndex ? 1 : 0.95)
-                    .onTapGesture(count: 2) {
-                        formatter.hapticFeedback(style: .medium, intensity: .strong)
-                        temporaryCustomSetIsLiked = true
-                    }
-                    .onTapGesture(count: 1) {
-                        setPreviewActive.toggle()
-                        selectSet(customSet: customSetDurian)
-                    }
+                    .tapRecognizer(tapSensitivity: 0.2, singleTapAction: selectSet, doubleTapAction: doubleTapAction)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .frame(minHeight: 200, maxHeight: 250)
+            .frame(minHeight: 280, maxHeight: 300)
             HStack (spacing: 10) {
+                // Like button icon
                 Button {
                     formatter.hapticFeedback(style: .medium, intensity: .strong)
                     temporaryCustomSetIsLiked.toggle()
@@ -312,7 +410,7 @@ struct MobileHomepageCustomSetCellView: View {
                         .scaleEffect(scaleEffectFloat)
                         .animation(.easeInOut(duration: 0.1))
                         .onChange(of: temporaryCustomSetIsLiked) { _ in
-                            scaleEffectFloat = 0.7
+                            scaleEffectFloat = 0.3
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 scaleEffectFloat = 1
                             }
@@ -329,16 +427,21 @@ struct MobileHomepageCustomSetCellView: View {
                 }
             }
             .font(.system(size: 22))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 15)
+            .padding(10)
             MobileCustomSetCellView(customSet: customSetDurian)
         }
     }
     
-    func selectSet(customSet: CustomSetDurian) {
+    func selectSet() {
+        setPreviewActive.toggle()
         formatter.hapticFeedback(style: .light)
-        gamesVM.getCustomSetData(customSet: customSet)
+        gamesVM.getCustomSetData(customSet: customSetDurian)
         participantsVM.resetScores()
+    }
+    
+    func doubleTapAction() {
+        formatter.hapticFeedback(style: .medium, intensity: .strong)
+        temporaryCustomSetIsLiked = true
     }
 }
 
@@ -422,8 +525,8 @@ struct MobileHomepageHeaderView: View {
                     }
                     Spacer()
                     Text("Trivio!")
-                        .kerning(-1)
-                        .font(formatter.font(.extraBold, fontSize: .large))
+                        .kerning(-2)
+                        .font(formatter.fontFloat(.extraBold, sizeFloat: 35))
                     Spacer()
                     Button {
                         formatter.hapticFeedback(style: .heavy, intensity: .weak)
@@ -488,10 +591,10 @@ struct MobileExploreBuildPromptButtonView: View {
                             .font(.system(size: 10, weight: .bold))
                         Text("Build a Set!")
                     }
-                    .shadow(color: Color.black.opacity(0.1), radius: 4)
+                    .shadow(color: Color.init(hex: "643316").opacity(0.5), radius: 10)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(formatter.color(.secondaryAccent))
+                    .background(formatter.gradient(.secondaryAccent))
                     .cornerRadius(10)
                     .padding(.horizontal, 15)
                     .background(formatter.color(.primaryBG)

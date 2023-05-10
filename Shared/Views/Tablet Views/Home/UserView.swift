@@ -91,7 +91,7 @@ struct UserCustomSetCellView: View {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
                         .frame(width: 5, height: 5)
-                    Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
+                    Text("\(customSet.numPlays) play" + "\(customSet.numPlays == 1 ? "" : "s")")
                     Circle()
                         .frame(width: 5, height: 5)
                     Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -101,7 +101,6 @@ struct UserCustomSetCellView: View {
             }
             .padding(.horizontal, 15).padding(.vertical, 20)
             .frame(maxWidth: .infinity, alignment: .leading)
-//            .background(formatter.color(exploreVM.recentlyPlayedSets.contains(customSet) ? .primaryFG : .secondaryFG))
             
             NavigationLink(destination: GamePreviewView()
                 .navigationBarTitle("Set Preview", displayMode: .inline),
@@ -119,7 +118,7 @@ struct UserCustomSetCellView: View {
         formatter.hapticFeedback(style: .light)
         exploreVM.shortenPublicSetsTo(10, customSet: customSet)
         gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomData(customSet: customSet)
         participantsVM.resetScores()
     }
 }
@@ -131,7 +130,7 @@ struct UserDraftCellView: View {
 
     @State var setPreviewActive = false
     
-    var customSet: CustomSetCherry
+    var customSet: CustomSetDurian
     var setID: String {
         return customSet.id ?? "NID"
     }
@@ -159,7 +158,7 @@ struct UserDraftCellView: View {
                     Text("\(customSet.hasTwoRounds ? "2 rounds" : "1 round"), \(customSet.numClues) clues")
                     Circle()
                         .frame(width: 5, height: 5)
-                    Text("\(customSet.plays) play" + "\(customSet.plays == 1 ? "" : "s")")
+                    Text("\(customSet.numPlays) play" + "\(customSet.numPlays == 1 ? "" : "s")")
                     Circle()
                         .frame(width: 5, height: 5)
                     Text("\(gamesVM.dateFormatter.string(from: customSet.dateCreated))")
@@ -183,10 +182,10 @@ struct UserDraftCellView: View {
         }
     }
     
-    func selectSet(customSet: CustomSetCherry) {
+    func selectSet(customSet: CustomSetDurian) {
         formatter.hapticFeedback(style: .light)
         gamesVM.reset()
-        gamesVM.getCustomData(setID: setID)
+        gamesVM.getCustomData(customSet: customSet)
         participantsVM.resetScores()
     }
 }

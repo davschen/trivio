@@ -41,7 +41,7 @@ struct MobileBuildFooterView: View {
                     formatter.hapticFeedback(style: .soft, intensity: .strong)
                     if buildVM.buildStage == .finalTrivio {
                         presentationMode.wrappedValue.dismiss()
-                        gamesVM.readCustomData()
+                        gamesVM.fetchMyCustomSets()
                     }
                     buildVM.nextButtonHandler()
                 }

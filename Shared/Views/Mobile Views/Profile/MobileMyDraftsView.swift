@@ -21,12 +21,12 @@ struct MobileMyDraftsView: View {
             VStack (spacing: 3) {
                 ForEach(profileVM.drafts, id: \.self) { draft in
                     Text("PLACEHOLDER")
-//                    MobileDraftCellView(expandedSetID: $expandedSetID, draft: draft)
-//                        .animation(.easeInOut(duration: 0.2))
-//                        .onAppear {
-//                            guard let firstSetID = profileVM.drafts.first?.id else { return }
-//                            expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
-//                        }
+                    MobileDraftCellView(expandedSetID: $expandedSetID, draft: draft)
+                        .animation(.easeInOut(duration: 0.2))
+                        .onAppear {
+                            guard let firstSetID = profileVM.drafts.first?.id else { return }
+                            expandedSetID = expandedSetID.isEmpty ? firstSetID : expandedSetID
+                        }
                 }
             }
         } else {
